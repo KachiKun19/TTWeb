@@ -1,0 +1,502 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Montserrat", Arial, sans-serif;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+.top-bar {
+  background-color: #000;
+  color: #ccc;
+  padding: 10px 0;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.bar-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.bar-list li a {
+  white-space: nowrap; /* QUAN TRỌNG: Ngăn chữ bị xuống dòng */
+}
+
+/* Thêm dấu chấm vào TRƯỚC mỗi mục, trừ mục đầu tiên */
+.bar-list li:not(:first-child)::before {
+  content: "•";
+  color: #ccc;
+  font-weight: 700;
+  /* Đây là nơi bạn điều chỉnh khoảng cách của dấu chấm */
+  margin-left: 35px; /* Khoảng cách bên trái dấu chấm */
+  margin-right: 35px; /* Khoảng cách bên phải dấu chấm */
+}
+
+/* --- Wrapper chung --- */
+.header-banner-wrapper {
+  position: relative;
+  width: 100%;
+  height: 90vh; /* Chiều cao banner */
+  min-height: 600px;
+}
+
+/* --- Header / Menubar chính --- */
+.main-header {
+  padding: 20px 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  /* Không cần background vì banner đã có lớp phủ */
+}
+
+.main-header .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 70px;
+}
+
+.logo-img {
+  height: 25px; /* Điều chỉnh kích thước logo */
+  filter: brightness(0) invert(1); /* Chuyển logo thành màu trắng */
+}
+
+.nav-list {
+  display: flex;
+  gap: 45px;
+}
+
+.nav-list a {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-list a i {
+  font-size: 10px;
+}
+
+.nav-list a:hover {
+  color: #f82c97; /* Màu hồng nhấn */
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+.icon-link {
+  font-size: 18px;
+  position: relative;
+}
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background-color: #f82c97;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* --- Banner Section --- */
+.banner-section {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.banner-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  /*transform: scale(1.1);  Hiệu ứng zoom nhẹ */
+  transition: background-image 1s ease-in-out;
+}
+
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(26, 0, 36, 0.9) 0%,
+    rgba(85, 9, 121, 0.5) 50%,
+    rgba(255, 0, 229, 0.1) 100%
+  );
+  z-index: 2;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 3;
+  padding: 0 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.banner-subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #eee;
+  margin-bottom: 10px;
+}
+
+.banner-title {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 30px;
+  color: #fff;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.banner-button {
+  display: inline-block;
+  background-color: #fff;
+  color: #000;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.banner-button:hover {
+  background-color: #f82c97;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(248, 44, 151, 0.4);
+}
+
+/* --- Slider Navigation Dots --- */
+/* --- Slider Navigation Dots --- */
+.slider-nav {
+  position: absolute;
+  bottom: 30px;
+  right: 50px;
+  z-index: 10; /* Đảm bảo nó nằm trên ảnh và lớp phủ */
+  display: flex;
+  gap: 12px;
+}
+
+.dot {
+  /* Reset lại style của button */
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+
+  /* Style hình tròn */
+  width: 30px; /* Làm cho hình tròn to hơn */
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #fff; /* Viền trắng */
+
+  /* Style cho số bên trong */
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Montserrat", sans-serif;
+
+  /* Hiệu ứng chuyển động */
+  transition: all 0.3s ease-in-out;
+}
+
+.dot:hover {
+  background-color: rgba(255, 255, 255, 0.3); /* Hiệu ứng khi di chuột */
+}
+
+.dot.active {
+  background-color: #fff; /* Trạng thái active: nền trắng */
+  color: #000; /* Trạng thái active: chữ đen */
+}
+
+/* --- CSS CHO LỚP PHỦ TÌM KIẾM --- */
+.search-overlay {
+  position: fixed; /* Nằm cố định trên cùng */
+  top: 0;
+  right: 0;
+  width: 500px; /* Chiều rộng của panel */
+  max-width: 100%; /* Đảm bảo không vượt quá màn hình nhỏ */
+
+  /* --- THAY ĐỔI CHIỀU CAO VÀ BO GÓC --- */
+  height: 600px; /* Chiều cao cố định, có thể chỉnh để vừa ảnh nền của bạn */
+  max-height: 90vh; /* Tối đa 90% chiều cao màn hình để không bị quá dài */
+  border-bottom-left-radius: 20px; /* Bo góc dưới bên trái */
+  border-top-left-radius: 20px; /* Bo góc trên bên trái */
+  /* --- KẾT THÚC THAY ĐỔI --- */
+
+  background-color: #ffffff;
+  z-index: 2000; /* Nằm trên mọi thứ khác */
+
+  transform: translateX(100%);
+  transition: transform 0.4s ease-in-out;
+
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Các phần còn lại giữ nguyên */
+.search-overlay.active {
+  transform: translateX(0);
+}
+
+.search-overlay-content {
+  padding: 40px;
+}
+
+.search-overlay-close {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  background: none;
+  border: none;
+  font-size: 3rem;
+  color: #888;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.search-overlay-input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  font-size: 1.5rem;
+  padding: 10px 0;
+  color: #000;
+  font-family: "Montserrat", sans-serif;
+}
+
+.search-overlay-input:focus {
+  outline: none;
+  border-bottom-color: #000;
+}
+
+.cart-overlay {
+  position: fixed; /* Nằm cố định trên cùng */
+  top: 0;
+  right: 0;
+  width: 500px; /* Chiều rộng của panel */
+  max-width: 100%;
+
+  /* Giữ nguyên style chiều cao và bo góc như panel tìm kiếm */
+  height: 600px;
+  max-height: 90vh;
+  border-bottom-left-radius: 20px;
+  border-top-left-radius: 20px;
+
+  background-color: #ffffff;
+  color: #000; /* Đảm bảo chữ màu đen trên nền trắng */
+  z-index: 2000;
+
+  /* Ẩn đi bằng cách đẩy nó ra khỏi màn hình */
+  transform: translateX(100%);
+  transition: transform 0.4s ease-in-out;
+
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Trạng thái "active" khi được mở */
+.cart-overlay.active {
+  transform: translateX(0); /* Đẩy nó vào màn hình */
+}
+
+.cart-overlay-content {
+  padding: 40px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Nút X để đóng (style riêng cho giỏ hàng) */
+.cart-overlay-close {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  background: none;
+  border: none;
+  font-size: 3rem;
+  color: #888;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Tiêu đề "Giỏ hàng của bạn" */
+.cart-overlay-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.cart-items-container {
+  flex-grow: 1; /* Tự động co giãn để lấp đầy */
+  overflow-y: auto; /* Thêm thanh cuộn nếu có nhiều sản phẩm */
+}
+
+/* Tin nhắn giỏ hàng trống */
+.cart-empty-message {
+  font-size: 1rem;
+  color: #555;
+  text-align: center;
+  padding: 60px 0;
+}
+
+/* sản phẩm */
+.main-content {
+  background-color: #ffffff; /* Nền trắng */
+  color: #000000; /* Chữ đen */
+  padding: 60px 0; /* Khoảng cách trên/dưới */
+}
+
+.category-grid {
+  display: flex;
+  justify-content: space-around; /* Căn đều các mục */
+  align-items: flex-start;
+  flex-wrap: wrap; /* Tự động xuống hàng trên màn hình nhỏ */
+  gap: 20px; /* Khoảng cách giữa các mục */
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column; /* Xếp icon trên, chữ dưới */
+  align-items: center; /* Căn giữa theo chiều ngang */
+  text-decoration: none;
+  width: 180px; /* Chiều rộng cho mỗi mục */
+}
+
+/* Style cho Icon (Style tối giản, không viền) */
+.category-item i {
+  font-size: 3.5rem; /* Giảm kích thước icon một chút */
+  color: #001f3f; /* Màu xanh navy đậm, giống trong ảnh */
+  margin-bottom: 20px; /* Khoảng cách giữa icon và chữ */
+  transition: all 0.3s ease;
+
+  /* Thêm phần màu xanh cho ghế */
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style cho Chữ */
+.category-item span {
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.4;
+  color: #000; /* Đảm bảo chữ màu đen */
+}
+
+/* Hiệu ứng khi di chuột (đơn giản) */
+.category-item:hover {
+  color: #f82c97; /* Đổi màu chữ sang màu hồng nhấn */
+}
+
+.category-item:hover i {
+  color: #f82c97; /* Đổi màu icon */
+  transform: scale(1.1); /* Phóng to icon một chút */
+}
+
+.nav-list [data-dropdown-toggle] {
+  /* Ghi đè lại style cũ của .nav-list a để căn chỉnh icon */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-popper-placement] {
+  z-index: 101 !important;
+}
+
+.nav-list > li > a {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-list > li > a:hover {
+  color: #f82c97;
+}
+
+/* Phần cho lọc */
+.filter-content {
+  /* 1. Ẩn nội dung bằng cách co chiều cao về 0 */
+  max-height: 0;
+  overflow: hidden;
+
+  /* 2. Đặt hiệu ứng trượt cho max-height */
+  transition: max-height 0.25s ease-out;
+}
+
+.filter-content.active {
+  /* 3. Khi "active", bung chiều cao ra */
+  max-height: 500px; /* (Đặt một số đủ lớn) */
+  transition: max-height 0.25s ease-in;
+}
+
+/* 4. Đây là phần nội dung bên trong (cái list) */
+.filter-content .inner-list {
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+}
+
+/* 5. PHÉP THUẬT NẰM Ở ĐÂY (transition-delay) */
+.filter-content.active .inner-list {
+  opacity: 1;
+  /* 6. Chờ 0.3 giây (sau khi trượt gần xong) mới mờ hiện ra */
+  transition-delay: 0.1s;
+}
