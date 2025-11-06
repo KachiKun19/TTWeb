@@ -22,3 +22,4 @@ public class ThuongHieu {
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
 }
+l,kmol
