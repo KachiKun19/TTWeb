@@ -39,7 +39,7 @@ public class HomeServlet extends HttpServlet {
             request.setAttribute("featuredProducts", featuredProducts);
             request.setAttribute("categories", categories);
             
-            // Chuyển hướng đến trang home.jsp
+            // Chuyển hướng đến trang home.jsp   hhhhjhjyh
             request.getRequestDispatcher("/Home.jsp").forward(request, response);
             
         } catch (Exception e) {
