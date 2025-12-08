@@ -12,10 +12,10 @@ public class ProductDAO {
     
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.*, c.categoryName, b.brandName, b.logoUrl " +
-                    "FROM Products p " +
-                    "JOIN Categories c ON p.categoryId = c.categoryId " +
-                    "JOIN Brands b ON p.brandId = b.brandId";
+        String sql = "SELECT p.*, c.categoryName, b.brandName " +
+                    "FROM Product p " +
+                    "JOIN Category c ON p.categoryId = c.categoryId " +
+                    "JOIN Brand b ON p.brandId = b.brandId";
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -33,10 +33,10 @@ public class ProductDAO {
     
     public List<Product> getProductsByCategory(int categoryId) {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.*, c.categoryName, b.brandName, b.logoUrl " +
-                    "FROM Products p " +
-                    "JOIN Categories c ON p.categoryId = c.categoryId " +
-                    "JOIN Brands b ON p.brandId = b.brandId " +
+        String sql = "SELECT p.*, c.categoryName, b.brandName " +
+                    "FROM Product p " +
+                    "JOIN Category c ON p.categoryId = c.categoryId " +
+                    "JOIN Brand b ON p.brandId = b.brandId " +
                     "WHERE p.categoryId = ?";
         
         try (Connection conn = DBUtil.getConnection();
@@ -57,10 +57,10 @@ public class ProductDAO {
     
     public List<Product> getFeaturedProducts() {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT TOP 8 p.*, c.categoryName, b.brandName, b.logoUrl " +
-                    "FROM Products p " +
-                    "JOIN Categories c ON p.categoryId = c.categoryId " +
-                    "JOIN Brands b ON p.brandId = b.brandId " +
+        String sql = "SELECT TOP 8 p.*, c.categoryName, b.brandName " +
+                    "FROM Product p " +
+                    "JOIN Category c ON p.categoryId = c.categoryId " +
+                    "JOIN Brand b ON p.brandId = b.brandId " +
                     "ORDER BY p.productId DESC";
         
         try (Connection conn = DBUtil.getConnection();
@@ -79,10 +79,10 @@ public class ProductDAO {
     
     public Product getProductById(int productId) {
         Product product = null;
-        String sql = "SELECT p.*, c.categoryName, b.brandName, b.logoUrl " +
-                    "FROM Products p " +
-                    "JOIN Categories c ON p.categoryId = c.categoryId " +
-                    "JOIN Brands b ON p.brandId = b.brandId " +
+        String sql = "SELECT p.*, c.categoryName, b.brandName " +
+                    "FROM Product p " +
+                    "JOIN Category c ON p.categoryId = c.categoryId " +
+                    "JOIN Brand b ON p.brandId = b.brandId " +
                     "WHERE p.productId = ?";
         
         try (Connection conn = DBUtil.getConnection();
@@ -104,7 +104,6 @@ public class ProductDAO {
         Product product = new Product();
         product.setProductId(rs.getInt("productId"));
         product.setName(rs.getString("name"));
-        product.setDescription(rs.getString("description"));
         product.setPrice(rs.getDouble("price"));
         product.setImageUrl(rs.getString("imageUrl"));
         product.setStock(rs.getInt("stock"));
@@ -117,18 +116,17 @@ public class ProductDAO {
         Brand brand = new Brand();
         brand.setBrandId(rs.getInt("brandId"));
         brand.setBrandName(rs.getString("brandName"));
-        brand.setLogoUrl(rs.getString("logoUrl"));
         product.setBrand(brand);
         
         return product;
     }
     public List<Product> searchProducts(String keyword) {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.*, c.categoryName, b.brandName, b.logoUrl " +
-                    "FROM Products p " +
-                    "JOIN Categories c ON p.categoryId = c.categoryId " +
-                    "JOIN Brands b ON p.brandId = b.brandId " +
-                    "WHERE p.name LIKE ? OR p.description LIKE ? OR b.brandName LIKE ?";
+        String sql = "SELECT p.*, c.categoryName, b.brandName,  " +
+                    "FROM Product p " +
+                    "JOIN Category c ON p.categoryId = c.categoryId " +
+                    "JOIN Brand b ON p.brandId = b.brandId " +
+                    "WHERE p.name LIKE ? OR b.brandName LIKE ?";
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -152,10 +150,10 @@ public class ProductDAO {
     
     public List<Product> getProductsByBrand(int brandId) {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.*, c.categoryName, b.brandName, b.logoUrl " +
-                    "FROM Products p " +
-                    "JOIN Categories c ON p.categoryId = c.categoryId " +
-                    "JOIN Brands b ON p.brandId = b.brandId " +
+        String sql = "SELECT p.*, c.categoryName, b.brandName " +
+                    "FROM Product p " +
+                    "JOIN Category c ON p.categoryId = c.categoryId " +
+                    "JOIN Brand b ON p.brandId = b.brandId " +
                     "WHERE p.brandId = ?";
         
         try (Connection conn = DBUtil.getConnection();
@@ -175,7 +173,7 @@ public class ProductDAO {
     }
     
     public boolean updateProductStock(int productId, int quantity) {
-        String sql = "UPDATE Products SET stock = stock - ? WHERE productId = ? AND stock >= ?";
+        String sql = "UPDATE Product SET stock = stock - ? WHERE productId = ? AND stock >= ?";
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

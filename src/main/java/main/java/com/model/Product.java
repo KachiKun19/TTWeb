@@ -3,7 +3,6 @@ package main.java.com.model;
 public class Product {
     private int productId;
     private String name;
-    private String description;
     private double price;
     private String imageUrl;
     private int stock; // số lượng tồn
@@ -11,11 +10,10 @@ public class Product {
     private Brand brand;
 
     public Product() {}
-    public Product(int productId, String name, String description, double price, 
+    public Product(int productId, String name, double price, 
                    String imageUrl, int stock, Category category, Brand brand) {
         this.productId = productId;
         this.name = name;
-        this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
         this.stock = stock;
@@ -34,12 +32,7 @@ public class Product {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
+
 	public double getPrice() {
 		return price;
 	}

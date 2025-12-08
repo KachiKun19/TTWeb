@@ -10,7 +10,7 @@ public class CategoryDAO {
     
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT * FROM Categories";
+        String sql = "SELECT * FROM Category";
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -30,7 +30,7 @@ public class CategoryDAO {
     
     public Category getCategoryById(int categoryId) {
         Category category = null;
-        String sql = "SELECT * FROM Categories WHERE categoryId = ?";
+        String sql = "SELECT * FROM Category WHERE categoryId = ?";
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

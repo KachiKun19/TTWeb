@@ -10,7 +10,7 @@ public class BrandDAO {
     
     public List<Brand> getAllBrands() {
         List<Brand> brands = new ArrayList<>();
-        String sql = "SELECT * FROM Brands";
+        String sql = "SELECT * FROM Brand";
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -20,7 +20,6 @@ public class BrandDAO {
                 Brand brand = new Brand();
                 brand.setBrandId(rs.getInt("brandId"));
                 brand.setBrandName(rs.getString("brandName"));
-                brand.setLogoUrl(rs.getString("logoUrl"));
                 brands.add(brand);
             }
         } catch (SQLException e) {
@@ -31,7 +30,7 @@ public class BrandDAO {
     
     public Brand getBrandById(int brandId) {
         Brand brand = null;
-        String sql = "SELECT * FROM Brands WHERE brandId = ?";
+        String sql = "SELECT * FROM Brand WHERE brandId = ?";
         
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -43,7 +42,6 @@ public class BrandDAO {
                 brand = new Brand();
                 brand.setBrandId(rs.getInt("brandId"));
                 brand.setBrandName(rs.getString("brandName"));
-                brand.setLogoUrl(rs.getString("logoUrl"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
