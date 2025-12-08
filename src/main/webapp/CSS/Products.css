@@ -1,0 +1,443 @@
+/* Product image fixes - SỬA LẠI */
+.product-image-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 75%; /* Tỷ lệ 4:3 */
+    background-color: #f5f5f5;
+    overflow: hidden;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    opacity: 0;
+}
+
+.product-image.loaded {
+    opacity: 1;
+}
+
+.product-image-container:hover .product-image {
+    transform: scale(1.05);
+}
+
+/* Skeleton loading effect */
+.skeleton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    z-index: 1;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Different aspect ratios */
+.aspect-ratio-1-1 {
+    padding-bottom: 100%; /* 1:1 */
+}
+
+.aspect-ratio-4-3 {
+    padding-bottom: 75%; /* 4:3 */
+}
+
+.aspect-ratio-16-9 {
+    padding-bottom: 56.25%; /* 16:9 */
+}
+
+/* Styles for product page - SỬA PHẦN NÀY */
+.products-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 16px;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 24px;
+    color: #1f2937;
+}
+
+.products-container {
+    display: flex;
+    gap: 32px;
+}
+
+/* Filter sidebar styles */
+.filter-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.filter-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.filter-header {
+    padding: 16px;
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+    color: #374151;
+}
+
+.filter-content {
+    padding: 16px;
+}
+
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group-title {
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #374151;
+    font-size: 14px;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.filter-option input[type="checkbox"] {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+}
+
+.filter-option label {
+    font-size: 14px;
+    color: #4b5563;
+    cursor: pointer;
+}
+
+.price-range {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.price-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #000000;
+    color: white;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.filter-button:hover {
+    background-color: #374151;
+}
+
+.reset-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #f3f4f6;
+    color: #374151;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 8px;
+    transition: background-color 0.2s;
+}
+
+.reset-button:hover {
+    background-color: #e5e7eb;
+}
+
+/* Products grid styles - SỬA QUAN TRỌNG */
+.products-main {
+    flex-grow: 1;
+}
+
+.products-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.products-count {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.sort-select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    color: #374151;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 640px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .products-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.product-card {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%; /* Thêm vào để đồng đều chiều cao */
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+}
+
+/* XÓA HOÀN TOÀN phần .product-image cũ trong này */
+
+.product-info {
+    padding: 16px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-brand {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.product-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    min-height: 40px; /* Thay height bằng min-height */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    flex-grow: 1; /* Giúp canh đều chiều cao */
+}
+
+.product-price {
+    font-weight: bold;
+    color: #000000;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.product-stock {
+    font-size: 12px;
+    color: #10b981;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.product-stock.out-of-stock {
+    color: #ef4444;
+}
+
+.product-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto; /* Đẩy xuống dưới cùng */
+}
+
+.add-to-cart-btn {
+    flex-grow: 1;
+    padding: 8px 16px;
+    background-color: #000000;
+    color: white;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #374151;
+}
+
+.view-detail-btn {
+    padding: 8px 12px;
+    background-color: #f3f4f6;
+    color: #374151;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.view-detail-btn:hover {
+    background-color: #e5e7eb;
+}
+
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 40px;
+}
+
+.pagination-link {
+    padding: 8px 12px;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #374151;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.pagination-link:hover {
+    background-color: #f3f4f6;
+}
+
+.pagination-link.active {
+    background-color: #000000;
+    color: white;
+    border-color: #000000;
+}
+
+.pagination-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.no-products {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 16px;
+    color: #6b7280;
+}
+
+.no-products-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.no-products-text {
+    font-size: 14px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .products-container {
+        flex-direction: column;
+    }
+    
+    .filter-sidebar {
+        width: 100%;
+    }
+    
+    .products-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .products-grid {
+        gap: 16px;
+    }
+    
+    .product-name {
+        min-height: 36px;
+        font-size: 13px;
+    }
+    
+    .product-price {
+        font-size: 16px;
+    }
+    
+    .product-actions {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .add-to-cart-btn,
+    .view-detail-btn {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+    }
+}
+
+/* Responsive product images */
+@media (max-width: 640px) {
+    .product-image-container {
+        padding-bottom: 66.67%; /* 3:2 cho mobile */
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
