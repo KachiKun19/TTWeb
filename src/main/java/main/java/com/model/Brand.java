@@ -1,32 +1,41 @@
 package main.java.com.model;
 
 public class Brand {
-    private int brandId;
-    private String brandName;
-    private String logoUrl;
+	private int id;
+	private String name;
+	private String logo; 
 
-    public Brand() {}
-    public Brand(int brandId, String brandName, String logoUrl) {
-        this.brandId = brandId;
-        this.brandName = brandName;
-        this.logoUrl = logoUrl;
-    }
-	public int getBrandId() {
-		return brandId;
+	public Brand() {
 	}
-	public void setBrandId(int brandId) {
-		this.brandId = brandId;
+
+	public Brand(int id, String name, String logo) {
+		this.id = id;
+		this.name = name;
+		this.logo = logo;
 	}
-	public String getBrandName() {
-		return brandName;
+
+	public int getId() {
+		return id;
 	}
-	public void setBrandName(String brandName) {
-		this.brandName = brandName;
+
+	public void setId(int id) {
+		this.id = id;
 	}
-	public String getLogoUrl() {
-		return logoUrl;
+
+	public String getName() {
+		return name;
 	}
-	public void setLogoUrl(String logoUrl) {
-		this.logoUrl = logoUrl;
+
+	public void setName(String name) {
+		this.name = name;
 	}
+
+	public String getLogo() {
+		return logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
+	}
+
 }
