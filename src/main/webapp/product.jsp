@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -17,7 +17,7 @@
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css"
       rel="stylesheet"
-    />
+    />6
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -108,7 +108,7 @@
               <h1 class="text-3xl font-bold">
                  <c:choose>
                     <c:when test="${not empty currentCategory}">
-                        ${currentCategory.categoryName}
+                        ${currentCategory}
                     </c:when>
                     <c:otherwise>Tất cả sản phẩm</c:otherwise>
                  </c:choose>
@@ -137,8 +137,8 @@
                     <div class="inner-list py-5 border-b border-gray-200 space-y-4">
                       <c:forEach var="brand" items="${brands}">
                           <div class="flex items-center">
-                            <input id="filter-brand-${brand.brandId}" type="checkbox" value="${brand.brandId}" class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" />
-                            <label for="filter-brand-${brand.brandId}" class="ml-3 text-sm font-medium text-gray-700">${brand.brandName}</label>
+                            <input id="filter-brand-${brand.id}" type="checkbox" value="${brand.id}" class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" />
+                            <label for="filter-brand-${brand.id}" class="ml-3 text-sm font-medium text-gray-700">${brand.name}</label>
                           </div>
                       </c:forEach>
                       <c:if test="${empty brands}">
@@ -228,13 +228,13 @@
                     <c:when test="${not empty products}">
                       <c:forEach var="p" items="${products}">
                         <div class="product-card border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group product-item"
-                             data-brand="${p.brand.brandId}"
+                             data-brand="${p.brand != null ? p.brand.id : '0'}"
                              data-price="${p.price}"
                              data-stock="${p.stock > 0 ? 'inStock' : 'outOfStock'}">
                           
-                          <a href="product-detail?id=${p.productId}" class="relative block">
+                          <a href="product-detail?id=${p.id}" class="relative block">
                             <img
-                              src="${not empty p.imageUrl ? p.imageUrl : 'https://via.placeholder.com/300x300'}"
+                              src="${not empty p.image ? p.image : 'https://via.placeholder.com/300x300'}"
                               alt="${p.name}"
                               class="w-full h-56 object-contain p-4"
                             />
@@ -247,7 +247,7 @@
                                 <c:choose>
                                     <c:when test="${p.stock > 0}">
                                       <button class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 add-to-cart"
-                                              data-id="${p.productId}">
+                                              data-id="${p.id}">
                                         + Chọn nhanh
                                       </button>
                                     </c:when>
@@ -262,7 +262,7 @@
 
                           <div class="p-4">
                             <h3 class="font-semibold text-base h-16 overflow-hidden line-clamp-2">
-                              <a href="product-detail?id=${p.productId}" class="hover:text-blue-600">
+                              <a href="product-detail?id=${p.id}" class="hover:text-blue-600">
                                 ${p.name}
                               </a>
                             </h3>

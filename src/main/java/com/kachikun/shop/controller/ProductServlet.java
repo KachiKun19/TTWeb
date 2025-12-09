@@ -41,7 +41,7 @@ public class ProductServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// lấy tham số từ category(mouse, keyboard)
+		// lấy tham số từ category(chuột, bàn phím cơ)
 		String cateId = request.getParameter("category");
 		
 		List<Product> listProduct = new ArrayList<>();
