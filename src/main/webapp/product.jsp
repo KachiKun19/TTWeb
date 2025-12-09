@@ -17,7 +17,7 @@
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css"
       rel="stylesheet"
-    />6
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
