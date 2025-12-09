@@ -1,4 +1,4 @@
-package main.java.com.model;
+package com.kachikun.shop.model;
 
 public class Category {
     private int id;
