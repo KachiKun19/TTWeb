@@ -1,4 +1,29 @@
-const backgroundElement = document.getElementById("banner-background");
+// tìm kiếm sản phẩm
+function searchByName(param) {
+        var txtSearch = param.value;
+        var resultContainer = document.getElementById("search-results");
+
+        // Nếu ô input trống thì ẩn khung kết quả đi
+        if (txtSearch.trim() === "") {
+            resultContainer.classList.add("hidden");
+            resultContainer.innerHTML = "";
+            return;
+        }
+
+        // Gọi AJAX (Sử dụng fetch API có sẵn của trình duyệt, không cần thư viện)
+        fetch("ajaxSearch?txt=" + encodeURIComponent(txtSearch))
+            .then(response => response.text())
+            .then(data => {
+                // Hiển thị khung kết quả
+                resultContainer.classList.remove("hidden");
+                // Đổ HTML nhận được vào khung
+                resultContainer.innerHTML = data;
+            })
+            .catch(error => console.error('Lỗi:', error));
+    }
+
+
+var backgroundElement = document.getElementById("banner-background");
 const dots = document.querySelectorAll(".slider-nav .dot"); // Lấy tất cả các nút bấm
 
 // 2. Danh sách ảnh (giữ nguyên như cũ)
@@ -193,3 +218,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
+
+
