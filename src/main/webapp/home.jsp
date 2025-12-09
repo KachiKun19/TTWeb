@@ -1,6 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+
+<%@ page import="com.kachikun.shop.dao.CategoryDAO" %>
+<%@ page import="com.kachikun.shop.model.Category" %>
+<%@ page import="java.util.List" %>
+
+<%
+    // gọi danh sách category từ DAO
+    CategoryDAO dao = new CategoryDAO();
+    List<Category> list = dao.getAllCategories();
+    
+    // Gán vào biến để bên dưới dùng được
+    request.setAttribute("listCategories", list);
+%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -140,7 +153,7 @@
 		</div>
 	</div>
 	<main class="main-content">
-		<section class="product-categories">
+		<section class="product-categories bg-white">
 			<div class="container">
 				<div class="category-grid">
 
