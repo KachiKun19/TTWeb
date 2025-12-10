@@ -298,15 +298,18 @@
     </div>
 
     <div id="search-overlay" class="search-overlay">
-      <button id="close-search" class="search-overlay-close">&times;</button>
-      <div class="search-overlay-content">
-        <input
-          type="text"
-          placeholder="Tìm kiếm..."
-          class="search-overlay-input"
-        />
-      </div>
-    </div>
+		<button id="close-search" class="search-overlay-close">&times;</button>
+		<div class="search-overlay-content w-full max-w-2xl mx-auto px-4">
+			<input oninput="searchByName(this)" name="txt" type="text"
+				placeholder="Gõ tên sản phẩm để tìm..."
+				class="search-overlay-input w-full p-4 text-xl border-b-2 border-gray-300 focus:border-blue-500 outline-none bg-transparent" />
+
+			<div id="search-results"
+				class="mt-4 max-h-[60vh] overflow-y-auto bg-white rounded-lg shadow-xl p-2 hidden">
+			</div>
+
+		</div>
+	</div>
     
     <footer class="footer">
       <div class="container">
