@@ -22,8 +22,7 @@ function searchByName(param) {
             .catch(error => console.error('Lỗi:', error));
     }
 
-
-var backgroundElement = document.getElementById("banner-background");
+const backgroundElement = document.getElementById("banner-background");
 const dots = document.querySelectorAll(".slider-nav .dot"); // Lấy tất cả các nút bấm
 
 // 2. Danh sách ảnh (giữ nguyên như cũ)
