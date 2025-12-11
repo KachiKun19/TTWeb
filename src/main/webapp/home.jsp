@@ -66,15 +66,16 @@
 							<div id="dropdownGaming"
 								class="z-50 hidden bg-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
 								<ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
-									<li><a href="product?cid=1"
+									<li><a href="products?category=Chuột Gaming"
 										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Chuột
 											Gaming</a></li>
-									<li><a href="product?cid=2"
+
+									<li><a href="products?category=Bàn phím cơ"
 										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Bàn
 											phím cơ</a></li>
-									<li><a href="#"
-										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Tai
-											nghe</a></li>
+
+									<li><a href="products?category=Lót chuột"
+										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lót chuột</a></li>
 								</ul>
 							</div></li>
 						<li><a href="#" class="flex items-center"
@@ -84,13 +85,14 @@
 							<div id="dropdownOffice"
 								class="z-50 hidden bg-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
 								<ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
-									<li><a href="#"
+									<li><a href="products?category=Ghế công thái học"
 										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Ghế
 											công thái học</a></li>
-									<li><a href="#"
-										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Bàn
-											nâng hạ</a></li>
-									<li><a href="#"
+
+									<li><a href="products?category=Tai nghe"
+										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Tai
+										nghe</a></li>
+									<li><a href="products?category=Phụ kiện"
 										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Phụ
 											kiện</a></li>
 								</ul>
