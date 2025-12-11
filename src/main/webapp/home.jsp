@@ -2,17 +2,17 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
-<%@ page import="com.kachikun.shop.dao.CategoryDAO" %>
-<%@ page import="com.kachikun.shop.model.Category" %>
-<%@ page import="java.util.List" %>
+<%@ page import="com.kachikun.shop.dao.CategoryDAO"%>
+<%@ page import="com.kachikun.shop.model.Category"%>
+<%@ page import="java.util.List"%>
 
 <%
-    // gọi danh sách category từ DAO
-    CategoryDAO dao = new CategoryDAO();
-    List<Category> list = dao.getAllCategories();
-    
-    // Gán vào biến để bên dưới dùng được
-    request.setAttribute("listCategories", list);
+// gọi danh sách category từ DAO
+CategoryDAO dao = new CategoryDAO();
+List<Category> list = dao.getAllCategories();
+
+// Gán vào biến để bên dưới dùng được
+request.setAttribute("listCategories", list);
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -75,7 +75,8 @@
 											phím cơ</a></li>
 
 									<li><a href="products?category=Lót chuột"
-										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lót chuột</a></li>
+										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lót
+											chuột</a></li>
 								</ul>
 							</div></li>
 						<li><a href="#" class="flex items-center"
@@ -91,7 +92,7 @@
 
 									<li><a href="products?category=Tai nghe"
 										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Tai
-										nghe</a></li>
+											nghe</a></li>
 									<li><a href="products?category=Phụ kiện"
 										class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Phụ
 											kiện</a></li>
@@ -163,16 +164,24 @@
 	<main class="main-content">
 		<section class="product-categories bg-white">
 			<div class="container">
-				<div class="category-grid">
+				<div class="category-wrapper" style="position: relative;">
 
-					<c:forEach items="${listCategories}" var="cate">
+					<button class="nav-btn prev-btn" id="btnPrev">
+						<i class="fas fa-chevron-left"></i>
+					</button>
 
-						<a href="products?category=${cate.name}" class="category-item">
+					<div class="category-grid" id="categoryList">
+						<c:forEach items="${listCategories}" var="cate">
+							<a href="products?category=${cate.name}" class="category-item">
+								<i class="${cate.icon}"></i> <span>${cate.name}</span>
+							</a>
+						</c:forEach>
+					</div>
 
-							<i class="${cate.icon}"></i> <span>${cate.name}</span>
-						</a>
+					<button class="nav-btn next-btn" id="btnNext">
+						<i class="fas fa-chevron-right"></i>
+					</button>
 
-					</c:forEach>
 				</div>
 			</div>
 		</section>

@@ -385,21 +385,37 @@ ul {
 	padding-top: 10px;
 }
 
+/* CONTAINER: Nơi chứa danh sách */
 .category-grid {
-	display: flex;
-	justify-content: space-around; /* Căn đều các mục */
-	align-items: flex-start;
-	flex-wrap: wrap; /* Tự động xuống hàng trên màn hình nhỏ */
-	gap: 20px; /* Khoảng cách giữa các mục */
-	margin-top: 20px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    padding: 10px 0;
+    overflow-x: hidden;
+    scroll-behavior: smooth; /* QUAN TRỌNG: Giúp cuộn mượt */
 }
 
+/* ITEM: Từng ô icon */
 .category-item {
-	display: flex;
-	flex-direction: column; /* Xếp icon trên, chữ dưới */
-	align-items: center; /* Căn giữa theo chiều ngang */
-	text-decoration: none;
-	width: 180px; /* Chiều rộng cho mỗi mục */
+    /* 1. Thêm dòng này để Padding không làm vỡ kích thước */
+    box-sizing: border-box; 
+
+    /* 2. Công thức: (100% chiều rộng - 3 khoảng hở 20px) chia cho 4 */
+    /* Kết quả: Hiển thị đúng 4 cái vừa khít màn hình */
+    min-width: calc((100% - 60px) / 4); 
+    flex: 0 0 calc((100% - 60px) / 4); 
+    
+    /* Các phần giữ nguyên */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    background: white;
+    
 }
 
 /* Style cho Icon (Style tối giản, không viền) */
@@ -424,6 +440,50 @@ ul {
 	line-height: 1.4;
 	color: #000; /* Đảm bảo chữ màu đen */
 }
+
+/* Container bao ngoài để giữ vị trí cho nút */
+.category-wrapper {
+    position: relative;
+    padding: 0 20px; /* Chừa chỗ 2 bên cho nút đỡ đè lên icon */
+}
+
+/* Style chung cho 2 nút bấm */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%); /* Căn giữa theo chiều dọc */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    z-index: 10;
+    display: flex; /* Căn icon vào giữa nút */
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+/* Hiệu ứng khi di chuột vào nút */
+.nav-btn:hover {
+    background-color: #f82c97; /* Màu hồng chủ đạo của shop */
+    color: white;
+    border-color: #f82c97;
+}
+
+/* Vị trí nút Trái */
+.prev-btn {
+    left: -20px; /* Đẩy ra ngoài mép trái một chút */
+}
+
+/* Vị trí nút Phải */
+.next-btn {
+    right: -20px; /* Đẩy ra ngoài mép phải một chút */
+}
+
 
 /* Hiệu ứng khi di chuột (đơn giản) */
 .category-item:hover {

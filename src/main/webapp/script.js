@@ -219,3 +219,32 @@ function searchByName(param) {
             .catch(error => console.error('Lỗi:', error));
     }
 
+	//cuộn ngang thanh icons
+	document.addEventListener("DOMContentLoaded", function() {
+		const categoryList = document.getElementById('categoryList');
+		const btnPrev = document.getElementById('btnPrev');
+		const btnNext = document.getElementById('btnNext');
+
+		// Kiểm tra xem các thẻ có tồn tại không thì mới chạy code
+		if (categoryList && btnPrev && btnNext) {
+
+			// --- XỬ LÝ NÚT NEXT (BÊN PHẢI) ---
+			btnNext.addEventListener('click', () => {
+			            const item = categoryList.querySelector('.category-item');
+			            // Lấy chiều rộng 1 ô + khoảng cách (20px)
+			            const val = item.offsetWidth + 20;
+
+			            // CHỈ CỘNG VỊ TRÍ, ĐỂ CSS TỰ LO HIỆU ỨNG TRƯỢT
+			            categoryList.scrollLeft += val; 
+			        });
+
+			        // --- XỬ LÝ NÚT PREV ---
+			        btnPrev.addEventListener('click', () => {
+			            const item = categoryList.querySelector('.category-item');
+			            const val = item.offsetWidth + 20;
+
+			            // CHỈ TRỪ VỊ TRÍ
+			            categoryList.scrollLeft -= val;
+			        });
+			    }
+			});
