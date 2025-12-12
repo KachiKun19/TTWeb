@@ -290,7 +290,7 @@
 
 												<a href="product-detail?id=${p.id}" class="relative block">
 													<img
-													src="${not empty p.image ? p.image : 'https://via.placeholder.com/300x300'}"
+													src="images/${not empty p.image ? p.image : 'https://via.placeholder.com/300x300'}"
 													alt="${p.name}" class="w-full h-56 object-contain p-4" />
 
 													<c:if test="${p.stock <= 0}">

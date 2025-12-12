@@ -122,12 +122,12 @@ request.setAttribute("listCategories", list);
 				style="background-image: url('https://cdn.sforum.vn/sforum/wp-content/uploads/2022/02/9-9-960x538.jpg');"></div>
 
 			<div class="banner-content">
-				<p class="banner-subtitle">Story cho các streamer và game thủ
+				<p class="banner-subtitle">Store cho các streamer và game thủ
 					lựa chọn!</p>
 				<h1 class="banner-title">
 					Tuyển thủ Kachi-Kun /<br />KhanhNgo Edition
 				</h1>
-				<a href="#" class="banner-button">Xem thêm</a>
+				<a href="products" class="banner-button">Xem thêm</a>
 			</div>
 
 			<div class="slider-nav">

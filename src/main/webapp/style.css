@@ -140,6 +140,7 @@ ul {
 	overflow: hidden;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 }
 
 .banner-bg {
@@ -172,6 +173,7 @@ ul {
 	max-width: 1400px;
 	margin: 0 auto;
 	width: 100%;
+	text-align: center;
 }
 
 .banner-subtitle {

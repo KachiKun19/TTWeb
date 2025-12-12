@@ -77,9 +77,9 @@ public class ProductDAO {
 				Product p = new Product(
 						rs.getInt("id"), 
 						rs.getString("name"), 
-						rs.getString("image"), 
-						rs.getDouble("price"), 
 						rs.getString("description"), 
+						rs.getDouble("price"),
+						rs.getString("image"), 
 						rs.getInt("stock_quantity"), b, c);
 				list.add(p);
 			}
