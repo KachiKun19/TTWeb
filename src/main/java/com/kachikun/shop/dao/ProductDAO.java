@@ -134,6 +134,129 @@ public class ProductDAO {
 		    }
 		    return list;
 		}
+		
+		// đếm sản phẩm
+	    public int getTotalProducts() {
+	        String sql = "SELECT count(*) FROM Products";
+	        try {
+	            Connection conn = DBConnection.getConnection();
+	            PreparedStatement ps = conn.prepareStatement(sql);
+	            ResultSet rs = ps.executeQuery();
+	            while (rs.next()) {
+	                return rs.getInt(1); // Trả về số lượng dòng đếm được
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return 0;
+	    }
+	    
+	    public List<Product> pagingProduct(int index) {
+	        List<Product> list = new ArrayList<>();
+	        // SQL Server dùng OFFSET ... FETCH NEXT thay vì LIMIT
+	        // Dùng LEFT JOIN để lỡ sản phẩm thiếu Brand/Category vẫn hiện ra được
+	        String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name, b.logo as brand_logo " +
+	                     "FROM Products p " +
+	                     "LEFT JOIN Categories c ON p.category_id = c.id " +
+	                     "LEFT JOIN Brands b ON p.brand_id = b.id " +
+	                     "ORDER BY p.id OFFSET ? ROWS FETCH NEXT 3 ROWS ONLY";
+	        try {
+	            Connection conn = DBConnection.getConnection();
+	            PreparedStatement ps = conn.prepareStatement(sql);
+	            // Công thức tính vị trí bắt đầu: (Trang hiện tại - 1) * 3
+	            ps.setInt(1, (index - 1) * 3); 
+	            ResultSet rs = ps.executeQuery();
+	            while (rs.next()) {
+	                Product p = new Product();
+	                p.setId(rs.getInt("id"));
+	                p.setName(rs.getString("name"));
+	                p.setDescription(rs.getString("description"));
+	                p.setImage(rs.getString("image"));
+	                p.setStock(rs.getInt("stock_quantity"));
+	                p.setPrice(rs.getDouble("price"));
+
+	                Category c = new Category();
+	                c.setId(rs.getInt("category_id"));
+	                c.setName(rs.getString("cat_name"));
+	                p.setCategory(c);
+
+	                Brand b = new Brand();
+	                b.setId(rs.getInt("brand_id"));
+	                b.setName(rs.getString("brand_name"));
+	                b.setLogo(rs.getString("brand_logo"));
+	                p.setBrand(b);
+
+	                list.add(p);
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return list;
+	    }
+	    
+	 // Đếm số lượng sản phẩm theo tên danh mục (để tính tổng trang khi lọc)
+	    public int countProductsByCategory(String cateName) {
+	        String sql = "SELECT count(*) FROM Products p " +
+	                     "INNER JOIN Categories c ON p.category_id = c.id " +
+	                     "WHERE c.name LIKE ?"; 
+	        try {
+	            Connection conn = DBConnection.getConnection();
+	            PreparedStatement ps = conn.prepareStatement(sql);
+	            ps.setString(1, "%" + cateName + "%");
+	            ResultSet rs = ps.executeQuery();
+	            while (rs.next()) {
+	                return rs.getInt(1);
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return 0;
+	    }
+
+	    // Lấy sản phẩm theo danh mục CÓ PHÂN TRANG (Limit 3)
+	    public List<Product> pagingProductByCategory(String cateName, int index) {
+	        List<Product> list = new ArrayList<>();
+	        // SQL Server syntax
+	        String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name, b.logo as brand_logo " +
+	                     "FROM Products p " +
+	                     "LEFT JOIN Categories c ON p.category_id = c.id " +
+	                     "LEFT JOIN Brands b ON p.brand_id = b.id " +
+	                     "WHERE c.name LIKE ? " +
+	                     "ORDER BY p.id OFFSET ? ROWS FETCH NEXT 3 ROWS ONLY";
+	        try {
+	            Connection conn = DBConnection.getConnection();
+	            PreparedStatement ps = conn.prepareStatement(sql);
+	            ps.setString(1, "%" + cateName + "%");
+	            ps.setInt(2, (index - 1) * 3); // Tính offset
+	            
+	            ResultSet rs = ps.executeQuery();
+	            while (rs.next()) {
+	                Product p = new Product();
+	                p.setId(rs.getInt("id"));
+	                p.setName(rs.getString("name"));
+	                p.setDescription(rs.getString("description"));
+	                p.setImage(rs.getString("image"));
+	                p.setStock(rs.getInt("stock_quantity"));
+	                p.setPrice(rs.getDouble("price"));
+
+	                Category c = new Category();
+	                c.setId(rs.getInt("category_id"));
+	                c.setName(rs.getString("cat_name"));
+	                p.setCategory(c);
+
+	                Brand b = new Brand();
+	                b.setId(rs.getInt("brand_id"));
+	                b.setName(rs.getString("brand_name"));
+	                b.setLogo(rs.getString("brand_logo"));
+	                p.setBrand(b);
+
+	                list.add(p);
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return list;
+	    }
 	
 	public static void main(String[] args) {
 		ProductDAO dao = new ProductDAO();

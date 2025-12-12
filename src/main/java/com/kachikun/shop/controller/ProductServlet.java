@@ -40,35 +40,45 @@ public class ProductServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// lấy tham số từ category(chuột, bàn phím cơ)
-		String cateId = request.getParameter("category");
-		
-		List<Product> listProduct = new ArrayList<>();
-		if(cateId == null || cateId.isEmpty()) {
-			listProduct = productDAO.getAllProducts();
-		} else {
-			//test hàm lọc
-			listProduct = productDAO.findByCategoryName(cateId);
-		}
-		
-		// cột thương hiệu 
-		List<Brand> listBrand = brandDAO.getAllBrands();
-		// Đẩy sang jsp
-		request.setAttribute("products", listProduct);
-		request.setAttribute("brands", listBrand);
-		// gửi category hiện tại cho jsp để xác định đang ở trang nào
-		request.setAttribute("currentCategory", cateId);
-		// chuyển hướng qua cho product.jsp
-		request.getRequestDispatcher("product.jsp").forward(request, response);
-	}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String cateId = request.getParameter("category");
+        String indexPage = request.getParameter("index");
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
+        if (indexPage == null) {
+            indexPage = "1";
+        }
+        int index = Integer.parseInt(indexPage);
 
+        List<Product> listProduct = new ArrayList<>();
+        int count = 0; // Tổng số sản phẩm tìm được
+
+        //KIỂM TRA ĐANG Ở CHẾ ĐỘ NÀO ĐỂ LẤY DỮ LIỆU
+        if (cateId == null || cateId.isEmpty()) {
+            //Xem tất cả (Home -> Xem thêm)
+            count = productDAO.getTotalProducts();     // Đếm tất cả
+            listProduct = productDAO.pagingProduct(index); // Phân trang tất cả
+        } else {
+            //Đang lọc theo danh mục
+            count = productDAO.countProductsByCategory(cateId); // Đếm theo danh mục
+            listProduct = productDAO.pagingProductByCategory(cateId, index); // Phân trang theo danh mục
+        }
+
+        //tính số trang
+        int endPage = count / 3;
+        if (count % 3 != 0) {
+            endPage++;
+        }
+
+        List<Brand> listBrand = brandDAO.getAllBrands();
+
+        // đưa qua sql
+        request.setAttribute("products", listProduct);
+        request.setAttribute("brands", listBrand);
+        request.setAttribute("currentCategory", cateId);
+        
+        request.setAttribute("endP", endPage); // Tổng số trang
+        request.setAttribute("tag", index);    // Trang hiện tại
+
+        request.getRequestDispatcher("product.jsp").forward(request, response);
+    }
 }
