@@ -73,17 +73,19 @@ const searchOverlay = document.getElementById("search-overlay");
 const searchInput = document.querySelector(".search-overlay-input");
 
 // (Sự kiện cho Search)
-openSearchBtn.addEventListener("click", function (event) {
-  event.preventDefault();
-  searchOverlay.classList.add("active");
-  setTimeout(() => {
-    searchInput.focus();
-  }, 400); // Tự động focus
-});
+if (openSearchBtn && closeSearchBtn && searchOverlay) {
+    openSearchBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+        searchOverlay.classList.add("active");
+        setTimeout(() => {
+            if(searchInput) searchInput.focus();
+        }, 400);
+    });
 
-closeSearchBtn.addEventListener("click", function () {
-  searchOverlay.classList.remove("active");
-});
+    closeSearchBtn.addEventListener("click", function() {
+        searchOverlay.classList.remove("active");
+    });
+}
 
 // Code cho phần User Dropdown
 document.addEventListener("DOMContentLoaded", function() {
@@ -222,6 +224,24 @@ function searchByName(param) {
             })
             .catch(error => console.error('Lỗi:', error));
     }
+	// xử lý nút chọn nhanh
+	document.addEventListener("DOMContentLoaded", function() {
+		// Lấy tất cả nút "Chọn nhanh"
+		const buttons = document.querySelectorAll(".add-to-cart");
+
+		buttons.forEach(btn => {
+			btn.addEventListener("click", function(e) {
+				e.preventDefault(); // Chặn hành vi mặc định thẻ a (nếu có)
+
+				// Lấy ID sản phẩm
+				const productId = this.getAttribute("data-id");
+
+				// Gọi Servlet thêm vào giỏ
+				// Lưu ý: Đường dẫn này sẽ chuyển trang ngay lập tức
+				window.location.href = "add-to-cart?id=" + productId;
+			});
+		});
+	});
 
 	//cuộn ngang thanh icons
 	document.addEventListener("DOMContentLoaded", function() {
