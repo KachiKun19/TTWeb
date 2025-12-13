@@ -190,6 +190,11 @@
     <c:if test="${not empty registerError}">
         container.classList.add("right-panel-active");
     </c:if>
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'signup') {
+        container.classList.add("right-panel-active");
+    }
 </script>
 
 </body>

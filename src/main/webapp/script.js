@@ -84,22 +84,26 @@ openSearchBtn.addEventListener("click", function (event) {
 closeSearchBtn.addEventListener("click", function () {
   searchOverlay.classList.remove("active");
 });
-// --- Kết thúc code cho Search Overlay ---
 
-// --- Bắt đầu code cho Cart Overlay (MỚI) ---
-// (Lấy các phần tử của Cart)
-const openCartBtn = document.getElementById("open-cart");
-const closeCartBtn = document.getElementById("close-cart");
-const cartOverlay = document.getElementById("cart-overlay");
+// Code cho phần User Dropdown
+document.addEventListener("DOMContentLoaded", function() {
+    const userBtn = document.getElementById("user-menu-btn");
+    const userDropdown = document.getElementById("user-dropdown");
 
-// (Sự kiện cho Cart)
-openCartBtn.addEventListener("click", function (event) {
-  event.preventDefault();
-  cartOverlay.classList.add("active");
-});
+    if (userBtn && userDropdown) {
+        // Khi bấm vào icon user -> Bật/Tắt class 'hidden'
+        userBtn.addEventListener("click", function(e) {
+            e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+            userDropdown.classList.toggle("hidden");
+        });
 
-closeCartBtn.addEventListener("click", function () {
-  cartOverlay.classList.remove("active");
+        // Khi bấm ra ngoài -> Ẩn menu
+        document.addEventListener("click", function(e) {
+            if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.add("hidden");
+            }
+        });
+    }
 });
 
 // phần lọc
@@ -248,3 +252,5 @@ function searchByName(param) {
 			        });
 			    }
 			});
+			
+			

@@ -731,3 +731,16 @@ ul {
 .social-icons a .fa-linkedin-in:hover {
 	color: #29839a; /* Màu xanh của LinkedIn */
 }
+
+/* tránh đè lên sp */
+@media (min-width: 1024px) {
+    aside {
+        width: 25%; /* Tương đương w-1/4 */
+        float: left; /* Dự phòng nếu flex chưa chạy */
+    }
+    section.w-full.lg\:w-3\/4 {
+        width: 75%; /* Tương đương w-3/4 */
+        float: left;
+    }
+    /* Reset lại float khi flexbox của Tailwind đã chạy (thường flex sẽ ghi đè float) */
+}

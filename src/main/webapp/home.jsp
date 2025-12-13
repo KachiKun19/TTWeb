@@ -106,12 +106,65 @@ request.setAttribute("listCategories", list);
 					<a href="#" id="open-search"
 						class="text-xl transition-opacity duration-200 hover:opacity-80">
 						<i class="fas fa-search"></i>
-					</a> <a href="#"
-						class="text-xl transition-opacity duration-200 hover:opacity-80">
-						<i class="fas fa-user"></i>
-					</a> <a href="#" id="open-cart"
-						class="text-xl transition-opacity duration-200 hover:opacity-80">
-						<i class="fas fa-shopping-basket"></i>
+					</a>
+
+					<div class="relative inline-block text-left">
+
+						<button type="button" id="user-menu-btn"
+							class="text-xl transition-colors duration-200 hover:text-pink-500 focus:outline-none py-2">
+							<i class="fas fa-user"></i>
+						</button>
+
+						<div id="user-dropdown"
+							class="hidden absolute right-0 z-50 mt-3 w-64 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-gray-100 overflow-hidden transform origin-top-right">
+
+							<c:choose>
+								<%-- ĐÃ ĐĂNG NHẬP --%>
+								<c:when test="${not empty sessionScope.user}">
+									<div class="px-6 py-4 bg-gray-50 border-b border-gray-100">
+										<p
+											class="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Tài
+											khoản</p>
+										<p
+											class="text-base font-bold text-gray-800 truncate leading-tight">
+											${sessionScope.user.fullName}</p>
+										<p class="text-xs text-gray-400 truncate mt-0.5">@${sessionScope.user.email}</p>
+									</div>
+
+									<a href="logout"
+										class="block px-6 py-3.5 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 font-medium transition-colors duration-200 flex items-center">
+										<i class="fas fa-sign-out-alt mr-3"></i> Đăng xuất
+									</a>
+								</c:when>
+
+								<%-- CHƯA ĐĂNG NHẬP --%>
+								<c:otherwise>
+									<div class="p-2">
+										<a href="login"
+											class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-pink-600 transition-colors">
+											<i
+											class="fas fa-sign-in-alt w-6 text-center mr-2 text-gray-400"></i>
+											Đăng nhập
+										</a> <a href="login.jsp?action=signup"
+											class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-pink-600 transition-colors">
+											<i
+											class="fas fa-user-plus w-6 text-center mr-2 text-gray-400"></i>
+											Đăng ký
+										</a>
+									</div>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+
+					<a href="cart.jsp"
+						class="text-xl transition-opacity duration-200 hover:opacity-80 relative">
+						<i class="fas fa-shopping-basket"></i> <%-- (Tùy chọn) Hiển thị số lượng nhỏ trên icon --%>
+						<c:if test="${not empty sessionScope.cart}">
+							<span
+								class="absolute -top-2 -right-2 bg-pink-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+								${sessionScope.cart.size()} </span>
+						</c:if>
 					</a>
 				</div>
 			</div>
