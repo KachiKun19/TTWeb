@@ -293,6 +293,51 @@
 										</div>
 									</div>
 								</div>
+								<h2 id="filter-heading-size">
+									<button type="button"
+										class="flex items-center justify-between w-full py-5 font-semibold text-left text-gray-900 border-b border-gray-200">
+										<span class="text-base">Kích thước</span>
+										<svg data-accordion-icon class="w-4 h-4 rotate-180 shrink-0"
+											aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+											fill="none" viewBox="0 0 10 6">
+            <path stroke="currentColor" stroke-linecap="round"
+												stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5" />
+        </svg>
+									</button>
+								</h2>
+								<div id="filter-body-size" class="filter-content"
+									aria-labelledby="filter-heading-size">
+									<div class="inner-list py-5 border-b border-gray-200 space-y-4">
+										<div class="flex items-center">
+											<input id="filter-size-s" type="checkbox" value="S"
+												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" />
+											<label for="filter-size-s"
+												class="ml-3 text-sm font-medium text-gray-700">Nhỏ
+												(S)</label>
+										</div>
+										<div class="flex items-center">
+											<input id="filter-size-m" type="checkbox" value="M"
+												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" />
+											<label for="filter-size-m"
+												class="ml-3 text-sm font-medium text-gray-700">Trung
+												bình (M)</label>
+										</div>
+										<div class="flex items-center">
+											<input id="filter-size-l" type="checkbox" value="L"
+												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" />
+											<label for="filter-size-l"
+												class="ml-3 text-sm font-medium text-gray-700">Lớn
+												(L)</label>
+										</div>
+										<div class="flex items-center">
+											<input id="filter-size-xl" type="checkbox" value="XL"
+												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2" />
+											<label for="filter-size-xl"
+												class="ml-3 text-sm font-medium text-gray-700">Rất
+												lớn (XL)</label>
+										</div>
+									</div>
+								</div>
 
 							</div>
 						</aside>

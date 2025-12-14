@@ -40,7 +40,7 @@ public class AjaxSearchServlet extends HttpServlet {
             NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
             
             for (Product p : list) {
-                out.println("<a href='detail?pid=" + p.getId() + "' class='flex items-center gap-4 p-3 hover:bg-gray-100 rounded-lg transition border-b border-gray-100'>");
+                out.println("<a href='add-to-cart?id=" + p.getId() + "' class='flex items-center gap-4 p-3 hover:bg-gray-100 rounded-lg transition border-b border-gray-100'>");
                 
                 // Cột Ảnh
                 out.println("  <img src='images/" + p.getImage() + "' alt='" + p.getName() + "' class='w-16 h-16 object-cover rounded'>");

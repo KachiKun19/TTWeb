@@ -11,6 +11,33 @@ public class Product {
 	// Quan hệ: Một sản phẩm thuộc về 1 Brand và 1 Category
 	private Brand brand;
 	private Category category;
+	private String connectionType;
+    private String material;
+	public String getConnectionType() {
+		return connectionType;
+	}
+
+	public void setConnectionType(String connectionType) {
+		this.connectionType = connectionType;
+	}
+
+	public String getMaterial() {
+		return material;
+	}
+
+	public void setMaterial(String material) {
+		this.material = material;
+	}
+
+	private String size;
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
 
 	// Constructor không tham số
 	public Product() {
@@ -27,6 +54,7 @@ public class Product {
 		this.stock = stock;
 		this.brand = brand;
 		this.category = category;
+		
 	}
 
 	public int getStock() {

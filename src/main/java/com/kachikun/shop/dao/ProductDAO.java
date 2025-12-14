@@ -300,6 +300,95 @@ public class ProductDAO {
 	 			}
 	 			return null;
 	 		}
+	 		
+	 	// hàm filterProducts lọc sản phẩm theo nhiều tiêu chí
+		    public List<Product> filterProducts(String[] brandIds, String[] connections, String[] materials, String[] sizes) {
+		        List<Product> list = new ArrayList<>();
+		        
+		        // Câu lệnh SQL gốc
+		        StringBuilder sql = new StringBuilder(
+		            "SELECT p.*, c.name as cat_name, b.name as brand_name, b.logo as brand_logo " +
+		            "FROM Products p " +
+		            "INNER JOIN Categories c ON p.category_id = c.id " +
+		            "INNER JOIN Brands b ON p.brand_id = b.id WHERE 1=1"
+		        );
+
+		        //LỌC THƯƠNG HIỆU (BRAND)
+		        if (brandIds != null && brandIds.length > 0) {
+		            sql.append(" AND brand_id IN (");
+		            for (int i = 0; i < brandIds.length; i++) {
+		                sql.append(brandIds[i]);
+		                if (i < brandIds.length - 1) sql.append(",");
+		            }
+		            sql.append(")");
+		        }
+
+		        //LỌC KẾT NỐI (CONNECTION)
+		        if (connections != null && connections.length > 0) {
+		            sql.append(" AND (");
+		            for (int i = 0; i < connections.length; i++) {
+		                sql.append("connection_type LIKE '%").append(connections[i]).append("%'");
+		                if (i < connections.length - 1) sql.append(" OR ");
+		            }
+		            sql.append(")");
+		        }
+
+		        //LỌC CHẤT LIỆU (MATERIAL)
+		        if (materials != null && materials.length > 0) {
+		            sql.append(" AND (");
+		            for (int i = 0; i < materials.length; i++) {
+		                sql.append("material LIKE '%").append(materials[i]).append("%'");
+		                if (i < materials.length - 1) sql.append(" OR ");
+		            }
+		            sql.append(")");
+		        }
+
+		        //LỌC KÍCH THƯỚC (SIZE)
+		        if (sizes != null && sizes.length > 0) {
+		            sql.append(" AND (");
+		            for (int i = 0; i < sizes.length; i++) {
+		                sql.append("product_size = '").append(sizes[i]).append("'");
+		                if (i < sizes.length - 1) sql.append(" OR ");
+		            }
+		            sql.append(")");
+		        }
+
+		        try {
+		            Connection conn = DBConnection.getConnection();
+		            java.sql.Statement stmt = conn.createStatement();
+		            ResultSet rs = stmt.executeQuery(sql.toString());
+		            
+		            while(rs.next()) {
+		                Product p = new Product();
+		                p.setId(rs.getInt("id"));
+		                p.setName(rs.getString("name"));
+		                p.setDescription(rs.getString("description")); // Mô tả
+		                p.setImage(rs.getString("image"));
+		                p.setStock(rs.getInt("stock_quantity"));
+		                p.setPrice(rs.getDouble("price"));
+
+		                Category c = new Category();
+		                c.setId(rs.getInt("category_id"));
+		                c.setName(rs.getString("cat_name"));
+		                p.setCategory(c);
+
+		                Brand b = new Brand();
+		                b.setId(rs.getInt("brand_id"));
+		                b.setName(rs.getString("brand_name"));
+		                b.setLogo(rs.getString("brand_logo"));
+		                p.setBrand(b);
+
+		                try { p.setConnectionType(rs.getString("connection_type")); } catch(Exception e) {}
+		                try { p.setMaterial(rs.getString("material")); } catch(Exception e) {}
+		                try { p.setSize(rs.getString("product_size")); } catch(Exception e) {}
+
+		                list.add(p);
+		            }
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		        return list;
+		    }
 	
 	public static void main(String[] args) {
 		ProductDAO dao = new ProductDAO();
