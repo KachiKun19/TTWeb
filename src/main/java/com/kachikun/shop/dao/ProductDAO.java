@@ -302,7 +302,7 @@ public class ProductDAO {
 	 		}
 	 		
 	 	// hàm filterProducts lọc sản phẩm theo nhiều tiêu chí
-		    public List<Product> filterProducts(String[] brandIds, String[] connections, String[] materials, String[] sizes) {
+		    public List<Product> filterProducts(String[] brandIds, String[] connections, String[] materials, String[] sizes,String category, int index) {
 		        List<Product> list = new ArrayList<>();
 		        
 		        // Câu lệnh SQL gốc
@@ -312,6 +312,11 @@ public class ProductDAO {
 		            "INNER JOIN Categories c ON p.category_id = c.id " +
 		            "INNER JOIN Brands b ON p.brand_id = b.id WHERE 1=1"
 		        );
+		        
+		        // LỌC DANH MỤC (CATEGORY)
+		        if (category != null && !category.isEmpty()) {
+		            sql.append(" AND c.name LIKE N'%").append(category).append("%'");
+		        }
 
 		        //LỌC THƯƠNG HIỆU (BRAND)
 		        if (brandIds != null && brandIds.length > 0) {
@@ -352,6 +357,8 @@ public class ProductDAO {
 		            }
 		            sql.append(")");
 		        }
+		        // phân trang khi lọc
+		        sql.append(" ORDER BY p.id OFFSET ").append((index - 1) * 3).append(" ROWS FETCH NEXT 3 ROWS ONLY");
 
 		        try {
 		            Connection conn = DBConnection.getConnection();
@@ -362,7 +369,7 @@ public class ProductDAO {
 		                Product p = new Product();
 		                p.setId(rs.getInt("id"));
 		                p.setName(rs.getString("name"));
-		                p.setDescription(rs.getString("description")); // Mô tả
+		                p.setDescription(rs.getString("description"));
 		                p.setImage(rs.getString("image"));
 		                p.setStock(rs.getInt("stock_quantity"));
 		                p.setPrice(rs.getDouble("price"));
@@ -388,6 +395,65 @@ public class ProductDAO {
 		            e.printStackTrace();
 		        }
 		        return list;
+		    }
+		    
+		 //  Đếm tổng số sản phẩm sau khi lọc (để tính số trang)
+		    public int countFilteredProducts(String[] brandIds, String[] connections, String[] materials, String[] sizes,String category) {
+		        StringBuilder sql = new StringBuilder(
+		            "SELECT count(*) FROM Products p " +
+		            "INNER JOIN Categories c ON p.category_id = c.id " +
+		            "INNER JOIN Brands b ON p.brand_id = b.id WHERE 1=1"
+		        );
+		        
+		        // lọc ở categories
+		        if (category != null && !category.isEmpty()) {
+		            // categoryName trong DB của bạn là tiếng Việt (Chuột Gaming...), nên dùng N'...' nếu cần, hoặc like
+		            sql.append(" AND c.name LIKE N'%").append(category).append("%'");
+		        }
+		        
+		        // lọc ở products
+		        if (brandIds != null && brandIds.length > 0) {
+		            sql.append(" AND brand_id IN (");
+		            for (int i = 0; i < brandIds.length; i++) {
+		                sql.append(brandIds[i]).append(i < brandIds.length - 1 ? "," : "");
+		            }
+		            sql.append(")");
+		        }
+		 
+		        if (connections != null && connections.length > 0) {
+		            sql.append(" AND (");
+		            for (int i = 0; i < connections.length; i++) {
+		                sql.append("connection_type LIKE '%").append(connections[i]).append("%'");
+		                if (i < connections.length - 1) sql.append(" OR ");
+		            }
+		            sql.append(")");
+		        }
+		        if (materials != null && materials.length > 0) {
+		            sql.append(" AND (");
+		            for (int i = 0; i < materials.length; i++) {
+		                sql.append("material LIKE '%").append(materials[i]).append("%'");
+		                if (i < materials.length - 1) sql.append(" OR ");
+		            }
+		            sql.append(")");
+		        }
+		        if (sizes != null && sizes.length > 0) {
+		            sql.append(" AND (");
+		            for (int i = 0; i < sizes.length; i++) {
+		                sql.append("product_size = '").append(sizes[i]).append("'");
+		                if (i < sizes.length - 1) sql.append(" OR ");
+		            }
+		            sql.append(")");
+		        }
+		        
+		        try {
+		            Connection conn = DBConnection.getConnection();
+		            java.sql.Statement stmt = conn.createStatement();
+		            ResultSet rs = stmt.executeQuery(sql.toString());
+		            if(rs.next()) return rs.getInt(1);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		        return 0;
 		    }
 	
 	public static void main(String[] args) {

@@ -17,20 +17,43 @@ import com.kachikun.shop.model.Product;
 @WebServlet("/ajaxFilter")
 public class AjaxFilterServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
         
         //Lấy danh sách các Brand ID được tích
+        String category = request.getParameter("category");	
         String[] brandIds = request.getParameterValues("brand");
         String[] connections = request.getParameterValues("connection");
         String[] materials = request.getParameterValues("material");
-        String[] sizes = request.getParameterValues("size"); // Mới thêm
+        String[] sizes = request.getParameterValues("size"); 
 
+      //XỬ LÝ INDEX (PHÂN TRANG) 
+        String indexPage = request.getParameter("index");
+        int index = 1; // Mặc định là trang 1
+        try {
+            if (indexPage != null && !indexPage.isEmpty()) {
+                index = Integer.parseInt(indexPage);
+                // Nếu người dùng cố tình gửi index = 0 hoặc số âm, ép về 1 để tránh lỗi 500
+                if (index < 1) index = 1; 
+            }
+        } catch (Exception e) {
+            index = 1; // Nếu lỗi parse số thì về trang 1
+        }
+        
         ProductDAO dao = new ProductDAO();
-        // Gọi hàm DAO mới (nhớ sửa bên DAO nhận 4 tham số nhé)
-        List<Product> list = dao.filterProducts(brandIds, connections, materials, sizes);
+        // Đếm tổng số sản phẩm sau khi lọc - đếm trang
+        int total = dao.countFilteredProducts(brandIds, connections, materials, sizes, category);
+        int endPage = total / 3;
+        if (total % 3 != 0) endPage++;
+        
+        // Gọi hàm DAO 
+        List<Product> list = dao.filterProducts(brandIds, connections, materials, sizes, category, index);
         
         //Trả về HTML 
         PrintWriter out = response.getWriter();
+        out.println("<input type='hidden' id='ajax-total-res' value='" + total + "' />");
+        
         NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
 
         if(list.isEmpty()){
@@ -55,6 +78,16 @@ public class AjaxFilterServlet extends HttpServlet {
             out.println("<p class='text-lg font-bold text-gray-800 mt-2'>" + nf.format(p.getPrice()) + "₫</p>");
             out.println("</div>");
             
+            out.println("</div>");
+        }
+     // số trang
+        if (endPage > 1) {
+            out.println("<div class='col-span-1 sm:col-span-2 lg:col-span-3 flex justify-center mt-8 space-x-2 py-4'>");
+            for (int i = 1; i <= endPage; i++) {
+                String activeClass = (index == i) ? "bg-pink-600 text-white font-bold" : "bg-white text-gray-700 hover:bg-pink-500 hover:text-white";
+                // Gọi hàm JS filterProducts(i) khi bấm
+                out.println("<button onclick='filterProducts(" + i + ")' class='px-4 py-2 border rounded-lg transition-colors duration-300 " + activeClass + "'>" + i + "</button>");
+            }
             out.println("</div>");
         }
     }

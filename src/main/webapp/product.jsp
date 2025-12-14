@@ -159,6 +159,8 @@
 		<div class="page-container">
 			<div class="page-content active" id="page-category">
 				<div class="container py-12">
+					<input type="hidden" id="current-category-slug"
+						value="${param.category}" />
 
 					<div class="flex items-center mb-8">
 						<c:set var="cat" value="${param.category}" />
@@ -344,7 +346,8 @@
 
 						<section class="w-full lg:w-3/4">
 							<div class="flex justify-between items-center mb-6">
-								<span class="text-sm text-gray-600"> Hiển thị <c:choose>
+								<span id="count-display" class="text-sm text-gray-600">
+									Hiển thị <c:choose>
 										<c:when test="${not empty products}">
                             ${products.size()}
                         </c:when>
@@ -439,23 +442,14 @@
 							</div>
 							<%-- Pagging sản phẩm ra nhiều trang --%>
 							<c:if test="${endP > 1}">
-								<div class="flex justify-center mt-8 space-x-2">
+								<div id="default-pagination"
+									class="flex justify-center mt-8 space-x-2">
 									<c:forEach begin="1" end="${endP}" var="i">
 
-										<c:choose>
-											<c:when test="${not empty currentCategory}">
-												<a href="products?category=${currentCategory}&index=${i}"
-													class="px-4 py-2 border rounded-lg hover:bg-pink-500 hover:text-white transition-colors duration-300
-                       ${tag == i ? 'bg-pink-600 text-white font-bold' : 'bg-white text-gray-700'}">
-													${i} </a>
-											</c:when>
-											<c:otherwise>
-												<a href="products?index=${i}"
-													class="px-4 py-2 border rounded-lg hover:bg-pink-500 hover:text-white transition-colors duration-300
-                       ${tag == i ? 'bg-pink-600 text-white font-bold' : 'bg-white text-gray-700'}">
-													${i} </a>
-											</c:otherwise>
-										</c:choose>
+										<button onclick="filterProducts(${i})"
+											class="px-4 py-2 border rounded-lg transition-colors duration-300
+    ${tag == i ? 'bg-pink-600 text-white font-bold' : 'bg-white text-gray-700 hover:bg-pink-500 hover:text-white'}">
+											${i}</button>
 
 									</c:forEach>
 								</div>

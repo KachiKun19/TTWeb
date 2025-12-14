@@ -74,38 +74,38 @@ const searchInput = document.querySelector(".search-overlay-input");
 
 // (Sự kiện cho Search)
 if (openSearchBtn && closeSearchBtn && searchOverlay) {
-    openSearchBtn.addEventListener("click", function(event) {
-        event.preventDefault();
-        searchOverlay.classList.add("active");
-        setTimeout(() => {
-            if(searchInput) searchInput.focus();
-        }, 400);
-    });
+	openSearchBtn.addEventListener("click", function(event) {
+		event.preventDefault();
+		searchOverlay.classList.add("active");
+		setTimeout(() => {
+			if (searchInput) searchInput.focus();
+		}, 400);
+	});
 
-    closeSearchBtn.addEventListener("click", function() {
-        searchOverlay.classList.remove("active");
-    });
+	closeSearchBtn.addEventListener("click", function() {
+		searchOverlay.classList.remove("active");
+	});
 }
 
 // Code cho phần User Dropdown
 document.addEventListener("DOMContentLoaded", function() {
-    const userBtn = document.getElementById("user-menu-btn");
-    const userDropdown = document.getElementById("user-dropdown");
+	const userBtn = document.getElementById("user-menu-btn");
+	const userDropdown = document.getElementById("user-dropdown");
 
-    if (userBtn && userDropdown) {
-        // Khi bấm vào icon user -> Bật/Tắt class 'hidden'
-        userBtn.addEventListener("click", function(e) {
-            e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
-            userDropdown.classList.toggle("hidden");
-        });
+	if (userBtn && userDropdown) {
+		// Khi bấm vào icon user -> Bật/Tắt class 'hidden'
+		userBtn.addEventListener("click", function(e) {
+			e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+			userDropdown.classList.toggle("hidden");
+		});
 
-        // Khi bấm ra ngoài -> Ẩn menu
-        document.addEventListener("click", function(e) {
-            if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
-                userDropdown.classList.add("hidden");
-            }
-        });
-    }
+		// Khi bấm ra ngoài -> Ẩn menu
+		document.addEventListener("click", function(e) {
+			if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+				userDropdown.classList.add("hidden");
+			}
+		});
+	}
 });
 
 // phần lọc
@@ -254,42 +254,44 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		// --- XỬ LÝ NÚT NEXT (BÊN PHẢI) ---
 		btnNext.addEventListener('click', () => {
-		            const item = categoryList.querySelector('.category-item');
-		            // Lấy chiều rộng 1 ô + khoảng cách (20px)
-		            const val = item.offsetWidth + 20;
+			const item = categoryList.querySelector('.category-item');
+			// Lấy chiều rộng 1 ô + khoảng cách (20px)
+			const val = item.offsetWidth + 20;
 
-		            // CHỈ CỘNG VỊ TRÍ, ĐỂ CSS TỰ LO HIỆU ỨNG TRƯỢT
-		            categoryList.scrollLeft += val; 
-		        });
-
-		        // --- XỬ LÝ NÚT PREV ---
-		        btnPrev.addEventListener('click', () => {
-		            const item = categoryList.querySelector('.category-item');
-		            const val = item.offsetWidth + 20;
-
-		            // CHỈ TRỪ VỊ TRÍ
-		            categoryList.scrollLeft -= val;
-		        });
-		    }
+			// CHỈ CỘNG VỊ TRÍ, ĐỂ CSS TỰ LO HIỆU ỨNG TRƯỢT
+			categoryList.scrollLeft += val;
 		});
-		
-		// xử lí lọc sản phẩm
-		function filterProducts() {
+
+		// --- XỬ LÝ NÚT PREV ---
+		btnPrev.addEventListener('click', () => {
+			const item = categoryList.querySelector('.category-item');
+			const val = item.offsetWidth + 20;
+
+			// CHỈ TRỪ VỊ TRÍ
+			categoryList.scrollLeft -= val;
+		});
+	}
+});
+
+// xử lí lọc sản phẩm
+// xử lí lọc sản phẩm
+function filterProducts(index = 1) {
 		    let params = new URLSearchParams();
 
-		    // 1. Lấy Brand
+		    // Thêm tham số index vào URL gửi đi
+		    params.append("index", index);
+			
+			//lấy category hiện tại
+			const categoryInput = document.getElementById("current-category-slug");
+			    if (categoryInput && categoryInput.value) {
+			        params.append("category", categoryInput.value);
+			    }
+
+		    // (Giữ nguyên phần lấy checkbox)
 		    document.querySelectorAll('input[id^="filter-brand-"]:checked').forEach(chk => params.append("brand", chk.value));
-
-		    // 2. Lấy Connection
 		    document.querySelectorAll('input[id^="filter-connection-"]:checked').forEach(chk => params.append("connection", chk.value));
-
-		    // 3. Lấy Material
 		    document.querySelectorAll('input[id^="filter-material-"]:checked').forEach(chk => params.append("material", chk.value));
-
-		    // 4. Lấy Size (MỚI)
-		    document.querySelectorAll('input[id^="filter-size-"]:checked').forEach(chk => {
-		        params.append("size", chk.value);
-		    });
+		    document.querySelectorAll('input[id^="filter-size-"]:checked').forEach(chk => params.append("size", chk.value));
 
 		    // Gửi AJAX
 		    fetch("ajaxFilter?" + params.toString())
@@ -299,14 +301,27 @@ document.addEventListener("DOMContentLoaded", function() {
 		            if (productGrid) {
 		                productGrid.innerHTML = data;
 		            }
+					const defaultPagination = document.getElementById("default-pagination");
+					            if (defaultPagination) {
+					                defaultPagination.classList.add("hidden"); 
+					            }
+								// Lấy số lượng từ thẻ ẩn mà Servlet vừa gửi về
+								    const hiddenTotal = document.getElementById("ajax-total-res");
+								    // Lấy dòng chữ "Hiển thị..." nhờ vào cái ID bạn vừa thêm ở Bước 1
+								    const countDisplay = document.getElementById("count-display");
+
+								    if (hiddenTotal && countDisplay) {
+								        // Thay nội dung chữ cũ bằng chữ mới kèm số lượng mới
+								        countDisplay.innerText = "Hiển thị " + hiddenTotal.value + " sản phẩm";
+									}
 		        })
 		        .catch(error => console.error('Lỗi lọc:', error));
 		}
+
+		// Khi bấm vào checkbox thì luôn gọi trang 1
 		document.addEventListener("DOMContentLoaded", function() {
-		    // Tìm tất cả các input type checkbox trong vùng lọc
 		    const checkboxes = document.querySelectorAll('.filter-content input[type="checkbox"]');
-		    
 		    checkboxes.forEach(chk => {
-		        chk.addEventListener("change", filterProducts); 
+		        chk.addEventListener("change", () => filterProducts(1)); 
 		    });
 		});
