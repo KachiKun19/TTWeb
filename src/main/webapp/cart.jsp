@@ -21,6 +21,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
 <style>
+/* CSS riêng cho trang giỏ hàng để số lượng đẹp hơn */
 .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button
 	{
 	-webkit-appearance: none;
@@ -167,13 +168,30 @@
 	<%-- sửa từ main cho chuyên nghiệp --%>
 	<main class="flex-grow container mx-auto px-4 py-8">
 
-		<div class="text-sm breadcrumbs text-gray-500 mb-6">
-			<a href="home" class="hover:text-black">Trang chủ</a> <span
-				class="mx-2">/</span> <span class="text-black font-semibold">Giỏ
-				hàng</span>
-		</div>
+		<nav class="flex mb-5" aria-label="Breadcrumb">
+			<ol class="inline-flex items-center space-x-1 md:space-x-3 text-sm">
+				<li class="inline-flex items-center"><a href="home"
+					class="text-gray-400 hover:text-black inline-flex items-center">
+						<i class="fa-solid fa-house mr-2"></i> Trang chủ
+				</a></li>
+				<li>
+					<div class="flex items-center">
+						<i class="fa-solid fa-chevron-right text-gray-600 mx-2"></i> <a
+							href="cart" class="text-gray-400 hover:text-black">Giỏ hàng</a>
+					</div>
+				</li>
+				<li aria-current="page">
+					<div class="flex items-center">
+						<i class="fa-solid fa-chevron-right text-gray-600 mx-2"></i> <span
+							class="text-pink-500 font-semibold">${detail.name}</span>
+					</div>
+				</li>
+			</ol>
+		</nav>
 
-		<h1 class="text-3xl font-bold mb-8 uppercase border-b-2 border-black inline-block pb-2 text-black">Giỏ hàng của bạn</h1>
+		<h1
+			class="text-3xl font-bold mb-8 uppercase border-b-2 border-black inline-block pb-2 text-black">Giỏ
+			hàng của bạn</h1>
 
 		<c:if test="${empty sessionScope.cart}">
 			<div class="text-center py-16 bg-white rounded shadow-sm">
@@ -205,18 +223,21 @@
 							<div
 								class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 items-center border-b last:border-0 hover:bg-gray-50 transition">
 								<div class="col-span-6 flex gap-4 items-center">
-									<div
-										class="w-20 h-20 flex-shrink-0 border rounded overflow-hidden">
+									<a href="product-detail?id=${item.product.id}"
+										class="w-20 h-20 flex-shrink-0 border rounded overflow-hidden hover:opacity-80 transition">
 										<img src="images/${item.product.image}"
-											alt="${item.product.name}" class="w-full h-full object-cover">
-									</div>
+										alt="${item.product.name}" class="w-full h-full object-cover">
+									</a>
+
 									<div>
 										<h3
 											class="font-bold text-gray-800 hover:text-blue-600 transition">
-											<a href="#">${item.product.name}</a>
+											<a href="product-detail?id=${item.product.id}">${item.product.name}</a>
 										</h3>
+
 										<p class="text-xs text-gray-500 mt-1">Mã SP:
 											#${item.product.id}</p>
+
 										<a href="update-cart?id=${item.product.id}&mod=-999"
 											class="text-red-500 text-xs mt-2 hover:underline flex items-center gap-1 cursor-pointer">
 											<i class="fas fa-trash"></i> Xóa
@@ -296,6 +317,33 @@
 									class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black text-black"></textarea>
 							</div>
 
+
+							<%-- Thanh toán --%>
+							>
+							<div class="mt-4">
+								<label
+									class="block text-xs font-bold text-gray-700 uppercase mb-2">Phương
+									thức thanh toán</label>
+
+								<div class="flex items-center mb-2">
+									<input id="payment-cod" type="radio" value="COD"
+										name="payment_method" checked
+										class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+									<label for="payment-cod"
+										class="ml-2 text-sm font-medium text-gray-900">Thanh
+										toán khi nhận hàng (COD)</label>
+								</div>
+
+								<div class="flex items-center">
+									<input id="payment-bank" type="radio" value="BANKING"
+										name="payment_method"
+										class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+									<label for="payment-bank"
+										class="ml-2 text-sm font-medium text-gray-900">Chuyển
+										khoản ngân hàng</label>
+								</div>
+							</div>
+
 							<button type="submit"
 								class="w-full bg-red-600 text-white py-3 rounded font-bold hover:bg-red-700 transition uppercase shadow-lg transform hover:-translate-y-1">
 								Tiến hành đặt hàng</button>
@@ -309,21 +357,22 @@
 			</div>
 		</c:if>
 	</main>
-	<%-- làm chức năng search --%>>
+	<%-- làm chức năng search --%>
+	>
 	<div id="search-overlay" class="search-overlay">
-    <button id="close-search" class="search-overlay-close">&times;</button>
-    <div class="search-overlay-content w-full max-w-2xl mx-auto px-4">
-        
-        <input oninput="searchByName(this)" name="txt" type="text"
-            placeholder="Gõ tên sản phẩm để tìm..."
-            class="search-overlay-input w-full p-4 text-xl border-b-2 border-gray-300 focus:border-blue-500 outline-none bg-transparent" />
+		<button id="close-search" class="search-overlay-close">&times;</button>
+		<div class="search-overlay-content w-full max-w-2xl mx-auto px-4">
 
-        <div id="search-results"
-            class="mt-4 max-h-[60vh] overflow-y-auto bg-white rounded-lg shadow-xl p-2 hidden">
-        </div>
+			<input oninput="searchByName(this)" name="txt" type="text"
+				placeholder="Gõ tên sản phẩm để tìm..."
+				class="search-overlay-input w-full p-4 text-xl border-b-2 border-gray-300 focus:border-blue-500 outline-none bg-transparent" />
 
-    </div>
-</div>
+			<div id="search-results"
+				class="mt-4 max-h-[60vh] overflow-y-auto bg-white rounded-lg shadow-xl p-2 hidden">
+			</div>
+
+		</div>
+	</div>
 	<%-- đây là footer rồi --%>
 	<footer class="footer">
 		<div class="container">

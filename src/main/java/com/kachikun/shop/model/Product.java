@@ -125,4 +125,49 @@ public class Product {
 	public String toString() {
 		return "Product: " + id + ", " + name + ", " + price ;
 	}
+	
+	public String getConnectionTypeVi() {
+		if (connectionType == null)
+			return "Đang cập nhật";
+		String lower = connectionType.toLowerCase();
+		if (lower.contains("wired"))
+			return "Có dây";
+		if (lower.contains("bluetooth"))
+			return "Bluetooth";
+		if (lower.contains("usb") || lower.contains("wireless"))
+			return "Không dây (USB/2.4G)";
+		return connectionType;
+	}
+
+	public String getMaterialVi() {
+		if (material == null)
+			return "Đang cập nhật";
+		String lower = material.toLowerCase();
+		if (lower.contains("pbt"))
+			return "Nhựa PBT cao cấp";
+		if (lower.contains("abs"))
+			return "Nhựa ABS";
+		if (lower.contains("carbon"))
+			return "Sợi Carbon";
+		if (lower.contains("plastic") || lower.contains("nhựa"))
+			return "Nhựa";
+		return material;
+	}
+
+	public String getSizeVi() {
+		if (size == null)
+			return "Đang cập nhật";
+		switch (size.toUpperCase()) {
+		case "S":
+			return "Nhỏ (S)";
+		case "M":
+			return "Trung bình (M)";
+		case "L":
+			return "Lớn (L)";
+		case "XL":
+			return "Rất lớn (XL)";
+		default:
+			return size;
+		}
+	}
 }

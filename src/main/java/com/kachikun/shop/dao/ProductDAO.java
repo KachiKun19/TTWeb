@@ -259,47 +259,47 @@ public class ProductDAO {
 	    }
 	    
 	 // Hàm lấy chi tiết sản phẩm theo ID (Dùng cho Giỏ hàng)
-	 		public Product getProductById(int id) {
-	 			// Giống hệt getAllProducts nhưng thêm điều kiện WHERE id = ?
-	 			String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name, b.logo as brand_logo " +
-	 						 "FROM Products p " +
-	 						 "INNER JOIN Categories c ON p.category_id = c.id " +
-	 						 "INNER JOIN Brands b ON p.brand_id = b.id " +
-	 						 "WHERE p.id = ?";
-	 			
-	 			try {
-	 				Connection conn = DBConnection.getConnection();
-	 				PreparedStatement ps = conn.prepareStatement(sql);
-	 				ps.setInt(1, id); // Gán ID vào dấu ?
-	 				ResultSet rs = ps.executeQuery();
-	 				
-	 				if (rs.next()) {
-	 					Product p = new Product();
-	 					p.setId(rs.getInt("id"));
-	 					p.setName(rs.getString("name"));
-	 					p.setDescription(rs.getString("description"));
-	 					p.setImage(rs.getString("image"));
-	 					p.setStock(rs.getInt("stock_quantity"));
-	 					p.setPrice(rs.getDouble("price"));
-	 					
-	 					Category c = new Category();
-	 					c.setId(rs.getInt("category_id"));
-	 					c.setName(rs.getString("cat_name"));
-	 					p.setCategory(c);
-	 					
-	 					Brand b = new Brand();
-	 					b.setId(rs.getInt("brand_id"));
-	 					b.setName(rs.getString("brand_name"));
-	 					b.setLogo(rs.getString("brand_logo"));
-	 					p.setBrand(b);
-	 					
-	 					return p; 
-	 				}
-	 			} catch (Exception e) {
-	 				e.printStackTrace();
-	 			}
-	 			return null;
-	 		}
+	    public Product getProductById(int id) {
+			String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name, b.logo as brand_logo " + "FROM Products p "
+					+ "INNER JOIN Categories c ON p.category_id = c.id " + "INNER JOIN Brands b ON p.brand_id = b.id "
+					+ "WHERE p.id = ?";
+
+			try {
+				Connection conn = DBConnection.getConnection();
+				PreparedStatement ps = conn.prepareStatement(sql);
+				ps.setInt(1, id);
+				ResultSet rs = ps.executeQuery();
+
+				if (rs.next()) {
+					Product p = new Product();
+					p.setId(rs.getInt("id"));
+					p.setName(rs.getString("name"));
+					p.setDescription(rs.getString("description"));
+					p.setImage(rs.getString("image"));
+					p.setStock(rs.getInt("stock_quantity"));
+					p.setPrice(rs.getDouble("price"));
+					p.setConnectionType(rs.getString("connection_type")); 
+		            p.setMaterial(rs.getString("material"));
+		            p.setSize(rs.getString("product_size"));
+
+					Category c = new Category();
+					c.setId(rs.getInt("category_id"));
+					c.setName(rs.getString("cat_name"));
+					p.setCategory(c);
+
+					Brand b = new Brand();
+					b.setId(rs.getInt("brand_id"));
+					b.setName(rs.getString("brand_name"));
+					b.setLogo(rs.getString("brand_logo"));
+					p.setBrand(b);
+
+					return p;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
 	 		
 	 	// hàm filterProducts lọc sản phẩm theo nhiều tiêu chí
 		    public List<Product> filterProducts(String[] brandIds, String[] connections, String[] materials, String[] sizes,String category, int index) {

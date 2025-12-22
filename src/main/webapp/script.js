@@ -2,7 +2,7 @@
 const backgroundElement = document.getElementById("banner-background");
 const dots = document.querySelectorAll(".slider-nav .dot"); // Lấy tất cả các nút bấm
 
-// 2. Danh sách ảnh (giữ nguyên như cũ)
+
 if (backgroundElement && dots.length > 0) {
 	const images = [
 		"https://cdn.sforum.vn/sforum/wp-content/uploads/2022/02/9-9-960x538.jpg",
@@ -10,11 +10,11 @@ if (backgroundElement && dots.length > 0) {
 		"https://cdn2.fptshop.com.vn/unsafe/0x0/hinh_nen_may_tinh_bang_9_a5b793ee3d.jpg",
 		"https://cdn2.fptshop.com.vn/unsafe/0x0/hinh_nen_may_tinh_bang_11_90150a3686.jpg",
 	];
-	let currentIndex = 0; // Vị trí ảnh hiện tại
-	let slideInterval; // Biến để giữ bộ đếm thời gian
+	let currentIndex = 0; 
+	let slideInterval; 
 
 	/**
-	 * Hàm trung tâm: Cập nhật giao diện (ảnh và dấu chấm)
+
 	 * @param {number} index - Vị trí của ảnh/dấu chấm cần hiển thị
 	 */
 	function updateSlider(index) {
@@ -23,44 +23,34 @@ if (backgroundElement && dots.length > 0) {
 
 		// Cập nhật các dấu chấm
 		dots.forEach((dot) => {
-			dot.classList.remove("active"); // Xóa active khỏi tất cả các chấm
+			dot.classList.remove("active"); 
 		});
-		dots[index].classList.add("active"); // Thêm active vào chấm được chọn
+		dots[index].classList.add("active"); 
 
-		// Cập nhật lại vị trí hiện tại
 		currentIndex = index;
 	}
 
-	/**
-	 * Hàm tự động chuyển sang slide tiếp theo
-	 */
 	function nextSlide() {
-		let nextIndex = (currentIndex + 1) % images.length; // Lấy vị trí tiếp theo, quay vòng
+		let nextIndex = (currentIndex + 1) % images.length;
 		updateSlider(nextIndex);
 	}
 
-	/**
-	 * Hàm khởi động hoặc khởi động lại bộ đếm thời gian
-	 */
 	function startSlideShow() {
-		clearInterval(slideInterval); // Xóa bộ đếm cũ (nếu có)
-		slideInterval = setInterval(nextSlide, 5000); // Đặt bộ đếm mới (5 giây)
+		clearInterval(slideInterval); 
+		slideInterval = setInterval(nextSlide, 5000); 
 	}
 
-	// 3. Gắn sự kiện "click" cho từng dấu chấm
 	dots.forEach((dot) => {
 		dot.addEventListener("click", () => {
-			let targetIndex = parseInt(dot.dataset.slide); // Lấy vị trí (0, 1, 2, 3)
+			let targetIndex = parseInt(dot.dataset.slide);
 
-			// Chỉ cập nhật nếu bấm vào chấm không phải là chấm hiện tại
 			if (targetIndex !== currentIndex) {
 				updateSlider(targetIndex);
-				startSlideShow(); // Bấm xong thì reset lại bộ đếm
+				startSlideShow(); 
 			}
 		});
 	});
 
-	// 4. Khởi chạy slider khi tải trang
 	updateSlider(0); // Hiển thị ảnh đầu tiên
 	startSlideShow(); // Bắt đầu tự động chạy
 }
@@ -93,13 +83,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	const userDropdown = document.getElementById("user-dropdown");
 
 	if (userBtn && userDropdown) {
-		// Khi bấm vào icon user -> Bật/Tắt class 'hidden'
 		userBtn.addEventListener("click", function(e) {
-			e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+			e.stopPropagation(); 
 			userDropdown.classList.toggle("hidden");
 		});
-
-		// Khi bấm ra ngoài -> Ẩn menu
 		document.addEventListener("click", function(e) {
 			if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
 				userDropdown.classList.add("hidden");
@@ -117,17 +104,12 @@ function initCustomAccordion() {
 
 	buttons.forEach((button) => {
 		button.addEventListener("click", () => {
-			// Lấy h2 (thẻ cha)
 			const h2 = button.parentElement;
-			// Lấy content div (là thẻ em tiếp theo)
 			const content = h2.nextElementSibling;
-			// Lấy icon (mũi tên)
 			const icon = button.querySelector("svg[data-accordion-icon]");
 
-			// 1. Thêm/xóa class "active" trên content div
 			content.classList.toggle("active");
 
-			// 2. Xoay mũi tên
 			if (icon) {
 				icon.classList.toggle("rotate-180");
 			}
@@ -135,7 +117,6 @@ function initCustomAccordion() {
 	});
 }
 
-// Chạy hàm này
 initCustomAccordion();
 
 // --- Kết thúc code cho Custom Accordion ---
@@ -159,28 +140,23 @@ function initPageSlider() {
 				return;
 			}
 
-			// 1. Thêm class trượt ra cho trang CŨ
 			currentPage.classList.add("slide-out-left");
-			// 2. Bỏ active trang CŨ
+
 			currentPage.classList.remove("active");
 
-			// 3. Thêm active cho trang MỚI (CSS sẽ tự làm nó trượt vào)
 			targetPage.classList.add("active");
 
-			// 4. Dọn dẹp class 'slide-out-left' sau khi animation xong (400ms)
 			setTimeout(() => {
 				currentPage.classList.remove("slide-out-left");
-			}, 400); // 400ms = 0.4s (phải khớp với 0.4s trong CSS)
+			}, 400); 
 		});
 	});
 }
 
-// Chạy hàm này
 initPageSlider();
 
 // chạy trang mình muốn
 document.addEventListener("DOMContentLoaded", () => {
-	// 1. Lấy hash từ URL (ví dụ: "phim" từ #phim)
 	const hash = window.location.hash.substring(1);
 
 	if (hash) {
@@ -189,10 +165,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		const targetPage = document.getElementById(targetId);
 
 		if (targetPage) {
-			// 3. Tìm trang đang active mặc định (là trang chuột)
+
 			const defaultActivePage = document.querySelector(".page-content.active");
 
-			// 4. Tắt trang mặc định và Bật trang mục tiêu
 			if (defaultActivePage) {
 				defaultActivePage.classList.remove("active");
 			}
@@ -274,7 +249,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // xử lí lọc sản phẩm
-// xử lí lọc sản phẩm
 function filterProducts(index = 1) {
 		    let params = new URLSearchParams();
 
@@ -287,7 +261,6 @@ function filterProducts(index = 1) {
 			        params.append("category", categoryInput.value);
 			    }
 
-		    // (Giữ nguyên phần lấy checkbox)
 		    document.querySelectorAll('input[id^="filter-brand-"]:checked').forEach(chk => params.append("brand", chk.value));
 		    document.querySelectorAll('input[id^="filter-connection-"]:checked').forEach(chk => params.append("connection", chk.value));
 		    document.querySelectorAll('input[id^="filter-material-"]:checked').forEach(chk => params.append("material", chk.value));
@@ -307,7 +280,6 @@ function filterProducts(index = 1) {
 					            }
 								// Lấy số lượng từ thẻ ẩn mà Servlet vừa gửi về
 								    const hiddenTotal = document.getElementById("ajax-total-res");
-								    // Lấy dòng chữ "Hiển thị..." nhờ vào cái ID bạn vừa thêm ở Bước 1
 								    const countDisplay = document.getElementById("count-display");
 
 								    if (hiddenTotal && countDisplay) {
@@ -318,7 +290,6 @@ function filterProducts(index = 1) {
 		        .catch(error => console.error('Lỗi lọc:', error));
 		}
 
-		// Khi bấm vào checkbox thì luôn gọi trang 1
 		document.addEventListener("DOMContentLoaded", function() {
 		    const checkboxes = document.querySelectorAll('.filter-content input[type="checkbox"]');
 		    checkboxes.forEach(chk => {
