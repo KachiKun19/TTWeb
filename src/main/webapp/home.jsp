@@ -53,7 +53,7 @@ request.setAttribute("listCategories", list);
 						src="images/LogoChuan.png" alt="Kachi-Kun Shop Logo"
 						class="logo-img w-24 h-auto" /> <span
 						class="text-white text-xl font-bold ml-0 whitespace-nowrap">
-							Kachi-Kun Shop </span>
+							K Shop </span>
 					</a>
 				</div>
 
@@ -178,7 +178,7 @@ request.setAttribute("listCategories", list);
 				<p class="banner-subtitle">Store cho các streamer và game thủ
 					lựa chọn!</p>
 				<h1 class="banner-title">
-					Tuyển thủ Kachi-Kun /<br />KhanhNgo Edition
+					 <br />Mouse Edition
 				</h1>
 				<a href="products" class="banner-button">Xem thêm</a>
 			</div>
@@ -243,7 +243,7 @@ request.setAttribute("listCategories", list);
 	<footer class="footer">
 		<div class="container">
 			<div>
-				<h3>GROUP 14</h3>
+				<h3>Hung Khanh</h3>
 				<p>
 					Linh Trung Ward<br /> Thu Duc - Ho Chi Minh City - Viet Nam<br />
 					<strong>Phone:</strong> +0862210723<br /> <strong>Email:</strong>
@@ -306,9 +306,9 @@ request.setAttribute("listCategories", list);
 	</footer>
 	<div class="footer-bottom">
 		<p>
-			© Copyright <strong>GROUP 14</strong>. All Rights Reserved
+			© Copyright <strong>Hung Khanh</strong>
 		</p>
-		<p>Designed by GROUP 14</p>
+		<p>Designed by Hung Khanh</p>
 	</div>
 
 	<script src="https://cdn.tailwindcss.com"></script>

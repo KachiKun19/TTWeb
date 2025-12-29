@@ -44,4 +44,24 @@ public class CategoryDAO {
 			System.out.println("ID: " + c.getId() + " | Tên: " + c.getName());
 		}
 	}
+
+	public Category getCategoryById(int id) {
+	    String sql = "SELECT * FROM Categories WHERE id = ?";
+	    try {
+	        Connection conn = DBConnection.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setInt(1, id);
+	        ResultSet rs = ps.executeQuery();
+	        
+	        if (rs.next()) {
+	            Category c = new Category();
+	            c.setId(rs.getInt("id"));
+	            c.setName(rs.getString("name"));
+	            return c;
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
 }

@@ -3,6 +3,8 @@ package com.kachikun.shop.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.kachikun.shop.model.User;
 import com.kachikun.shop.utils.DBConnection;
@@ -33,25 +35,26 @@ public class UserDAO {
 
 	}
 
+	// Thêm phương thức này vào UserDAO.java (nếu chưa có)
 	public boolean register(User u) {
-		String sql = "INSERT INTO Users (username, password, full_name, email, role) VALUES (?,?,?,?,?)";
-
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-
-			ps.setString(1, u.getUsername());
-			ps.setString(2, u.getPassword());
-			ps.setString(3, u.getFullName());
-			ps.setString(4, u.getEmail());
-			ps.setInt(5, 0);
-
-			int rowsAffected = ps.executeUpdate();
-			return rowsAffected > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
+	    String sql = "INSERT INTO Users (username, password, full_name, email, role) VALUES (?, ?, ?, ?, ?)";
+	    
+	    try {
+	        Connection conn = DBConnection.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        
+	        ps.setString(1, u.getUsername());
+	        ps.setString(2, u.getPassword());
+	        ps.setString(3, u.getFullName());
+	        ps.setString(4, u.getEmail());
+	        ps.setInt(5, u.getRole());
+	        
+	        int rowsAffected = ps.executeUpdate();
+	        return rowsAffected > 0;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return false;
 	}
 	
 	public static void main(String[] args) {
@@ -78,4 +81,102 @@ public class UserDAO {
         	System.out.println("Đăng nhập thất bại");
         }
 	}
+	public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users ORDER BY id DESC";
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setUsername(rs.getString("username"));
+                u.setFullName(rs.getString("full_name"));
+                u.setEmail(rs.getString("email"));
+                u.setRole(rs.getInt("role"));
+                users.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+    
+    public User getUserById(int id) {
+        String sql = "SELECT * FROM Users WHERE id = ?";
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setUsername(rs.getString("username"));
+                u.setFullName(rs.getString("full_name"));
+                u.setEmail(rs.getString("email"));
+                u.setRole(rs.getInt("role"));
+                return u;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public boolean updateUser(User u) {
+        String sql = "UPDATE Users SET full_name = ?, email = ?, role = ? WHERE id = ?";
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, u.getFullName());
+            ps.setString(2, u.getEmail());
+            ps.setInt(3, u.getRole());
+            ps.setInt(4, u.getId());
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public boolean deleteUser(int id) {
+        String sql = "DELETE FROM Users WHERE id = ?";
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public List<User> getUsersByRole(int role) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users WHERE role = ? ORDER BY id DESC";
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, role);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setUsername(rs.getString("username"));
+                u.setFullName(rs.getString("full_name"));
+                u.setEmail(rs.getString("email"));
+                u.setRole(rs.getInt("role"));
+                users.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+    
 }

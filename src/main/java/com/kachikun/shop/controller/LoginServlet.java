@@ -13,33 +13,38 @@ import com.kachikun.shop.model.User;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    // Khi người dùng gõ /login -> Hiện trang login.jsp
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("login.jsp").forward(request, response);
-    }
+	// Khi người dùng gõ /login -> Hiện trang login.jsp
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		request.getRequestDispatcher("login.jsp").forward(request, response);
+	}
 
-    // Khi người dùng bấm nút "Đăng Nhập" ở form
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String u = request.getParameter("username");
-        String p = request.getParameter("password");
-        
-        UserDAO dao = new UserDAO();
-        // Hàm này bạn đã có trong file UserDAO.java
-        User user = dao.checkLogin(u, p); 
-        
-        if(user != null) {
-            // Đăng nhập đúng: Lưu thông tin vào Session
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user); 
-            
-            // Chuyển về trang chủ
-            response.sendRedirect("home");
-        } else {
-            // Đăng nhập sai: Báo lỗi
-            request.setAttribute("error", "Tài khoản hoặc mật khẩu không đúng!");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-        }
-    }
+	// Khi người dùng bấm nút "Đăng Nhập" ở form
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String u = request.getParameter("username");
+		String p = request.getParameter("password");
+
+		UserDAO dao = new UserDAO();
+		User user = dao.checkLogin(u, p);
+
+		if (user != null) {
+			HttpSession session = request.getSession();
+			session.setAttribute("user", user);
+
+			// PHÂN QUYỀN THEO ROLE
+			if (user.getRole() == 1) {
+				// Admin -> chuyển đến trang admin
+				response.sendRedirect("adminHome");
+			} else {
+				// User thường -> chuyển đến trang chủ
+				response.sendRedirect("home");
+			}
+		} else {
+			request.setAttribute("error", "Tài khoản hoặc mật khẩu không đúng!");
+			request.getRequestDispatcher("login.jsp").forward(request, response);
+		}
+	}
 }
