@@ -530,7 +530,7 @@ body {
 						dùng</a></li>
 				<li><a href="adminProducts" class="active"><i
 						class="fas fa-box"></i> Quản lý sản phẩm</a></li>
-				<li><a href="#"><i class="fas fa-shopping-cart"></i> Quản
+				<li><a href="adminOrders"><i class="fas fa-shopping-cart"></i> Quản
 						lý đơn hàng</a></li>
 				<li><a href="#"><i class="fas fa-chart-bar"></i> Thống kê &
 						Báo cáo</a></li>

@@ -1,6 +1,10 @@
 package com.kachikun.shop.dao;
 
 import com.kachikun.shop.model.User;
+import com.kachikun.shop.model.CartItem;
+import com.kachikun.shop.model.Order;
+import com.kachikun.shop.model.OrderDetail;
+import com.kachikun.shop.model.Product;
 import com.kachikun.shop.utils.DBConnection;
 
 import java.sql.Statement;
@@ -10,72 +14,80 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kachikun.shop.model.OrderDetail;
-import com.kachikun.shop.model.Product;
-
 public class OrderDAO {
-	public boolean createOrder(User user, List<OrderDetail> cart, double totalPrice ) {
-		Connection conn = null;
-		PreparedStatement psOrder = null;
-		PreparedStatement psDetail = null;
-		boolean result = false;
-		
-		try {
-			conn = DBConnection.getConnection();
-			conn.setAutoCommit(false);
-			
-			String sqlOrder = "INSERT INTO Orders (user_id, total_price, status, order_date) VALUES (?, ?, ?, GETDATE())";
-			psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
-			psOrder.setInt(1, user.getId());
-			psOrder.setDouble(2, totalPrice);
-			psOrder.setString(3, "Đang xử lí");
-			
-			psOrder.executeUpdate();
-			
-			ResultSet rs = psOrder.getGeneratedKeys();
-			int orderId = 0;
-			if(rs.next()) {
-				orderId = rs.getInt(1);
-			}
-			
-			if(orderId > 0 && cart != null) {
-				String sqlDetail = "INSERT INTO OrderDetails (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
-				psDetail = conn.prepareStatement(sqlDetail);
-				
-				for(OrderDetail item : cart) {
-					psDetail.setInt(1, orderId);
-					psDetail.setInt(2, item.getProduct().getId());
-					psDetail.setDouble(3, item.getPrice());
-					psDetail.setInt(4, item.getQuantity());
-					
-					psDetail.addBatch();
-				}
-				psDetail.executeBatch();
-			}
-			// ktra có lỗi gì ko rồi mới lưu
-			conn.commit();
-			result = true;
-			System.out.println("Tạo đơn hàng thành công! Mã đơn: " + orderId);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-			// nếu thấy lỗi thì gọi rollback để xóa dữ liệu 
-			try {
-				if(conn != null) conn.rollback();
-				System.out.println("Đơn hàng đã bị hủy");	
-			}catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-		finally {
-			//Đóng kết nối
-			try {
-				if(conn != null) conn.setAutoCommit(true);
-				if(conn != null) conn.close();
-			}catch(Exception e){}
-		}
-		return result;
-	}
+    public boolean createOrder(User user, List<CartItem> cart, double totalPrice, String fullname, String phone, String address, String paymentMethod) {
+        Connection conn = null;
+        PreparedStatement psOrder = null;
+        PreparedStatement psDetail = null;
+        boolean result = false;
+
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); 
+
+            // 1. INSERT VÀO BẢNG ORDERS
+            // Cập nhật SQL thêm 4 cột mới: recipient_name, recipient_phone, shipping_address, payment_method
+            String sqlOrder = "INSERT INTO Orders (user_id, total_price, status, order_date, recipient_name, recipient_phone, shipping_address, payment_method) VALUES (?, ?, ?, GETDATE(), ?, ?, ?, ?)";
+            
+            psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
+            psOrder.setInt(1, user.getId());
+            psOrder.setDouble(2, totalPrice);
+            psOrder.setString(3, "Đang xử lý"); // Status mặc định
+            
+            // Set giá trị cho 4 cột mới
+            psOrder.setString(4, fullname);
+            psOrder.setString(5, phone);
+            psOrder.setString(6, address);
+            psOrder.setString(7, paymentMethod);
+
+            psOrder.executeUpdate();
+
+            // Lấy ID đơn hàng vừa tạo
+            ResultSet rs = psOrder.getGeneratedKeys();
+            int orderId = 0;
+            if (rs.next()) {
+                orderId = rs.getInt(1);
+            }
+
+            // 2. INSERT VÀO ORDER DETAILS
+            if (orderId > 0 && cart != null) {
+                String sqlDetail = "INSERT INTO OrderDetails (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
+                psDetail = conn.prepareStatement(sqlDetail);
+
+                for (CartItem item : cart) {
+                    psDetail.setInt(1, orderId);
+                    psDetail.setInt(2, item.getProduct().getId()); // Lấy ID sản phẩm từ CartItem
+                    psDetail.setDouble(3, item.getProduct().getPrice()); // Lấy giá
+                    psDetail.setInt(4, item.getQuantity()); // Lấy số lượng
+
+                    psDetail.addBatch();
+                }
+                psDetail.executeBatch();
+            }
+
+            // Mọi thứ ok thì lưu lại (Commit)
+            conn.commit();
+            result = true;
+            System.out.println("Tạo đơn hàng thành công! Mã đơn: " + orderId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                if (conn != null) conn.rollback(); // Có lỗi thì hoàn tác
+                System.out.println("Đơn hàng đã bị hủy do lỗi.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (Exception e) {}
+        }
+        return result;
+    }
 	
 	public boolean updateStatus(int orderId, String status) {
 		String sql = "UPDATE Orders SET status = ? WHERE id = ?";
@@ -128,6 +140,71 @@ public class OrderDAO {
 		e.printStackTrace();
 	}
 		return list;
+	}
+	
+	public List<Order> getAllOrders() {
+	    List<Order> list = new ArrayList<>();
+	    String sql = "SELECT * FROM Orders ORDER BY order_date DESC"; 
+	    
+	    try {
+	        Connection conn = DBConnection.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ResultSet rs = ps.executeQuery();
+	        
+	        while(rs.next()) {
+	            Order o = new Order();
+	            o.setId(rs.getInt("id"));
+	            o.setTotalPrice(rs.getDouble("total_price"));
+	            o.setStatus(rs.getString("status"));
+	            o.setOrderDate(rs.getDate("order_date"));
+	            
+	            // Set thông tin người nhận
+	            o.setRecipientName(rs.getString("recipient_name"));
+	            o.setRecipientPhone(rs.getString("recipient_phone"));
+	            o.setShippingAddress(rs.getString("shipping_address"));
+	            o.setPaymentMethod(rs.getString("payment_method"));
+	            
+	            // Xử lý user (chỉ cần lấy ID để biết user nào đặt, nếu cần tên account thì join thêm)
+	            User u = new User();
+	            u.setId(rs.getInt("user_id"));
+	            o.setUser(u);
+	            
+	            list.add(o);
+	        }
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    }
+	    return list;
+	}
+
+	// Lấy thông tin 1 đơn hàng
+	public Order getOrderById(int id) {
+	    String sql = "SELECT * FROM Orders WHERE id = ?";
+	    try {
+	        Connection conn = DBConnection.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setInt(1, id);
+	        ResultSet rs = ps.executeQuery();
+	        if(rs.next()) {
+	            Order o = new Order();
+	            o.setId(rs.getInt("id"));
+	            o.setTotalPrice(rs.getDouble("total_price"));
+	            o.setStatus(rs.getString("status"));
+	            o.setOrderDate(rs.getDate("order_date"));
+	            o.setRecipientName(rs.getString("recipient_name"));
+	            o.setRecipientPhone(rs.getString("recipient_phone"));
+	            o.setShippingAddress(rs.getString("shipping_address"));
+	            o.setPaymentMethod(rs.getString("payment_method"));
+	            
+	            User u = new User();
+	            u.setId(rs.getInt("user_id"));
+	            o.setUser(u);
+	            return o;
+	        }
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    }
+	    return null;
 	}
 	
 	public static void main(String[] args) {
