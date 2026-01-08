@@ -14,12 +14,6 @@ public class ProductService {
 		return productDAO.getAllProducts();
 	}
 	public Product getproductById(int id) {
-		List<Product> list = new ArrayList<>();
-		for(Product p : list) {
-			if(p.getId() == id) {
-				return p;
-			}
-		}
-		return null;
+	    return productDAO.getProductById(id); 
 	}
 }

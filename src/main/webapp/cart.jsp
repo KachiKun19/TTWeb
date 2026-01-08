@@ -279,7 +279,7 @@
 
 				<div class="lg:col-span-1">
 					<div class="bg-white p-6 rounded shadow sticky top-24">
-						<h2 class="text-lg font-bold mb-4 uppercase border-b pb-2">Thông
+						<h2 class="text-lg font-bold mb-4 uppercase border-b pb-2 text-black">Thông
 							tin thanh toán</h2>
 
 						<form action="checkout" method="post" class="space-y-4">
@@ -438,6 +438,110 @@
 			</div>
 		</div>
 	</footer>
+	
+	<%-- them chuc nang thanh toan --%>>
+	<c:if test="${not empty msg}">
+		<div id="paymentModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 overflow-y-auto h-full w-full z-[9999] flex items-center justify-center backdrop-blur-sm">
+			<div class="relative p-6 border w-[450px] shadow-2xl rounded-2xl bg-white text-center transform transition-all scale-100">
+				
+				<c:if test="${paymentMethod == 'COD'}">
+					<div class="mt-2">
+						<div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4 animate-bounce">
+							<i class="fas fa-check text-green-600 text-3xl"></i>
+						</div>
+						<h3 class="text-2xl font-bold text-gray-900 mb-2">Đặt hàng thành công!</h3>
+						<div class="mt-2 px-2 py-3">
+							<p class="text-gray-500">
+								Cảm ơn bạn đã mua sắm tại Kachi-Kun Shop.<br>
+								Đơn hàng của bạn đã được ghi nhận. Chúng tôi sẽ liên hệ sớm để giao hàng.
+							</p>
+						</div>
+						<div class="mt-4">
+							<button onclick="window.location.href='home'" 
+									class="px-6 py-3 bg-green-600 text-white text-base font-bold rounded-lg w-full shadow hover:bg-green-700 transition duration-300">
+								Về trang chủ
+							</button>
+						</div>
+					</div>
+				</c:if>
+
+				<c:if test="${paymentMethod == 'BANKING'}">
+					<div class="mt-2">
+						<img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Logo_BIDV.svg" 
+							 alt="BIDV Logo" class="h-10 mx-auto mb-4">
+						
+						<h3 class="text-xl font-bold text-gray-800 mb-4 uppercase border-b pb-2">Thông tin chuyển khoản</h3>
+						
+						<div class="text-left bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-inner mx-1">
+							
+							<div class="mb-4 text-center">
+								<p class="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-1">Số tài khoản</p>
+								<div class="flex items-center justify-center gap-2">
+									<p id="bank-acc-num" class="text-blue-700 font-extrabold text-3xl tracking-widest font-mono">1234 567 890</p>
+									<button onclick="copyToClipboard()" class="text-gray-400 hover:text-blue-600" title="Sao chép">
+										<i class="far fa-copy"></i>
+									</button>
+								</div>
+							</div>
+
+							<div class="border-t border-blue-200 my-3 border-dashed"></div>
+
+							<div class="space-y-3 text-sm">
+								<div class="flex justify-between">
+									<span class="text-gray-600">Ngân hàng:</span>
+									<span class="font-bold text-gray-900">BIDV</span>
+								</div>
+								<div class="flex justify-between">
+									<span class="text-gray-600">Chủ tài khoản:</span>
+									<span class="font-bold text-gray-900 uppercase">KACHI KUN SHOP</span>
+								</div>
+								<div class="flex justify-between items-center bg-white p-2 rounded border border-blue-100">
+									<span class="text-gray-600">Số tiền:</span>
+									<span class="text-red-600 font-bold text-lg">
+										<fmt:formatNumber value="${finalTotal}" type="currency" currencySymbol="₫"/>
+									</span>
+								</div>
+								<div class="flex justify-between">
+									<span class="text-gray-600">Nội dung:</span>
+									<span class="font-bold text-gray-900 italic">Thanh toan don hang</span>
+								</div>
+							</div>
+						</div>
+
+						<p class="text-[11px] text-gray-500 mt-4 italic">
+							*Vui lòng chuyển khoản đúng số tiền để hệ thống xác nhận nhanh nhất.
+						</p>
+
+						<div class="mt-5 space-y-2">
+							<button onclick="alert('Đơn hàng của bạn đang được xử lý. Cảm ơn bạn!'); window.location.href='home'" 
+									class="px-4 py-3 bg-blue-700 text-white text-base font-bold rounded-lg w-full shadow-lg hover:bg-blue-800 transition transform hover:-translate-y-0.5">
+								Đã chuyển khoản xong
+							</button>
+							<button onclick="window.location.href='home'" 
+									class="px-4 py-2 text-gray-500 text-sm hover:text-gray-800 underline">
+								Để sau, về trang chủ
+							</button>
+						</div>
+					</div>
+				</c:if>
+
+			</div>
+		</div>
+		
+		<script>
+			function copyToClipboard() {
+				var copyText = document.getElementById("bank-acc-num").innerText;
+				// Loại bỏ khoảng trắng
+				var rawText = copyText.replace(/\s/g, ''); 
+				navigator.clipboard.writeText(rawText).then(function() {
+					alert("Đã sao chép số tài khoản: " + rawText);
+				}, function(err) {
+					console.error('Lỗi sao chép: ', err);
+				});
+			}
+		</script>
+	</c:if>
+	
 	<div class="footer-bottom">
 		<p>
 			© Copyright <strong>GROUP 14</strong>. All Rights Reserved

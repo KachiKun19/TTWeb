@@ -87,8 +87,6 @@ body { font-family: 'Montserrat', 'Arial', sans-serif; background-color: #f5f7fa
                 <li><a href="adminUsers"><i class="fas fa-users"></i> Quản lý người dùng</a></li>
                 <li><a href="adminProducts"><i class="fas fa-box"></i> Quản lý sản phẩm</a></li>
                 <li><a href="adminOrders" class="active"><i class="fas fa-shopping-cart"></i> Quản lý đơn hàng</a></li>
-                <li><a href="#"><i class="fas fa-chart-bar"></i> Thống kê & Báo cáo</a></li>
-                <li><a href="#"><i class="fas fa-cog"></i> Cài đặt hệ thống</a></li>
                 <li><a href="home"><i class="fas fa-store"></i> Về trang cửa hàng</a></li>
             </ul>
         </div>
