@@ -49,11 +49,11 @@ request.setAttribute("listCategories", list);
 		<header class="main-header">
 			<div class="container">
 				<div class="logo">
-					<a href="index4.html" class="flex items-center"> <img
+					<a href="home" class="flex items-center"> <img
 						src="images/LogoChuan.png" alt="Kachi-Kun Shop Logo"
 						class="logo-img w-24 h-auto" /> <span
 						class="text-white text-xl font-bold ml-0 whitespace-nowrap">
-							K Shop </span>
+							Kachi-Kun Shop </span>
 					</a>
 				</div>
 
@@ -98,7 +98,9 @@ request.setAttribute("listCategories", list);
 											kiện</a></li>
 								</ul>
 							</div></li>
-						<li><a href="#">Liên Hệ</a></li>
+						<li>
+    <a href="${not empty sessionScope.user ? 'contact.jsp' : 'login'}">Liên Hệ</a>
+</li>
 					</ul>
 				</nav>
 
@@ -157,15 +159,50 @@ request.setAttribute("listCategories", list);
 						</div>
 					</div>
 
-					<a href="cart.jsp"
-						class="text-xl transition-opacity duration-200 hover:opacity-80 relative">
-						<i class="fas fa-shopping-basket"></i> <%-- (Tùy chọn) Hiển thị số lượng nhỏ trên icon --%>
-						<c:if test="${not empty sessionScope.cart}">
-							<span
-								class="absolute -top-2 -right-2 bg-pink-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-								${sessionScope.cart.size()} </span>
-						</c:if>
-					</a>
+					<div class="relative">
+    <button id="cartDropdownButton" data-dropdown-toggle="cartDropdown" 
+            class="text-xl transition-opacity duration-200 hover:opacity-80 relative focus:outline-none pt-2">
+        <i class="fas fa-shopping-basket"></i>
+        
+        <c:if test="${not empty sessionScope.cart}">
+            <span class="absolute -top-1 -right-2 bg-pink-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-[#1a1a1a]">
+                ${sessionScope.cart.size()} 
+            </span>
+        </c:if>
+    </button>
+
+    <div id="cartDropdown" class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-lg w-48 overflow-hidden transform origin-top-right transition-all duration-200">
+        <div class="px-4 py-3 bg-gray-50 border-b text-gray-900 text-sm font-semibold">
+            Hoạt động mua sắm
+        </div>
+        
+        <ul class="py-1 text-sm text-gray-700" aria-labelledby="cartDropdownButton">
+            <li>
+                <a href="cart.jsp" class="block px-4 py-3 hover:bg-pink-50 hover:text-pink-600 transition flex items-center group">
+                    <span class="bg-pink-100 text-pink-600 w-8 h-8 rounded-full flex items-center justify-center mr-3 group-hover:bg-pink-200 transition">
+                        <i class="fas fa-shopping-cart text-xs"></i>
+                    </span>
+                    <div>
+                        <span class="font-bold block">Giỏ hàng</span>
+                        <span class="text-xs text-gray-500">Thanh toán ngay</span>
+                    </div>
+                </a>
+            </li>
+            
+            <li>
+                <a href="order-history" class="block px-4 py-3 hover:bg-blue-50 hover:text-blue-600 transition flex items-center group">
+                    <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center mr-3 group-hover:bg-blue-200 transition">
+                        <i class="fas fa-receipt text-xs"></i>
+                    </span>
+                    <div>
+                        <span class="font-bold block">Đơn mua</span>
+                        <span class="text-xs text-gray-500">Xem lịch sử</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
 				</div>
 			</div>
 		</header>

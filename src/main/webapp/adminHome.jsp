@@ -367,6 +367,7 @@ body {
 				<li><a href="adminProducts"><i class="fas fa-box"></i> Quản lý sản phẩm</a></li>
 				<li><a href="adminOrders"><i class="fas fa-shopping-cart"></i> Quản
 						lý đơn hàng</a></li>
+				<li><a href="adminContacts"><i class="fas fa-envelope"></i> Quản lý liên hệ</a></li>
 				<li><a href="home"><i class="fas fa-store"></i> Về trang
 						cửa hàng</a></li>
 			</ul>

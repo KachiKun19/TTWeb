@@ -207,6 +207,47 @@ public class OrderDAO {
 	    return null;
 	}
 	
+	public List<Order> getOrdersByUserId(int userId) {
+        List<Order> list = new ArrayList<>();
+        String sql = "SELECT * FROM Orders WHERE user_id = ? ORDER BY id DESC"; // Đơn mới nhất lên đầu
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Order o = new Order();
+                o.setId(rs.getInt("id"));
+                o.setOrderDate(rs.getDate("order_date"));
+                o.setTotalPrice(rs.getDouble("total_price"));
+                o.setStatus(rs.getString("status"));
+                o.setRecipientName(rs.getString("recipient_name"));
+                o.setRecipientPhone(rs.getString("recipient_phone"));
+                o.setShippingAddress(rs.getString("shipping_address"));
+                o.setPaymentMethod(rs.getString("payment_method"));
+                list.add(o);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // 2. Khách hàng tự hủy đơn (Chỉ hủy được khi trạng thái là 'Đang xử lý')
+    public boolean userCancelOrder(int orderId) {
+        String sql = "UPDATE Orders SET status = N'Đã hủy' WHERE id = ? AND status = N'Đang xử lý'";
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, orderId);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+	
 	public static void main(String[] args) {
 		OrderDAO dao = new OrderDAO();
 //		User u = new User();
