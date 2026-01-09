@@ -10,8 +10,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import com.kachikun.shop.dao.OrderDAO;
+import com.kachikun.shop.dao.ProductDAO; // Nhớ import cái này
 import com.kachikun.shop.model.CartItem;
-import com.kachikun.shop.model.User; // Import User
+import com.kachikun.shop.model.Product; // Nhớ import cái này
+import com.kachikun.shop.model.User;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
@@ -39,10 +41,21 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        double totalMoney = 0;
+        ProductDAO pDao = new ProductDAO();
         for (CartItem item : cart) {
-            totalMoney += item.getTotalPrice();
+
+            Product dbProduct = pDao.getProductById(item.getProduct().getId());
+
+            if (item.getQuantity() > dbProduct.getStock()) {
+                request.setAttribute("stockError", "Sản phẩm '" + dbProduct.getName() + "' chỉ còn lại " + dbProduct.getStock() + " cái. Vui lòng giảm số lượng!");
+                
+                request.setAttribute("totalMoney", calculateTotal(cart)); 
+                
+                request.getRequestDispatcher("cart.jsp").forward(request, response);
+                return; 
+            }
         }
+        double totalMoney = calculateTotal(cart);
 
         OrderDAO dao = new OrderDAO();
         boolean check = dao.createOrder(user, cart, totalMoney, fullname, phone, address, paymentMethod);
@@ -57,9 +70,20 @@ public class CheckoutServlet extends HttpServlet {
             
             request.getRequestDispatcher("cart.jsp").forward(request, response);
         } else {
-            // Thất bại
+
             request.setAttribute("error", "Đặt hàng thất bại. Vui lòng thử lại!");
+            request.setAttribute("totalMoney", totalMoney); 
             request.getRequestDispatcher("cart.jsp").forward(request, response);
         }
+    }
+
+    private double calculateTotal(List<CartItem> cart) {
+        double total = 0;
+        if (cart != null) {
+            for (CartItem item : cart) {
+                total += item.getTotalPrice();
+            }
+        }
+        return total;
     }
 }

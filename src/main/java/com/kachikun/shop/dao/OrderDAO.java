@@ -15,79 +15,92 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAO {
-    public boolean createOrder(User user, List<CartItem> cart, double totalPrice, String fullname, String phone, String address, String paymentMethod) {
-        Connection conn = null;
-        PreparedStatement psOrder = null;
-        PreparedStatement psDetail = null;
-        boolean result = false;
+	public boolean createOrder(User user, List<CartItem> cart, double totalPrice, String fullname, String phone, String address, String paymentMethod) {
+	    Connection conn = null;
+	    PreparedStatement psOrder = null;
+	    PreparedStatement psDetail = null;
+	    PreparedStatement psStock = null; // --- [MỚI] Khai báo thêm cái này
+	    boolean result = false;
 
-        try {
-            conn = DBConnection.getConnection();
-            conn.setAutoCommit(false); 
+	    try {
+	        conn = DBConnection.getConnection();
+	        conn.setAutoCommit(false); // Bắt đầu Transaction
 
-            // 1. INSERT VÀO BẢNG ORDERS
-            // Cập nhật SQL thêm 4 cột mới: recipient_name, recipient_phone, shipping_address, payment_method
-            String sqlOrder = "INSERT INTO Orders (user_id, total_price, status, order_date, recipient_name, recipient_phone, shipping_address, payment_method) VALUES (?, ?, ?, GETDATE(), ?, ?, ?, ?)";
-            
-            psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
-            psOrder.setInt(1, user.getId());
-            psOrder.setDouble(2, totalPrice);
-            psOrder.setString(3, "Đang xử lý"); // Status mặc định
-            
-            // Set giá trị cho 4 cột mới
-            psOrder.setString(4, fullname);
-            psOrder.setString(5, phone);
-            psOrder.setString(6, address);
-            psOrder.setString(7, paymentMethod);
+	        // 1. INSERT VÀO BẢNG ORDERS
+	        String sqlOrder = "INSERT INTO Orders (user_id, total_price, status, order_date, recipient_name, recipient_phone, shipping_address, payment_method) VALUES (?, ?, ?, GETDATE(), ?, ?, ?, ?)";
+	        
+	        psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
+	        psOrder.setInt(1, user.getId());
+	        psOrder.setDouble(2, totalPrice);
+	        psOrder.setString(3, "Đang xử lý");
+	        psOrder.setString(4, fullname);
+	        psOrder.setString(5, phone);
+	        psOrder.setString(6, address);
+	        psOrder.setString(7, paymentMethod);
 
-            psOrder.executeUpdate();
+	        psOrder.executeUpdate();
 
-            // Lấy ID đơn hàng vừa tạo
-            ResultSet rs = psOrder.getGeneratedKeys();
-            int orderId = 0;
-            if (rs.next()) {
-                orderId = rs.getInt(1);
-            }
+	        // Lấy ID đơn hàng vừa tạo
+	        ResultSet rs = psOrder.getGeneratedKeys();
+	        int orderId = 0;
+	        if (rs.next()) {
+	            orderId = rs.getInt(1);
+	        }
 
-            // 2. INSERT VÀO ORDER DETAILS
-            if (orderId > 0 && cart != null) {
-                String sqlDetail = "INSERT INTO OrderDetails (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
-                psDetail = conn.prepareStatement(sqlDetail);
+	        // 2. INSERT VÀO ORDER DETAILS VÀ TRỪ KHO
+	        if (orderId > 0 && cart != null) {
+	            String sqlDetail = "INSERT INTO OrderDetails (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
+	            
+	            // --- [MỚI] Chuẩn bị câu lệnh trừ kho
+	            String sqlUpdateStock = "UPDATE Products SET stock_quantity = stock_quantity - ? WHERE id = ?";
+	            
+	            psDetail = conn.prepareStatement(sqlDetail);
+	            psStock = conn.prepareStatement(sqlUpdateStock); // --- [MỚI]
 
-                for (CartItem item : cart) {
-                    psDetail.setInt(1, orderId);
-                    psDetail.setInt(2, item.getProduct().getId()); // Lấy ID sản phẩm từ CartItem
-                    psDetail.setDouble(3, item.getProduct().getPrice()); // Lấy giá
-                    psDetail.setInt(4, item.getQuantity()); // Lấy số lượng
+	            for (CartItem item : cart) {
+	                // A. Lưu chi tiết đơn hàng
+	                psDetail.setInt(1, orderId);
+	                psDetail.setInt(2, item.getProduct().getId());
+	                psDetail.setDouble(3, item.getProduct().getPrice());
+	                psDetail.setInt(4, item.getQuantity());
+	                psDetail.addBatch(); // Gom lệnh lại chạy 1 lần
 
-                    psDetail.addBatch();
-                }
-                psDetail.executeBatch();
-            }
+	                // B. --- [MỚI] TRỪ TỒN KHO ---
+	                psStock.setInt(1, item.getQuantity()); // Trừ đi số lượng khách mua
+	                psStock.setInt(2, item.getProduct().getId()); // Của sản phẩm ID này
+	                psStock.executeUpdate(); // Chạy lệnh trừ ngay lập tức
+	            }
+	            
+	            psDetail.executeBatch(); // Chạy batch insert details
+	        }
 
-            // Mọi thứ ok thì lưu lại (Commit)
-            conn.commit();
-            result = true;
-            System.out.println("Tạo đơn hàng thành công! Mã đơn: " + orderId);
+	        // Mọi thứ ok thì lưu lại (Commit)
+	        conn.commit();
+	        result = true;
+	        System.out.println("Tạo đơn hàng thành công! Mã đơn: " + orderId);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            try {
-                if (conn != null) conn.rollback(); // Có lỗi thì hoàn tác
-                System.out.println("Đơn hàng đã bị hủy do lỗi.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                }
-            } catch (Exception e) {}
-        }
-        return result;
-    }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        try {
+	            if (conn != null) conn.rollback(); 
+	            System.out.println("Đơn hàng đã bị hủy do lỗi.");
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+	    } finally {
+	        // Đóng kết nối
+	        try {
+	            if (psStock != null) psStock.close(); 
+	            if (psDetail != null) psDetail.close();
+	            if (psOrder != null) psOrder.close();
+	            if (conn != null) {
+	                conn.setAutoCommit(true);
+	                conn.close();
+	            }
+	        } catch (Exception e) {}
+	    }
+	    return result;
+	}
 	
 	public boolean updateStatus(int orderId, String status) {
 		String sql = "UPDATE Orders SET status = ? WHERE id = ?";
@@ -203,6 +216,7 @@ public class OrderDAO {
 	        }
 	    } catch(Exception e) {
 	        e.printStackTrace();
+	        System.out.println("Lỗi ở OrderDAO: " + e.getMessage());
 	    }
 	    return null;
 	}
@@ -233,7 +247,6 @@ public class OrderDAO {
         return list;
     }
 
-    // 2. Khách hàng tự hủy đơn (Chỉ hủy được khi trạng thái là 'Đang xử lý')
     public boolean userCancelOrder(int orderId) {
         String sql = "UPDATE Orders SET status = N'Đã hủy' WHERE id = ? AND status = N'Đang xử lý'";
         try {
@@ -277,4 +290,5 @@ public class OrderDAO {
 			System.out.println("-----------------");
 		}
 	}
+
 }

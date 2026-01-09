@@ -19,45 +19,50 @@ public class AddToCartServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Lấy ID sản phẩm từ đường dẫn (VD: add-to-cart?id=123)
         String idStr = request.getParameter("id");
-        int productId = Integer.parseInt(idStr);
+        
+        if(idStr != null) {
+            int productId = Integer.parseInt(idStr);
 
-        // Lấy giỏ hàng từ Session
-        HttpSession session = request.getSession();
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-
-        // Nếu chưa có giỏ hàng thì tạo list mới
-        if (cart == null) {
-            cart = new ArrayList<>();
-        }
-
-        // Kiểm tra sản phẩm đã có trong giỏ chưa
-        boolean found = false;
-        for (CartItem item : cart) {
-            if (item.getProduct().getId() == productId) {
-                // Nếu có rồi thì tăng số lượng lên 1
-                item.setQuantity(item.getQuantity() + 1);
-                found = true;
-                break;
-            }
-        }
-
-        // Nếu chưa có thì lấy thông tin từ DB và thêm vào list
-        if (!found) {
             ProductDAO dao = new ProductDAO();
-            Product p = dao.getProductById(productId); // Hàm này bạn đã viết trong ProductDAO rồi
-            if (p != null) {
-                CartItem newItem = new CartItem(p, 1);
-                cart.add(newItem);
+            Product dbProduct = dao.getProductById(productId);
+
+            HttpSession session = request.getSession();
+            List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+
+            if (cart == null) {
+                cart = new ArrayList<>();
             }
+
+            boolean found = false;
+
+            for (CartItem item : cart) {
+                if (item.getProduct().getId() == productId) {
+
+                    if (item.getQuantity() < dbProduct.getStock()) {
+
+                        item.setQuantity(item.getQuantity() + 1);
+                    } else {
+                        session.setAttribute("stockError", "Sản phẩm " + dbProduct.getName() + " đã đạt giới hạn số lượng tồn kho!");
+                    }
+                    
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                if (dbProduct.getStock() > 0) {
+                    CartItem newItem = new CartItem(dbProduct, 1);
+                    cart.add(newItem);
+                } else {
+                     session.setAttribute("stockError", "Sản phẩm này đã hết hàng!");
+                }
+            }
+
+            session.setAttribute("cart", cart);
         }
 
-        // Lưu lại vào session
-        session.setAttribute("cart", cart);
-
-        // Chuyển hướng về trang giỏ hàng
-        // Về thẳng trang giỏ hàng (Cart)
-        response.sendRedirect("cart");
+        response.sendRedirect("cart.jsp");
     }
 }
