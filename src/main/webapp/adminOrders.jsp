@@ -12,69 +12,304 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Montserrat', 'Arial', sans-serif; background-color: #f5f7fa; color: #333; line-height: 1.6; }
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: 'Montserrat', 'Arial', sans-serif;
+	background-color: #f5f7fa;
+	color: #333;
+	line-height: 1.6;
+}
 
 /* --- HEADER & SIDEBAR GIỐNG HỆT ADMINUSERS --- */
-.admin-header { background: linear-gradient(135deg, #2d7e7e 0%, #1a5c5c 100%); color: white; padding: 20px 30px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); display: flex; justify-content: space-between; align-items: center; }
-.admin-header h1 { font-size: 24px; font-weight: 600; }
-.user-info { display: flex; align-items: center; gap: 15px; }
-.user-avatar { width: 40px; height: 40px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.logout-btn { background-color: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 500; transition: background-color 0.3s; }
-.logout-btn:hover { background-color: rgba(255, 255, 255, 0.3); }
+.admin-header {
+	background: linear-gradient(135deg, #2d7e7e 0%, #1a5c5c 100%);
+	color: white;
+	padding: 20px 30px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
 
-.admin-container { display: flex; min-height: calc(100vh - 80px); }
-.sidebar { width: 250px; background-color: white; padding: 20px 0; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05); }
-.sidebar-menu { list-style: none; }
-.sidebar-menu li { padding: 0; }
-.sidebar-menu a { display: flex; align-items: center; padding: 15px 25px; color: #555; text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; }
-.sidebar-menu a:hover { background-color: #f0f7f7; color: #2d7e7e; border-left-color: #2d7e7e; }
-.sidebar-menu a.active { background-color: #e8f4f4; color: #2d7e7e; border-left-color: #2d7e7e; font-weight: 600; }
-.sidebar-menu i { width: 24px; margin-right: 12px; text-align: center; }
+.admin-header h1 {
+	font-size: 24px;
+	font-weight: 600;
+}
+
+.user-info {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.user-avatar {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background-color: rgba(255, 255, 255, 0.2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 18px;
+}
+
+.logout-btn {
+	background-color: rgba(255, 255, 255, 0.2);
+	border: none;
+	color: white;
+	padding: 8px 16px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-family: 'Montserrat', sans-serif;
+	font-weight: 500;
+	transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+	background-color: rgba(255, 255, 255, 0.3);
+}
+
+.admin-container {
+	display: flex;
+	min-height: calc(100vh - 80px);
+}
+
+.sidebar {
+	width: 250px;
+	background-color: white;
+	padding: 20px 0;
+	box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-menu {
+	list-style: none;
+}
+
+.sidebar-menu li {
+	padding: 0;
+}
+
+.sidebar-menu a {
+	display: flex;
+	align-items: center;
+	padding: 15px 25px;
+	color: #555;
+	text-decoration: none;
+	transition: all 0.3s;
+	border-left: 4px solid transparent;
+}
+
+.sidebar-menu a:hover {
+	background-color: #f0f7f7;
+	color: #2d7e7e;
+	border-left-color: #2d7e7e;
+}
+
+.sidebar-menu a.active {
+	background-color: #e8f4f4;
+	color: #2d7e7e;
+	border-left-color: #2d7e7e;
+	font-weight: 600;
+}
+
+.sidebar-menu i {
+	width: 24px;
+	margin-right: 12px;
+	text-align: center;
+}
 
 /* --- MAIN CONTENT RIÊNG CHO ORDERS --- */
-.main-content { flex: 1; padding: 30px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-.page-header h2 { font-size: 24px; color: #2d7e7e; }
+.main-content {
+	flex: 1;
+	padding: 30px;
+}
 
-.order-section { background-color: white; border-radius: 10px; padding: 25px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+.page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30px;
+}
+
+.page-header h2 {
+	font-size: 24px;
+	color: #2d7e7e;
+}
+
+.order-section {
+	background-color: white;
+	border-radius: 10px;
+	padding: 25px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
 
 /* Table Style cho Đơn hàng */
-.custom-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-.custom-table th { text-align: left; padding: 15px; border-bottom: 2px solid #f0f0f0; color: #2d7e7e; font-weight: 600; font-size: 14px; }
-.custom-table td { padding: 15px; border-bottom: 1px solid #f5f5f5; font-size: 14px; vertical-align: middle; }
-.custom-table tr:last-child td { border-bottom: none; }
-.custom-table tr:hover { background-color: #f9fbfb; }
+.custom-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 10px;
+}
+
+.custom-table th {
+	text-align: left;
+	padding: 15px;
+	border-bottom: 2px solid #f0f0f0;
+	color: #2d7e7e;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.custom-table td {
+	padding: 15px;
+	border-bottom: 1px solid #f5f5f5;
+	font-size: 14px;
+	vertical-align: middle;
+}
+
+.custom-table tr:last-child td {
+	border-bottom: none;
+}
+
+.custom-table tr:hover {
+	background-color: #f9fbfb;
+}
 
 /* Status Badges */
-.status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
-.status-pending { background-color: #fff3cd; color: #856404; } /* Đang xử lý - Vàng */
-.status-shipping { background-color: #cce5ff; color: #004085; } /* Đang giao - Xanh dương */
-.status-done { background-color: #d4edda; color: #155724; } /* Đã giao - Xanh lá */
-.status-cancel { background-color: #f8d7da; color: #721c24; } /* Đã hủy - Đỏ */
+.status-badge {
+	padding: 6px 12px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: 600;
+	display: inline-block;
+}
+
+.status-pending {
+	background-color: #fff3cd;
+	color: #856404;
+} /* Đang xử lý - Vàng */
+.status-shipping {
+	background-color: #cce5ff;
+	color: #004085;
+} /* Đang giao - Xanh dương */
+.status-done {
+	background-color: #d4edda;
+	color: #155724;
+} /* Đã giao - Xanh lá */
+.status-cancel {
+	background-color: #f8d7da;
+	color: #721c24;
+} /* Đã hủy - Đỏ */
 
 /* Action Buttons */
-.action-btn { padding: 6px 12px; border-radius: 4px; border: none; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.3s; margin-right: 5px; text-decoration: none; color: white; font-family: 'Montserrat', sans-serif; }
-.view-btn { background-color: #17a2b8; }
-.view-btn:hover { background-color: #138496; }
-.edit-btn { background-color: #ffc107; color: #333; }
-.edit-btn:hover { background-color: #e0a800; }
+.action-btn {
+	padding: 6px 12px;
+	border-radius: 4px;
+	border: none;
+	font-size: 13px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	transition: all 0.3s;
+	margin-right: 5px;
+	text-decoration: none;
+	color: white;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.view-btn {
+	background-color: #17a2b8;
+}
+
+.view-btn:hover {
+	background-color: #138496;
+}
+
+.edit-btn {
+	background-color: #ffc107;
+	color: #333;
+}
+
+.edit-btn:hover {
+	background-color: #e0a800;
+}
 
 /* Dropdown cập nhật nhanh */
-.dropdown { position: relative; display: inline-block; }
-.dropdown-content { display: none; position: absolute; right: 0; background-color: white; min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 1; border-radius: 4px; border: 1px solid #ddd; }
-.dropdown-content a { color: #333; padding: 10px 15px; text-decoration: none; display: block; font-size: 13px; border-left: none; }
-.dropdown-content a:hover { background-color: #f1f1f1; color: #2d7e7e; }
-.dropdown:hover .dropdown-content { display: block; }
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
 
-.price-text { color: #d63031; font-weight: 700; }
-.customer-info div { margin-bottom: 3px; }
-.customer-sub { font-size: 12px; color: #888; }
+.dropdown-content {
+	display: none;
+	position: absolute;
+	right: 0;
+	background-color: white;
+	min-width: 160px;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+	z-index: 1;
+	border-radius: 4px;
+	border: 1px solid #ddd;
+}
 
-.no-orders { text-align: center; padding: 40px; color: #777; }
-.no-orders i { font-size: 48px; margin-bottom: 15px; color: #ccc; }
+.dropdown-content a {
+	color: #333;
+	padding: 10px 15px;
+	text-decoration: none;
+	display: block;
+	font-size: 13px;
+	border-left: none;
+}
 
-@media (max-width: 992px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; margin-bottom: 20px; } }
+.dropdown-content a:hover {
+	background-color: #f1f1f1;
+	color: #2d7e7e;
+}
+
+.dropdown:hover .dropdown-content {
+	display: block;
+}
+
+.price-text {
+	color: #d63031;
+	font-weight: 700;
+}
+
+.customer-info div {
+	margin-bottom: 3px;
+}
+
+.customer-sub {
+	font-size: 12px;
+	color: #888;
+}
+
+.no-orders {
+	text-align: center;
+	padding: 40px;
+	color: #777;
+}
+
+.no-orders i {
+	font-size: 48px;
+	margin-bottom: 15px;
+	color: #ccc;
+}
+
+@media ( max-width : 992px) {
+	.admin-container {
+		flex-direction: column;
+	}
+	.sidebar {
+		width: 100%;
+		margin-bottom: 20px;
+	}
+}
 </style>
 </head>
 <body>

@@ -214,5 +214,38 @@ public class UserDAO {
         }
         return false;
     }
+
+    public int getTotalUsers() {
+        int total = 0;
+        String sql = "SELECT COUNT(*) as total FROM Users"; // Giả sử table Users tồn tại
+        
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt("total");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return total;
+    }
+    public int getNewUsersToday() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) as count FROM Users WHERE CAST(created_at AS DATE) = CAST(GETDATE() AS DATE)";
+        
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt("count");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
     
 }

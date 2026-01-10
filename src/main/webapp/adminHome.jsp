@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -14,6 +15,193 @@
 	rel="stylesheet">
 
 <style>
+/* CSS cho báo cáo doanh thu theo tháng */
+.revenue-chart-container {
+    margin-top: 20px;
+}
+
+.chart-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-left: 4px solid #2d7e7e;
+}
+
+.chart-summary h3 {
+    color: #2d7e7e;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.stat-item {
+    background: white;
+    padding: 12px 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.stat-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.stat-value.total-revenue {
+    color: #28a745;
+    font-size: 18px;
+}
+
+.revenue-table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.revenue-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.revenue-table thead {
+    background: linear-gradient(135deg, #2d7e7e 0%, #1a5c5c 100%);
+}
+
+.revenue-table th {
+    padding: 15px;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 13px;
+}
+
+.revenue-table tbody tr {
+    border-bottom: 1px solid #f1f1f1;
+    transition: background-color 0.3s;
+}
+
+.revenue-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.revenue-table td {
+    padding: 15px;
+}
+
+.month-column {
+    font-weight: 600;
+    color: #2d7e7e;
+    min-width: 120px;
+}
+
+.revenue-column {
+    font-weight: 600;
+    color: #333;
+    min-width: 150px;
+}
+
+.chart-column {
+    width: 60%;
+}
+
+.chart-bar-container {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    height: 30px;
+    overflow: hidden;
+    position: relative;
+}
+
+.chart-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    min-width: 40px;
+    transition: width 1s ease-in-out;
+}
+
+.bar-label {
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.no-data-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.no-data-message i {
+    font-size: 48px;
+    color: #dee2e6;
+    margin-bottom: 15px;
+}
+
+.no-data-message p {
+    font-size: 16px;
+}
+
+/* Animation cho chart bars */
+@keyframes slideIn {
+    from {
+        width: 0;
+    }
+    to {
+        width: var(--bar-width);
+    }
+}
+
+.revenue-table tbody tr:nth-child(1) .chart-bar {
+    background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.revenue-table tbody tr:nth-child(2) .chart-bar {
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.revenue-table tbody tr:nth-child(3) .chart-bar {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+@media (max-width: 768px) {
+    .summary-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .revenue-table th,
+    .revenue-table td {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .chart-column {
+        display: none;
+    }
+}
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -244,20 +432,20 @@ body {
 	align-items: center;
 	justify-content: center;
 	margin-right: 15px;
+	font-size: 16px;
 	color: white;
-	flex-shrink: 0;
 }
 
 .activity-icon.new-user {
-	background-color: #667eea;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .activity-icon.new-order {
-	background-color: #4facfe;
+	background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
 .activity-icon.new-product {
-	background-color: #f5576c;
+	background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
 .activity-details {
@@ -266,42 +454,48 @@ body {
 
 .activity-title {
 	font-weight: 600;
-	margin-bottom: 5px;
+	margin-bottom: 3px;
+}
+
+.activity-desc {
+	color: #666;
+	margin-bottom: 3px;
+	font-size: 14px;
 }
 
 .activity-time {
-	font-size: 13px;
-	color: #777;
+	color: #999;
+	font-size: 12px;
 }
 
 .welcome-message {
-	background: linear-gradient(135deg, #e8f4f4 0%, #f0f7f7 100%);
+	background-color: white;
 	border-radius: 10px;
-	padding: 30px;
+	padding: 25px;
 	margin-bottom: 30px;
-	border-left: 5px solid #2d7e7e;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .welcome-message h2 {
-	color: #2d7e7e;
+	font-size: 24px;
 	margin-bottom: 10px;
+	color: #2d7e7e;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
 .welcome-message p {
+	margin-bottom: 8px;
 	color: #555;
-	margin-bottom: 15px;
 }
 
-.alert {
-	background-color: #fff3cd;
-	border: 1px solid #ffeaa7;
-	color: #856404;
-	padding: 15px;
-	border-radius: 5px;
-	margin-bottom: 20px;
+#current-time {
+	color: #2d7e7e;
+	font-weight: 600;
 }
 
-@media ( max-width : 992px) {
+@media (max-width: 992px) {
 	.admin-container {
 		flex-direction: column;
 	}
@@ -309,51 +503,35 @@ body {
 		width: 100%;
 		margin-bottom: 20px;
 	}
-	.dashboard-cards {
-		grid-template-columns: repeat(2, 1fr);
+	.sidebar-menu {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+	.sidebar-menu li {
+		flex: 1 1 auto;
 	}
 }
 
-@media ( max-width : 768px) {
+@media (max-width: 768px) {
 	.dashboard-cards {
 		grid-template-columns: 1fr;
-	}
-	.admin-header {
-		flex-direction: column;
-		gap: 15px;
-		align-items: flex-start;
-	}
-	.user-info {
-		align-self: flex-end;
 	}
 }
 </style>
 </head>
 <body>
-	<!-- Kiểm tra quyền admin -->
-	<c:if test="${empty user or user.role ne 1}">
-		<c:redirect url="login" />
-	</c:if>
-
 	<div class="admin-header">
-		<h1>
-			<i class="fas fa-crown"></i> Trang Quản Trị - Kachi-Kun Shop
-		</h1>
+		<h1>Quản Trị Kachi-Kun Shop</h1>
 		<div class="user-info">
 			<div class="user-avatar">
-				<i class="fas fa-user-shield"></i>
+				<i class="fas fa-user"></i>
 			</div>
-			<div>
-				<div>
-					Xin chào, <strong>${user.fullName}</strong>
-				</div>
-				<div style="font-size: 12px; opacity: 0.9;">Quản trị viên</div>
-			</div>
-			<a href="logout">
-				<button class="logout-btn">
+			<form action="logout" method="post">
+				<button class="logout-btn" type="submit">
 					<i class="fas fa-sign-out-alt"></i> Đăng xuất
 				</button>
-			</a>
+			</form>
 		</div>
 	</div>
 
@@ -391,8 +569,7 @@ body {
 						<i class="fas fa-users"></i>
 					</div>
 					<h3>Tổng người dùng</h3>
-					<div class="card-value">1,248</div>
-					<div class="card-change">+12% so với tháng trước</div>
+					<div class="card-value">${totalUsers}</div>
 				</div>
 
 				<div class="card">
@@ -400,8 +577,7 @@ body {
 						<i class="fas fa-box"></i>
 					</div>
 					<h3>Tổng sản phẩm</h3>
-					<div class="card-value">568</div>
-					<div class="card-change">+8% so với tháng trước</div>
+					<div class="card-value">${totalProducts}</div>
 				</div>
 
 				<div class="card">
@@ -409,8 +585,7 @@ body {
 						<i class="fas fa-shopping-cart"></i>
 					</div>
 					<h3>Đơn hàng hôm nay</h3>
-					<div class="card-value">42</div>
-					<div class="card-change">+5% so với hôm qua</div>
+					<div class="card-value">${todayOrders}</div>
 				</div>
 
 				<div class="card">
@@ -418,62 +593,104 @@ body {
 						<i class="fas fa-dollar-sign"></i>
 					</div>
 					<h3>Doanh thu hôm nay</h3>
-					<div class="card-value">12.5 triệu ₫</div>
-					<div class="card-change negative">-3% so với hôm qua</div>
+					<div class="card-value">
+						<fmt:formatNumber value="${todayRevenue}" type="currency" currencySymbol="₫" />
+					</div>
 				</div>
 			</div>
 
-			<div class="recent-activity">
-				<h2>
-					<i class="fas fa-history"></i> Hoạt động gần đây
-				</h2>
-				<ul class="activity-list">
-					<li class="activity-item">
-						<div class="activity-icon new-user">
-							<i class="fas fa-user-plus"></i>
-						</div>
-						<div class="activity-details">
-							<div class="activity-title">Người dùng mới đăng ký</div>
-							<div class="activity-desc">"kachikun_fan" vừa đăng ký tài
-								khoản</div>
-							<div class="activity-time">10 phút trước</div>
-						</div>
-					</li>
-					<li class="activity-item">
-						<div class="activity-icon new-order">
-							<i class="fas fa-cart-plus"></i>
-						</div>
-						<div class="activity-details">
-							<div class="activity-title">Đơn hàng mới</div>
-							<div class="activity-desc">Đơn hàng #ORD-2024-00123 với giá
-								trị 850,000 ₫</div>
-							<div class="activity-time">45 phút trước</div>
-						</div>
-					</li>
-					<li class="activity-item">
-						<div class="activity-icon new-product">
-							<i class="fas fa-box-open"></i>
-						</div>
-						<div class="activity-details">
-							<div class="activity-title">Sản phẩm mới được thêm</div>
-							<div class="activity-desc">"Áo thun Kachi-Kun Limited
-								Edition" đã được thêm vào kho</div>
-							<div class="activity-time">2 giờ trước</div>
-						</div>
-					</li>
-					<li class="activity-item">
-						<div class="activity-icon new-user">
-							<i class="fas fa-user-check"></i>
-						</div>
-						<div class="activity-details">
-							<div class="activity-title">Xác minh người dùng</div>
-							<div class="activity-desc">Tài khoản "shop_admin" đã được
-								xác minh thành công</div>
-							<div class="activity-time">5 giờ trước</div>
-						</div>
-					</li>
-				</ul>
-			</div>
+<div class="recent-activity">
+    <h2>
+        <i class="fas fa-chart-line"></i> Báo cáo doanh thu theo tháng
+    </h2>
+    
+    <c:if test="${not empty monthlyRevenue}">
+        <div class="revenue-chart-container">
+            <div class="chart-header">
+                <div class="chart-summary">
+                    <h3>Tổng quan 12 tháng gần nhất</h3>
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Tháng cao nhất:</span>
+                            <span class="stat-value">
+                                <fmt:formatNumber value="${maxRevenue}" type="currency" currencySymbol="₫" />
+                            </span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Trung bình/tháng:</span>
+                            <span class="stat-value">
+                                <fmt:formatNumber value="${avgRevenue}" type="currency" currencySymbol="₫" />
+                            </span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Tổng doanh thu:</span>
+                            <span class="stat-value total-revenue">
+                                <fmt:formatNumber value="${totalYearRevenue}" type="currency" currencySymbol="₫" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="revenue-table-container">
+                <table class="revenue-table">
+                    <thead>
+                        <tr>
+                            <th>Tháng/Năm</th>
+                            <th>Doanh thu</th>
+                            <th>Tỷ lệ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:set var="maxValue" value="${0}" />
+                        <c:forEach items="${monthlyRevenue}" var="entry">
+                            <c:if test="${entry.value > maxValue}">
+                                <c:set var="maxValue" value="${entry.value}" />
+                            </c:if>
+                        </c:forEach>
+                        
+                        <c:set var="total" value="${0}" />
+                        <c:forEach items="${monthlyRevenue}" var="entry">
+                            <c:set var="total" value="${total + entry.value}" />
+                        </c:forEach>
+                        
+                        <c:forEach items="${monthlyRevenue}" var="entry">
+                            <c:set var="percentage" value="${(entry.value/maxValue)*100}" />
+                            <c:set var="monthName" value="${entry.key}" />
+                            <tr>
+                                <td class="month-column">
+                                    <span class="month-label">${monthName}</span>
+                                </td>
+                                <td class="revenue-column">
+                                    <span class="revenue-value">
+                                        <fmt:formatNumber value="${entry.value}" type="currency" currencySymbol="₫" />
+                                    </span>
+                                </td>
+                                <td class="chart-column">
+                                    <div class="chart-bar-container">
+                                        <div class="chart-bar" style="width: ${percentage}%">
+                                            <span class="bar-label">
+                                                <fmt:formatNumber value="${(entry.value/total)*100}" 
+                                                    maxFractionDigits="1" />%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </c:if>
+    
+    <c:if test="${empty monthlyRevenue}">
+        <div class="no-data-message">
+            <i class="fas fa-chart-pie"></i>
+            <p>Chưa có dữ liệu doanh thu theo tháng.</p>
+        </div>
+    </c:if>
+</div>
 		</div>
 	</div>
 
