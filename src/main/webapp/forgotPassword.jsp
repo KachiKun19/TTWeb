@@ -173,10 +173,12 @@
                         <input type="text" name="otp6" class="otp-input" maxlength="1" required autocomplete="off">
                     </div>
                     
-                    <input type="password" name="newPassword" placeholder="Mật khẩu mới" required>
-                    <input type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu mới" required>
-                    
-                    <button type="submit">Đặt lại mật khẩu</button>
+                    <input type="password" id="newPass" name="newPassword" placeholder="Mật khẩu mới" required oninput="validatePassword()">
+<input type="password" id="confirmPass" name="confirmPassword" placeholder="Xác nhận mật khẩu mới" required oninput="validatePassword()">
+
+<div id="passwordError" style="color: red; font-size: 12px; margin-bottom: 10px; display: none;"></div>
+
+<button type="submit" id="btnSubmit" onclick="return validatePassword()">Đặt lại mật khẩu</button>
                 </form>
                 
                 <div class="resend-link">
@@ -231,6 +233,41 @@
                 }
             }
         });
+        
+        function validatePassword() {
+            var password = document.getElementById("newPass").value;
+            var confirmPassword = document.getElementById("confirmPass").value;
+            var errorDiv = document.getElementById("passwordError");
+            var btnSubmit = document.getElementById("btnSubmit");
+            var msg = "";
+
+            // 1. Kiểm tra độ dài
+            if (password.length < 6) {
+                msg = "Mật khẩu phải có ít nhất 6 ký tự.";
+            } 
+            // 2. Kiểm tra có số không (Tùy chọn)
+            else if (!/\d/.test(password)) {
+                msg = "Mật khẩu phải chứa ít nhất 1 số.";
+            }
+            // 3. Kiểm tra chữ hoa (Tùy chọn)
+            else if (!/[A-Z]/.test(password)) {
+                msg = "Mật khẩu phải chứa ít nhất 1 chữ hoa.";
+            }
+            // 4. Kiểm tra trùng khớp
+            else if (password !== confirmPassword && confirmPassword.length > 0) {
+                msg = "Mật khẩu xác nhận không khớp.";
+            }
+
+            // Hiển thị lỗi
+            if (msg !== "") {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + msg;
+                return false; // Chặn submit
+            } else {
+                errorDiv.style.display = "none";
+                return true; // Cho phép submit
+            }
+        }
     </script>
 </body>
 </html>

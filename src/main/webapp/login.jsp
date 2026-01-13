@@ -349,29 +349,42 @@ to {
 	<div class="container" id="container">
 
 		<div class="form-container sign-up-container">
-			<form action="register" method="post">
-				<h1 class="mb-4">Tạo tài khoản</h1>
-				<div class="social-container">
-					<a href="#" class="social"><i class="fab fa-facebook-f"></i></a> <a
-						href="#" class="social"><i class="fab fa-google-plus-g"></i></a> <a
-						href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-				</div>
-				<span>hoặc sử dụng email để đăng ký</span>
-				<c:if test="${not empty registerError}">
-					<div class="alert alert-error">
-						<i class="fas fa-exclamation-circle"></i> ${registerError}
-					</div>
-				</c:if>
-				<input type="text" name="username" placeholder="Tên đăng nhập"
-					required autocomplete="off" /> <input type="text" name="fullname"
-					placeholder="Họ và tên" required autocomplete="off" /> <input
-					type="email" name="email" placeholder="Email" required
-					autocomplete="off" /> <input type="password" name="password"
-					placeholder="Mật khẩu" required /> <input type="password"
-					name="repassword" placeholder="Nhập lại mật khẩu" required />
-				<button type="submit" class="mt-4">Đăng Ký</button>
-			</form>
-		</div>
+    <form action="register" method="post" id="registerForm">
+        <h1 class="mb-4">Tạo tài khoản</h1>
+        
+        <div class="social-container">
+            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        <span>hoặc sử dụng email để đăng ký</span>
+        
+        <c:if test="${not empty registerError}">
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> ${registerError}
+            </div>
+        </c:if>
+
+        <input type="text" name="username" placeholder="Tên đăng nhập" 
+               value="${usernameValue}" required autocomplete="off" />
+
+        <input type="text" name="fullname" placeholder="Họ và tên" 
+               value="${fullnameValue}" required autocomplete="off" />
+
+        <input type="email" name="email" placeholder="Email" 
+               value="${emailValue}" required autocomplete="off" />
+
+        <input type="password" id="regPass" name="password" placeholder="Mật khẩu" 
+               required onkeyup="showStrengthBar();" autocomplete="new-password" />
+
+        <div id="password-strength" style="width: 100%; height: 5px; margin-bottom: 10px; transition: all 0.3s; border-radius: 2px;"></div>
+        <small id="password-msg" style="color: red; display: none; margin-bottom: 10px; font-weight: bold; font-size: 12px;"></small>
+
+        <input type="password" id="rePass" name="repassword" placeholder="Nhập lại mật khẩu" required />
+
+        <button type="submit" class="mt-4">Đăng Ký</button>
+    </form>
+</div>
 
 		<div class="form-container sign-in-container">
 			<form action="login" method="post">
@@ -425,26 +438,77 @@ to {
 	</div>
 
 	<script>
-    const signUpButton = document.getElementById('signUp');
+	const signUpButton = document.getElementById('signUp');
     const signInButton = document.getElementById('signIn');
     const container = document.getElementById('container');
 
-    signUpButton.addEventListener('click', () => {
-        container.classList.add("right-panel-active");
-    });
+    // Chuyển tab khi bấm nút
+    signUpButton.addEventListener('click', () => container.classList.add("right-panel-active"));
+    signInButton.addEventListener('click', () => container.classList.remove("right-panel-active"));
 
-    signInButton.addEventListener('click', () => {
-        container.classList.remove("right-panel-active");
-    });
+    // --- ĐOẠN MỚI THÊM: TỰ ĐỘNG CHUYỂN TAB DỰA VÀO KẾT QUẢ ---
     
+    // Lấy tham số từ URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const msg = urlParams.get('msg');
+    
+    // Nếu có lỗi đăng ký (registerError được set từ Servlet) -> Bật tab Đăng ký
     <c:if test="${not empty registerError}">
         container.classList.add("right-panel-active");
     </c:if>
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('action') === 'signup') {
-        container.classList.add("right-panel-active");
+
+    // Nếu Đăng ký thành công (có msg trên URL) -> Bật tab Đăng nhập để họ nhập nick
+    if (msg) {
+        container.classList.remove("right-panel-active");
+        // Có thể alert nhẹ 1 cái cho chắc
+        // alert(decodeURIComponent(msg)); 
     }
+    
+    function showStrengthBar() {
+        var password = document.getElementById("regPass").value;
+        var strengthBar = document.getElementById("password-strength");
+        
+        // Logic tính điểm đơn giản
+        var score = 0;
+        if (password.length >= 8) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+
+        // Đổi màu thanh
+        if (password.length === 0) strengthBar.style.backgroundColor = "transparent";
+        else if (score < 3) strengthBar.style.backgroundColor = "red";
+        else if (score < 4) strengthBar.style.backgroundColor = "orange";
+        else strengthBar.style.backgroundColor = "green";
+    }
+
+    // 2. XỬ LÝ KHI BẤM NÚT ĐĂNG KÝ (Quan trọng)
+    document.getElementById("registerForm").addEventListener("submit", function(event) {
+        var password = document.getElementById("regPass").value;
+        var msg = document.getElementById("password-msg");
+        
+        // Regex mật khẩu mạnh: 8 ký tự, 1 hoa, 1 thường, 1 số, 1 ký tự đặc biệt
+        var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+
+        if (!strongRegex.test(password)) {
+            // A. Chặn không cho gửi đi
+            event.preventDefault(); 
+            
+            // B. Hiện thông báo lỗi
+            msg.style.display = "block";
+            msg.innerText = "Mật khẩu yếu! Cần 8 ký tự, có chữ Hoa, Thường, Số và Ký tự đặc biệt.";
+            
+            // C. XÓA TRẮNG ô mật khẩu (Theo yêu cầu của bạn)
+            document.getElementById("regPass").value = ""; 
+            document.getElementById("rePass").value = ""; 
+            
+            // D. Đưa con trỏ chuột quay lại ô mật khẩu để nhập luôn
+            document.getElementById("regPass").focus(); 
+            
+            // E. Reset thanh màu về trong suốt
+            document.getElementById("password-strength").style.backgroundColor = "transparent";
+        }
+    });
 </script>
 
 </body>

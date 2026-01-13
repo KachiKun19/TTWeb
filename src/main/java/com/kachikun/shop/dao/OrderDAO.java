@@ -1,6 +1,7 @@
 package com.kachikun.shop.dao;
 
 import com.kachikun.shop.model.User;
+import com.kachikun.shop.model.DailyStat;
 import com.kachikun.shop.model.CartItem;
 import com.kachikun.shop.model.Order;
 import com.kachikun.shop.model.OrderDetail;
@@ -297,14 +298,35 @@ public class OrderDAO {
 			System.out.println("-----------------");
 		}
 	}
+	
+	public Map<String, Double> getRevenueLast12Months() {
+	    // LinkedHashMap để giữ thứ tự tháng (Tháng cũ trước, tháng mới sau hoặc ngược lại)
+	    Map<String, Double> map = new LinkedHashMap<>();
+	    
+	    // Query lấy 12 tháng gần nhất, tính tổng tiền những đơn "Hoàn thành" hoặc "Đã giao"
+	    String sql = "SELECT FORMAT(order_date, 'MM/yyyy') as month_year, SUM(total_price) as total " +
+	                 "FROM Orders " +
+	                 "WHERE status IN (N'Đã giao', N'Hoàn thành') " +
+	                 "GROUP BY FORMAT(order_date, 'MM/yyyy'), YEAR(order_date), MONTH(order_date) " +
+	                 "ORDER BY YEAR(order_date) DESC, MONTH(order_date) DESC";
+	    
+	    try {
+	        Connection conn = DBConnection.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ResultSet rs = ps.executeQuery();
+	        
+	        while (rs.next()) {
+	            map.put(rs.getString("month_year"), rs.getDouble("total"));
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return map;
+	}
 
 	public int getTodayOrdersCount() {
 		int count = 0;
-		String sql = "SELECT COUNT(*) FROM Orders WHERE CAST(order_date AS DATE) = ? AND status IN (N'Đã giao', N'Hoàn thành')"; // Lọc
-																																	// status
-																																	// đã
-																																	// thanh
-																																	// toán
+		String sql = "SELECT COUNT(*) FROM Orders WHERE CAST(order_date AS DATE) = ? AND status IN (N'Đã giao', N'Hoàn thành')";
 
 		try {
 			Connection conn = DBConnection.getConnection();
@@ -324,12 +346,7 @@ public class OrderDAO {
 
 	public double getTodayRevenue() {
 		double revenue = 0.0;
-		String sql = "SELECT SUM(total_price) FROM Orders WHERE CAST(order_date AS DATE) = ? AND status IN (N'Đã giao', N'Hoàn thành')"; // Lọc
-																																			// status
-																																			// đã
-																																			// thanh
-																																			// toán
-
+		String sql = "SELECT SUM(total_price) FROM Orders WHERE CAST(order_date AS DATE) = ? AND status IN (N'Đã giao', N'Hoàn thành')"; 
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -387,5 +404,106 @@ public class OrderDAO {
 			e.printStackTrace();
 		}
 		return count;
+	}
+	
+	public List<DailyStat> getDailyStatistics(int month, int year) {
+	    List<DailyStat> list = new ArrayList<>();
+	    
+	    // Query: Gom nhóm theo NGÀY trong tháng được chọn
+	    String sql = "SELECT DAY(order_date) as day, COUNT(id) as count, SUM(total_price) as total " +
+	                 "FROM Orders " +
+	                 "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? " +
+	                 "AND status IN (N'Đã giao', N'Hoàn thành') " +
+	                 "GROUP BY DAY(order_date) " +
+	                 "ORDER BY day ASC";
+	    
+	    try {
+	        Connection conn = DBConnection.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setInt(1, month);
+	        ps.setInt(2, year);
+	        ResultSet rs = ps.executeQuery();
+	        
+	        while (rs.next()) {
+	            list.add(new DailyStat(
+	                rs.getInt("day"),
+	                rs.getInt("count"),
+	                rs.getDouble("total")
+	            ));
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return list;
+	}
+	
+	public List<Order> getOrdersByMonthYear(int month, int year) {
+	    List<Order> list = new ArrayList<>();
+	    
+	    // Câu lệnh SQL lấy dữ liệu
+	    String sql = "SELECT * FROM Orders " +
+	                 "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? " +
+	                 "ORDER BY order_date DESC";
+	    
+	    try {
+	        Connection conn = DBConnection.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        ps.setInt(1, month);
+	        ps.setInt(2, year);
+	        
+	        ResultSet rs = ps.executeQuery();
+	        while (rs.next()) {
+	            Order o = new Order();
+	            o.setId(rs.getInt("id"));
+	            
+	            // 1. SỬA LỖI USER: Tạo đối tượng User giả để hứng ID
+	            // (Vì model của bạn là private User user)
+	            User u = new User();
+	            if (hasColumn(rs, "user_id")) {
+	                u.setId(rs.getInt("user_id"));
+	                // Nếu muốn lấy cả tên user thì phải JOIN bảng, 
+	                // nhưng tạm thời chỉ cần ID để link hoặc export là đủ.
+	            }
+	            o.setUser(u); // Set đối tượng User vào Order
+
+	            // 2. SỬA LỖI NGÀY THÁNG: Dùng rs.getDate để khớp với java.sql.Date
+	            o.setOrderDate(rs.getDate("order_date")); 
+	            
+	            o.setTotalPrice(rs.getDouble("total_price"));
+	            o.setStatus(rs.getString("status"));
+	            
+	            // Các thông tin người nhận
+	            o.setRecipientName(rs.getString("recipient_name"));
+	            o.setRecipientPhone(rs.getString("recipient_phone"));
+	            
+	            // 3. SỬA LỖI ĐỊA CHỈ: Dùng setShippingAddress
+	            // (Kiểm tra xem trong DB cột tên là 'address' hay 'shipping_address')
+	            if (hasColumn(rs, "address")) {
+	                o.setShippingAddress(rs.getString("address"));
+	            } else if (hasColumn(rs, "shipping_address")) {
+	                o.setShippingAddress(rs.getString("shipping_address"));
+	            }
+
+	            // Payment method
+	            if (hasColumn(rs, "payment_method")) {
+	                 o.setPaymentMethod(rs.getString("payment_method"));
+	            }
+
+	            list.add(o);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return list;
+	}
+
+	// Hàm phụ trợ check cột (Giữ nguyên như cũ)
+	private boolean hasColumn(ResultSet rs, String columnName) {
+	    try {
+	        rs.findColumn(columnName);
+	        return true;
+	    } catch (Exception e) {
+	        return false;
+	    }
 	}
 }

@@ -49,7 +49,7 @@
             <div class="logo">
                 <a href="home" class="flex items-center"> 
                     <img src="images/LogoChuan.png" alt="Kachi-Kun Shop Logo" class="logo-img w-24 h-auto" /> 
-                    <span class="text-white text-xl font-bold ml-0 whitespace-nowrap"> K Shop </span>
+                    <span class="text-white text-xl font-bold ml-0 whitespace-nowrap"> Kachi-Kun Shop </span>
                 </a>
             </div>
 

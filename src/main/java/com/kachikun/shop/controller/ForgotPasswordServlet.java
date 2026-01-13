@@ -1,6 +1,7 @@
 package com.kachikun.shop.controller;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.Properties;
 import java.util.Random;
 
@@ -21,11 +22,13 @@ import jakarta.mail.internet.MimeMessage;
 
 import com.kachikun.shop.dao.UserDAO;
 import com.kachikun.shop.model.User;
+import com.kachikun.shop.service.UserService;
 
 @WebServlet("/forgotPassword")
 public class ForgotPasswordServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UserDAO userDAO = new UserDAO();
+    private UserService userService = new UserService();
 
     // Cấu hình email (thay bằng email của bạn)
     private final String FROM_EMAIL = "tranhung2642005@gmail.com"; // Email gửi
@@ -73,23 +76,28 @@ public class ForgotPasswordServlet extends HttpServlet {
             String newPassword = request.getParameter("newPassword");
             String confirmPassword = request.getParameter("confirmPassword");
 
-            if (!newPassword.equals(confirmPassword)) {
-                request.setAttribute("error", "Mật khẩu xác nhận không khớp!");
+            String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,}$";
+
+            if (!newPassword.matches(passwordPattern)) {
+                request.setAttribute("error", "Mật khẩu quá yếu! Cần ít nhất 6 ký tự, bao gồm chữ hoa và số.");
                 request.setAttribute("step", "verify");
                 request.setAttribute("email", email);
                 request.getRequestDispatcher("forgotPassword.jsp").forward(request, response);
-                return;
+                return; // Dừng lại ngay, không cho lưu
             }
 
             if (storedOtp != null && storedOtp.equals(inputOtp)) {
-                boolean updated = userDAO.updatePassword(email, newPassword); // Hash password nếu cần (thêm BCrypt)
+                
+                // 1. Băm mật khẩu mới trước
+            	boolean updated = userService.recoverPassword(email, newPassword);
+                
                 if (updated) {
                     session.removeAttribute("otp");
                     session.removeAttribute("email");
                     request.setAttribute("success", "Đặt lại mật khẩu thành công! Vui lòng đăng nhập.");
                     request.getRequestDispatcher("login.jsp").forward(request, response);
                 } else {
-                    request.setAttribute("error", "Lỗi cập nhật mật khẩu!");
+                    request.setAttribute("error", "Lỗi cập nhật mật khẩu! Vui lòng thử lại.");
                     request.setAttribute("step", "verify");
                     request.setAttribute("email", email);
                     request.getRequestDispatcher("forgotPassword.jsp").forward(request, response);
@@ -102,7 +110,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             }
 
         } else if ("resend".equals(action)) {
-            // Resend OTP
+             // ... (Giữ nguyên logic Resend) ...
             String email = request.getParameter("email");
             String otp = generateOTP();
             session.setAttribute("otp", otp);
@@ -147,6 +155,24 @@ public class ForgotPasswordServlet extends HttpServlet {
         } catch (MessagingException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+    
+    private String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(password.getBytes());
+            byte[] byteData = md.digest();
+            
+            // Chuyển đổi byte sang mã Hex
+            StringBuilder sb = new StringBuilder();
+            for (byte b : byteData) {
+                sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

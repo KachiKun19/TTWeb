@@ -37,25 +37,28 @@ public class UserDAO {
 
 	// Thêm phương thức này vào UserDAO.java (nếu chưa có)
 	public boolean register(User u) {
-	    String sql = "INSERT INTO Users (username, password, full_name, email, role) VALUES (?, ?, ?, ?, ?)";
-	    
-	    try {
-	        Connection conn = DBConnection.getConnection();
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        
-	        ps.setString(1, u.getUsername());
-	        ps.setString(2, u.getPassword());
-	        ps.setString(3, u.getFullName());
-	        ps.setString(4, u.getEmail());
-	        ps.setInt(5, u.getRole());
-	        
-	        int rowsAffected = ps.executeUpdate();
-	        return rowsAffected > 0;
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return false;
-	}
+        // SQL Server của bạn cột tên là [full_name], không phải [fullname]
+        String sql = "INSERT INTO Users (username, password, email, full_name, role) VALUES (?, ?, ?, ?, ?)";
+        
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            
+            ps.setString(1, u.getUsername());
+            ps.setString(2, u.getPassword());
+            ps.setString(3, u.getEmail());
+            ps.setString(4, u.getFullName()); // Chắc chắn rằng Model User của bạn có hàm getFullName()
+            ps.setInt(5, u.getRole()); // Mặc định là 0
+            
+            int row = ps.executeUpdate();
+            return row > 0;
+            
+        } catch (Exception e) {
+            System.out.println("--- LỖI SQL KHI ĐĂNG KÝ ---");
+            e.printStackTrace(); // Quan trọng: Nó sẽ in lỗi đỏ lòm ra Console nếu sai tên cột
+            return false;
+        }
+    }
 	
 	public static void main(String[] args) {
 		UserDAO dao = new UserDAO();
@@ -246,6 +249,42 @@ public class UserDAO {
             e.printStackTrace();
         }
         return count;
+    }
+    
+    public boolean isUsernameExists(String username) {
+        try {
+            Connection conn = DBConnection.getConnection();
+            String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
+    }
+
+    public boolean isEmailExists(String email) {
+        try {
+            Connection conn = DBConnection.getConnection();
+            String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
+    }
+
+    public boolean isFullnameExists(String fullname) {
+        try {
+            Connection conn = DBConnection.getConnection();
+            String sql = "SELECT COUNT(*) FROM Users WHERE full_name = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, fullname);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
     }
     
 }
