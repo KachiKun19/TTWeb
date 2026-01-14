@@ -25,7 +25,7 @@ body {
 	line-height: 1.6;
 }
 
-/* --- HEADER & SIDEBAR GIỐNG HỆT ADMINUSERS --- */
+
 .admin-header {
 	background: linear-gradient(135deg, #2d7e7e 0%, #1a5c5c 100%);
 	color: white;
@@ -123,7 +123,7 @@ body {
 	text-align: center;
 }
 
-/* --- MAIN CONTENT RIÊNG CHO ORDERS --- */
+
 .main-content {
 	flex: 1;
 	padding: 30px;
@@ -148,7 +148,7 @@ body {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* Table Style cho Đơn hàng */
+
 .custom-table {
 	width: 100%;
 	border-collapse: collapse;
@@ -179,7 +179,7 @@ body {
 	background-color: #f9fbfb;
 }
 
-/* Status Badges */
+
 .status-badge {
 	padding: 6px 12px;
 	border-radius: 20px;
@@ -191,21 +191,21 @@ body {
 .status-pending {
 	background-color: #fff3cd;
 	color: #856404;
-} /* Đang xử lý - Vàng */
+} 
 .status-shipping {
 	background-color: #cce5ff;
 	color: #004085;
-} /* Đang giao - Xanh dương */
+} 
 .status-done {
 	background-color: #d4edda;
 	color: #155724;
-} /* Đã giao - Xanh lá */
+} 
 .status-cancel {
 	background-color: #f8d7da;
 	color: #721c24;
-} /* Đã hủy - Đỏ */
+} 
 
-/* Action Buttons */
+
 .action-btn {
 	padding: 6px 12px;
 	border-radius: 4px;
@@ -239,7 +239,7 @@ body {
 	background-color: #e0a800;
 }
 
-/* Dropdown cập nhật nhanh */
+
 .dropdown {
 	position: relative;
 	display: inline-block;

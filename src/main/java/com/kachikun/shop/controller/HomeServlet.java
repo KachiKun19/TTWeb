@@ -15,38 +15,35 @@ import com.kachikun.shop.model.Product;
 
 @WebServlet("/home")
 public class HomeServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    
-    // Gọi nhân viên kho DAO
-    CategoryDAO cateDAO = new CategoryDAO();
-    
-    private ProductDAO productDAO = new ProductDAO();
+	private static final long serialVersionUID = 1L;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. Sai nhân viên kho đi lấy hàng
-        List<Product> list = productDAO.getAllProducts();
-        List<Category> listC = cateDAO.getAllCategories();
-        
-        // --- ĐOẠN KIỂM TRA (DEBUG) ---
-        // Nhìn vào cửa sổ Console của Eclipse xem dòng này có hiện ra không
-        System.out.println("====================================");
-        System.out.println("DEBUG: Đang chạy HomeServlet");
-        System.out.println("DEBUG: Số lượng sản phẩm lấy được: " + list.size());
-        if(list.size() > 0) {
-            System.out.println("DEBUG: Sản phẩm đầu tiên là: " + list.get(0).getName());
-        }
-        System.out.println("====================================");
-        // -----------------------------
+	CategoryDAO cateDAO = new CategoryDAO();
 
-        // 2. Đóng gói hàng vào túi "products" (Khớp với JSP: items="${products}")
-        request.setAttribute("products", list);
-        // đóng gói category qua jsp (Loại )
-        request.setAttribute("listCategories", listC);
-        // 3. Chuyển sang giao diện
-        request.getRequestDispatcher("home.jsp").forward(request, response);
-    }
+	private ProductDAO productDAO = new ProductDAO();
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
-    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		List<Product> list = productDAO.getAllProducts();
+		List<Category> listC = cateDAO.getAllCategories();
+
+		System.out.println("====================================");
+		System.out.println("DEBUG: Đang chạy HomeServlet");
+		System.out.println("DEBUG: Số lượng sản phẩm lấy được: " + list.size());
+		if (list.size() > 0) {
+			System.out.println("DEBUG: Sản phẩm đầu tiên là: " + list.get(0).getName());
+		}
+		System.out.println("====================================");
+
+		request.setAttribute("products", list);
+
+		request.setAttribute("listCategories", listC);
+
+		request.getRequestDispatcher("home.jsp").forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
 }

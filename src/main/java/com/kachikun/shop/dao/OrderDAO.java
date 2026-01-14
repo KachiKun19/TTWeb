@@ -25,14 +25,13 @@ public class OrderDAO {
 		Connection conn = null;
 		PreparedStatement psOrder = null;
 		PreparedStatement psDetail = null;
-		PreparedStatement psStock = null; // --- [MỚI] Khai báo thêm cái này
+		PreparedStatement psStock = null;
 		boolean result = false;
 
 		try {
 			conn = DBConnection.getConnection();
-			conn.setAutoCommit(false); // Bắt đầu Transaction
+			conn.setAutoCommit(false);
 
-			// 1. INSERT VÀO BẢNG ORDERS
 			String sqlOrder = "INSERT INTO Orders (user_id, total_price, status, order_date, recipient_name, recipient_phone, shipping_address, payment_method) VALUES (?, ?, ?, GETDATE(), ?, ?, ?, ?)";
 
 			psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
@@ -46,41 +45,36 @@ public class OrderDAO {
 
 			psOrder.executeUpdate();
 
-			// Lấy ID đơn hàng vừa tạo
 			ResultSet rs = psOrder.getGeneratedKeys();
 			int orderId = 0;
 			if (rs.next()) {
 				orderId = rs.getInt(1);
 			}
 
-			// 2. INSERT VÀO ORDER DETAILS VÀ TRỪ KHO
 			if (orderId > 0 && cart != null) {
 				String sqlDetail = "INSERT INTO OrderDetails (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
 
-				// --- [MỚI] Chuẩn bị câu lệnh trừ kho
 				String sqlUpdateStock = "UPDATE Products SET stock_quantity = stock_quantity - ? WHERE id = ?";
 
 				psDetail = conn.prepareStatement(sqlDetail);
-				psStock = conn.prepareStatement(sqlUpdateStock); // --- [MỚI]
+				psStock = conn.prepareStatement(sqlUpdateStock);
 
 				for (CartItem item : cart) {
-					// A. Lưu chi tiết đơn hàng
+
 					psDetail.setInt(1, orderId);
 					psDetail.setInt(2, item.getProduct().getId());
 					psDetail.setDouble(3, item.getProduct().getPrice());
 					psDetail.setInt(4, item.getQuantity());
-					psDetail.addBatch(); // Gom lệnh lại chạy 1 lần
+					psDetail.addBatch();
 
-					// B. --- [MỚI] TRỪ TỒN KHO ---
-					psStock.setInt(1, item.getQuantity()); // Trừ đi số lượng khách mua
-					psStock.setInt(2, item.getProduct().getId()); // Của sản phẩm ID này
-					psStock.executeUpdate(); // Chạy lệnh trừ ngay lập tức
+					psStock.setInt(1, item.getQuantity());
+					psStock.setInt(2, item.getProduct().getId());
+					psStock.executeUpdate();
 				}
 
-				psDetail.executeBatch(); // Chạy batch insert details
+				psDetail.executeBatch();
 			}
 
-			// Mọi thứ ok thì lưu lại (Commit)
 			conn.commit();
 			result = true;
 			System.out.println("Tạo đơn hàng thành công! Mã đơn: " + orderId);
@@ -95,7 +89,7 @@ public class OrderDAO {
 				ex.printStackTrace();
 			}
 		} finally {
-			// Đóng kết nối
+
 			try {
 				if (psStock != null)
 					psStock.close();
@@ -178,14 +172,11 @@ public class OrderDAO {
 				o.setStatus(rs.getString("status"));
 				o.setOrderDate(rs.getDate("order_date"));
 
-				// Set thông tin người nhận
 				o.setRecipientName(rs.getString("recipient_name"));
 				o.setRecipientPhone(rs.getString("recipient_phone"));
 				o.setShippingAddress(rs.getString("shipping_address"));
 				o.setPaymentMethod(rs.getString("payment_method"));
 
-				// Xử lý user (chỉ cần lấy ID để biết user nào đặt, nếu cần tên account thì join
-				// thêm)
 				User u = new User();
 				u.setId(rs.getInt("user_id"));
 				o.setUser(u);
@@ -198,7 +189,6 @@ public class OrderDAO {
 		return list;
 	}
 
-	// Lấy thông tin 1 đơn hàng
 	public Order getOrderById(int id) {
 		String sql = "SELECT * FROM Orders WHERE id = ?";
 		try {
@@ -231,7 +221,7 @@ public class OrderDAO {
 
 	public List<Order> getOrdersByUserId(int userId) {
 		List<Order> list = new ArrayList<>();
-		String sql = "SELECT * FROM Orders WHERE user_id = ? ORDER BY id DESC"; // Đơn mới nhất lên đầu
+		String sql = "SELECT * FROM Orders WHERE user_id = ? ORDER BY id DESC";
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -269,59 +259,27 @@ public class OrderDAO {
 		}
 	}
 
-	public static void main(String[] args) {
-		OrderDAO dao = new OrderDAO();
-//		User u = new User();
-//		u.setId(1);
-//		
-//		List<OrderDetail> giohang = new ArrayList<>();
-//		
-//		Product iphone = new Product();
-//		iphone.setId(1);
-//		
-//		OrderDetail item = new OrderDetail();
-//		item.setProduct(iphone);
-//		item.setPrice(30000);
-//		item.setQuantity(2);
-//		
-//		giohang.add(item);
-//		
-//		dao.createOrder(u, giohang, 60000);
-
-		int orderxem = 1;
-		List<OrderDetail> detail = dao.getOrderDetail(orderxem);
-		System.out.println("--- Chi tiết đơn hàng: ---");
-		for (OrderDetail d : detail) {
-			System.out.println("Sản phẩm: " + d.getProduct().getName());
-			System.out.println("Số lượng: " + d.getQuantity());
-			System.out.println("Giá lúc mua: " + d.getPrice());
-			System.out.println("-----------------");
-		}
-	}
-	
 	public Map<String, Double> getRevenueLast12Months() {
-	    // LinkedHashMap để giữ thứ tự tháng (Tháng cũ trước, tháng mới sau hoặc ngược lại)
-	    Map<String, Double> map = new LinkedHashMap<>();
-	    
-	    // Query lấy 12 tháng gần nhất, tính tổng tiền những đơn "Hoàn thành" hoặc "Đã giao"
-	    String sql = "SELECT FORMAT(order_date, 'MM/yyyy') as month_year, SUM(total_price) as total " +
-	                 "FROM Orders " +
-	                 "WHERE status IN (N'Đã giao', N'Hoàn thành') " +
-	                 "GROUP BY FORMAT(order_date, 'MM/yyyy'), YEAR(order_date), MONTH(order_date) " +
-	                 "ORDER BY YEAR(order_date) DESC, MONTH(order_date) DESC";
-	    
-	    try {
-	        Connection conn = DBConnection.getConnection();
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ResultSet rs = ps.executeQuery();
-	        
-	        while (rs.next()) {
-	            map.put(rs.getString("month_year"), rs.getDouble("total"));
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return map;
+
+		Map<String, Double> map = new LinkedHashMap<>();
+
+		String sql = "SELECT FORMAT(order_date, 'MM/yyyy') as month_year, SUM(total_price) as total " + "FROM Orders "
+				+ "WHERE status IN (N'Đã giao', N'Hoàn thành') "
+				+ "GROUP BY FORMAT(order_date, 'MM/yyyy'), YEAR(order_date), MONTH(order_date) "
+				+ "ORDER BY YEAR(order_date) DESC, MONTH(order_date) DESC";
+
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				map.put(rs.getString("month_year"), rs.getDouble("total"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return map;
 	}
 
 	public int getTodayOrdersCount() {
@@ -332,7 +290,7 @@ public class OrderDAO {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement(sql);
 			LocalDate today = LocalDate.now();
-			ps.setDate(1, Date.valueOf(today)); // Chuyển LocalDate sang SQL Date
+			ps.setDate(1, Date.valueOf(today));
 
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
@@ -346,7 +304,7 @@ public class OrderDAO {
 
 	public double getTodayRevenue() {
 		double revenue = 0.0;
-		String sql = "SELECT SUM(total_price) FROM Orders WHERE CAST(order_date AS DATE) = ? AND status IN (N'Đã giao', N'Hoàn thành')"; 
+		String sql = "SELECT SUM(total_price) FROM Orders WHERE CAST(order_date AS DATE) = ? AND status IN (N'Đã giao', N'Hoàn thành')";
 		try {
 			Connection conn = DBConnection.getConnection();
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -405,105 +363,86 @@ public class OrderDAO {
 		}
 		return count;
 	}
-	
+
 	public List<DailyStat> getDailyStatistics(int month, int year) {
-	    List<DailyStat> list = new ArrayList<>();
-	    
-	    // Query: Gom nhóm theo NGÀY trong tháng được chọn
-	    String sql = "SELECT DAY(order_date) as day, COUNT(id) as count, SUM(total_price) as total " +
-	                 "FROM Orders " +
-	                 "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? " +
-	                 "AND status IN (N'Đã giao', N'Hoàn thành') " +
-	                 "GROUP BY DAY(order_date) " +
-	                 "ORDER BY day ASC";
-	    
-	    try {
-	        Connection conn = DBConnection.getConnection();
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ps.setInt(1, month);
-	        ps.setInt(2, year);
-	        ResultSet rs = ps.executeQuery();
-	        
-	        while (rs.next()) {
-	            list.add(new DailyStat(
-	                rs.getInt("day"),
-	                rs.getInt("count"),
-	                rs.getDouble("total")
-	            ));
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return list;
+		List<DailyStat> list = new ArrayList<>();
+
+		String sql = "SELECT DAY(order_date) as day, COUNT(id) as count, SUM(total_price) as total " + "FROM Orders "
+				+ "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? " + "AND status IN (N'Đã giao', N'Hoàn thành') "
+				+ "GROUP BY DAY(order_date) " + "ORDER BY day ASC";
+
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, month);
+			ps.setInt(2, year);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				list.add(new DailyStat(rs.getInt("day"), rs.getInt("count"), rs.getDouble("total")));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
-	
+
 	public List<Order> getOrdersByMonthYear(int month, int year) {
-	    List<Order> list = new ArrayList<>();
-	    
-	    // Câu lệnh SQL lấy dữ liệu
-	    String sql = "SELECT * FROM Orders " +
-	                 "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? " +
-	                 "ORDER BY order_date DESC";
-	    
-	    try {
-	        Connection conn = DBConnection.getConnection();
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ps.setInt(1, month);
-	        ps.setInt(2, year);
-	        
-	        ResultSet rs = ps.executeQuery();
-	        while (rs.next()) {
-	            Order o = new Order();
-	            o.setId(rs.getInt("id"));
-	            
-	            // 1. SỬA LỖI USER: Tạo đối tượng User giả để hứng ID
-	            // (Vì model của bạn là private User user)
-	            User u = new User();
-	            if (hasColumn(rs, "user_id")) {
-	                u.setId(rs.getInt("user_id"));
-	                // Nếu muốn lấy cả tên user thì phải JOIN bảng, 
-	                // nhưng tạm thời chỉ cần ID để link hoặc export là đủ.
-	            }
-	            o.setUser(u); // Set đối tượng User vào Order
+		List<Order> list = new ArrayList<>();
 
-	            // 2. SỬA LỖI NGÀY THÁNG: Dùng rs.getDate để khớp với java.sql.Date
-	            o.setOrderDate(rs.getDate("order_date")); 
-	            
-	            o.setTotalPrice(rs.getDouble("total_price"));
-	            o.setStatus(rs.getString("status"));
-	            
-	            // Các thông tin người nhận
-	            o.setRecipientName(rs.getString("recipient_name"));
-	            o.setRecipientPhone(rs.getString("recipient_phone"));
-	            
-	            // 3. SỬA LỖI ĐỊA CHỈ: Dùng setShippingAddress
-	            // (Kiểm tra xem trong DB cột tên là 'address' hay 'shipping_address')
-	            if (hasColumn(rs, "address")) {
-	                o.setShippingAddress(rs.getString("address"));
-	            } else if (hasColumn(rs, "shipping_address")) {
-	                o.setShippingAddress(rs.getString("shipping_address"));
-	            }
+		String sql = "SELECT * FROM Orders " + "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? "
+				+ "ORDER BY order_date DESC";
 
-	            // Payment method
-	            if (hasColumn(rs, "payment_method")) {
-	                 o.setPaymentMethod(rs.getString("payment_method"));
-	            }
+		try {
+			Connection conn = DBConnection.getConnection();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, month);
+			ps.setInt(2, year);
 
-	            list.add(o);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return list;
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				Order o = new Order();
+				o.setId(rs.getInt("id"));
+
+				User u = new User();
+				if (hasColumn(rs, "user_id")) {
+					u.setId(rs.getInt("user_id"));
+
+				}
+				o.setUser(u);
+
+				o.setOrderDate(rs.getDate("order_date"));
+
+				o.setTotalPrice(rs.getDouble("total_price"));
+				o.setStatus(rs.getString("status"));
+
+				o.setRecipientName(rs.getString("recipient_name"));
+				o.setRecipientPhone(rs.getString("recipient_phone"));
+
+				if (hasColumn(rs, "address")) {
+					o.setShippingAddress(rs.getString("address"));
+				} else if (hasColumn(rs, "shipping_address")) {
+					o.setShippingAddress(rs.getString("shipping_address"));
+				}
+
+				if (hasColumn(rs, "payment_method")) {
+					o.setPaymentMethod(rs.getString("payment_method"));
+				}
+
+				list.add(o);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 
-	// Hàm phụ trợ check cột (Giữ nguyên như cũ)
 	private boolean hasColumn(ResultSet rs, String columnName) {
-	    try {
-	        rs.findColumn(columnName);
-	        return true;
-	    } catch (Exception e) {
-	        return false;
-	    }
+		try {
+			rs.findColumn(columnName);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }

@@ -216,44 +216,36 @@ body {
 	background-color: #f9fcfc;
 }
 
-/* Điều chỉnh độ rộng các cột */
-.products-table th:nth-child(1), 
-.products-table td:nth-child(1) {
+.products-table th:nth-child(1), .products-table td:nth-child(1) {
 	width: 60px;
 	text-align: center;
 }
 
-.products-table th:nth-child(2), 
-.products-table td:nth-child(2) {
+.products-table th:nth-child(2), .products-table td:nth-child(2) {
 	width: 35%;
 	min-width: 250px;
 }
 
-.products-table th:nth-child(3), 
-.products-table td:nth-child(3) {
+.products-table th:nth-child(3), .products-table td:nth-child(3) {
 	width: 120px;
 	text-align: right;
 	white-space: nowrap;
 }
 
-.products-table th:nth-child(4), 
-.products-table td:nth-child(4) {
+.products-table th:nth-child(4), .products-table td:nth-child(4) {
 	width: 100px;
 	text-align: center;
 }
 
-.products-table th:nth-child(5), 
-.products-table td:nth-child(5) {
+.products-table th:nth-child(5), .products-table td:nth-child(5) {
 	width: 15%;
 }
 
-.products-table th:nth-child(6), 
-.products-table td:nth-child(6) {
+.products-table th:nth-child(6), .products-table td:nth-child(6) {
 	width: 15%;
 }
 
-.products-table th:nth-child(7), 
-.products-table td:nth-child(7) {
+.products-table th:nth-child(7), .products-table td:nth-child(7) {
 	width: 160px;
 	text-align: center;
 }
@@ -356,7 +348,6 @@ body {
 	color: #ccc;
 }
 
-/* Phân trang - CẢI THIỆN */
 .pagination-container {
 	display: flex;
 	justify-content: space-between;
@@ -494,7 +485,7 @@ body {
 </style>
 </head>
 <body>
-	<!-- Kiểm tra quyền admin -->
+
 	<c:if test="${empty user or user.role ne 1}">
 		<c:redirect url="login" />
 	</c:if>
@@ -526,13 +517,14 @@ body {
 			<ul class="sidebar-menu">
 				<li><a href="adminHome"><i class="fas fa-tachometer-alt"></i>
 						Tổng quan</a></li>
-				<li><a href="adminUsers"><i class="fas fa-users"></i> Quản lý người
-						dùng</a></li>
+				<li><a href="adminUsers"><i class="fas fa-users"></i> Quản
+						lý người dùng</a></li>
 				<li><a href="adminProducts" class="active"><i
 						class="fas fa-box"></i> Quản lý sản phẩm</a></li>
-				<li><a href="adminOrders"><i class="fas fa-shopping-cart"></i> Quản
-						lý đơn hàng</a></li>
-				<li><a href="adminContacts"><i class="fas fa-envelope"></i> Quản lý liên hệ</a></li>
+				<li><a href="adminOrders"><i class="fas fa-shopping-cart"></i>
+						Quản lý đơn hàng</a></li>
+				<li><a href="adminContacts"><i class="fas fa-envelope"></i>
+						Quản lý liên hệ</a></li>
 				<li><a href="home"><i class="fas fa-store"></i> Về trang
 						cửa hàng</a></li>
 			</ul>
@@ -550,23 +542,26 @@ body {
 				</a>
 			</div>
 
-			<!-- Thông báo thành công -->
+
 			<c:if test="${param.success eq 'true'}">
 				<div class="alert alert-success">
-					<i class="fas fa-check-circle"></i> Sản phẩm đã được thêm thành công!
+					<i class="fas fa-check-circle"></i> Sản phẩm đã được thêm thành
+					công!
 				</div>
 			</c:if>
 
 			<c:if test="${param.success eq 'delete_success'}">
 				<div class="alert alert-success">
-					<i class="fas fa-check-circle"></i> Sản phẩm đã được xóa thành công!
+					<i class="fas fa-check-circle"></i> Sản phẩm đã được xóa thành
+					công!
 				</div>
 			</c:if>
 
-			<!-- Thông báo lỗi -->
+
 			<c:if test="${param.error eq 'delete_failed'}">
 				<div class="alert alert-error">
-					<i class="fas fa-exclamation-circle"></i> Không thể xóa sản phẩm. Vui lòng thử lại!
+					<i class="fas fa-exclamation-circle"></i> Không thể xóa sản phẩm.
+					Vui lòng thử lại!
 				</div>
 			</c:if>
 
@@ -595,39 +590,29 @@ body {
 								<c:forEach var="product" items="${productList}">
 									<tr>
 										<td>${product.id}</td>
-										<td>
-											<span class="product-name">${product.name}</span>
-											<c:if test="${not empty product.description}">
+										<td><span class="product-name">${product.name}</span> <c:if
+												test="${not empty product.description}">
 												<span class="product-desc">${product.description}</span>
-											</c:if>
-										</td>
-										<td>
-											<span class="product-price">
-												<fmt:formatNumber value="${product.price}" 
-													type="number" maxFractionDigits="0" groupingUsed="true" /> ₫
-											</span>
-										</td>
-										<td>
-											<span class="product-stock ${product.stock lt 10 ? 'stock-low' : 'stock-ok'}">
-												${product.stock}
-											</span>
-										</td>
-										<td>
-											<c:if test="${not empty product.category}">
+											</c:if></td>
+										<td><span class="product-price"> <fmt:formatNumber
+													value="${product.price}" type="number"
+													maxFractionDigits="0" groupingUsed="true" /> ₫
+										</span></td>
+										<td><span
+											class="product-stock ${product.stock lt 10 ? 'stock-low' : 'stock-ok'}">
+												${product.stock} </span></td>
+										<td><c:if test="${not empty product.category}">
 												${product.category.name}
-											</c:if>
-											<c:if test="${empty product.category}">
-												<span style="color: #999; font-style: italic;">Không có</span>
-											</c:if>
-										</td>
-										<td>
-											<c:if test="${not empty product.brand}">
+											</c:if> <c:if test="${empty product.category}">
+												<span style="color: #999; font-style: italic;">Không
+													có</span>
+											</c:if></td>
+										<td><c:if test="${not empty product.brand}">
 												${product.brand.name}
-											</c:if>
-											<c:if test="${empty product.brand}">
-												<span style="color: #999; font-style: italic;">Không có</span>
-											</c:if>
-										</td>
+											</c:if> <c:if test="${empty product.brand}">
+												<span style="color: #999; font-style: italic;">Không
+													có</span>
+											</c:if></td>
 										<td>
 											<div class="action-buttons">
 												<button class="delete-btn"
@@ -644,53 +629,54 @@ body {
 				</c:choose>
 			</div>
 
-			<!-- Phân trang - FIXED -->
+
 			<c:if test="${not empty productList}">
 				<div class="pagination-container">
 					<div class="pagination-info">
-						Trang <strong>${currentPage}</strong> / <strong>${totalPages}</strong> 
+						Trang <strong>${currentPage}</strong> / <strong>${totalPages}</strong>
 						- Hiển thị <strong>${productList.size()}</strong> sản phẩm
 						<c:if test="${totalProducts > 0}">
 							/ Tổng <strong>${totalProducts}</strong> sản phẩm
 						</c:if>
 					</div>
-					
+
 					<c:if test="${totalPages > 1}">
 						<div class="pagination">
-							<!-- Nút Trang đầu -->
+
 							<c:choose>
 								<c:when test="${currentPage > 1}">
-									<a href="adminProducts?page=1" class="page-btn" title="Trang đầu">
-										<i class="fas fa-angle-double-left"></i>
+									<a href="adminProducts?page=1" class="page-btn"
+										title="Trang đầu"> <i class="fas fa-angle-double-left"></i>
 									</a>
 								</c:when>
 								<c:otherwise>
-									<span class="page-btn disabled">
-										<i class="fas fa-angle-double-left"></i>
+									<span class="page-btn disabled"> <i
+										class="fas fa-angle-double-left"></i>
 									</span>
 								</c:otherwise>
 							</c:choose>
-							
-							<!-- Nút Trang trước -->
+
+
 							<c:choose>
 								<c:when test="${currentPage > 1}">
-									<a href="adminProducts?page=${currentPage - 1}" class="page-btn" title="Trang trước">
-										<i class="fas fa-chevron-left"></i>
+									<a href="adminProducts?page=${currentPage - 1}"
+										class="page-btn" title="Trang trước"> <i
+										class="fas fa-chevron-left"></i>
 									</a>
 								</c:when>
 								<c:otherwise>
-									<span class="page-btn disabled">
-										<i class="fas fa-chevron-left"></i>
+									<span class="page-btn disabled"> <i
+										class="fas fa-chevron-left"></i>
 									</span>
 								</c:otherwise>
 							</c:choose>
-							
-							<!-- Các số trang -->
+
+
 							<div class="page-numbers">
 								<c:set var="startPage" value="1" />
 								<c:set var="endPage" value="${totalPages}" />
-								
-								<!-- Giới hạn hiển thị tối đa 5 số trang -->
+
+
 								<c:if test="${totalPages > 5}">
 									<c:choose>
 										<c:when test="${currentPage <= 3}">
@@ -707,16 +693,16 @@ body {
 										</c:otherwise>
 									</c:choose>
 								</c:if>
-								
-								<!-- Hiển thị ... nếu có trang trước startPage -->
+
+
 								<c:if test="${startPage > 1}">
 									<a href="adminProducts?page=1" class="page-number">1</a>
 									<c:if test="${startPage > 2}">
 										<span class="ellipsis">...</span>
 									</c:if>
 								</c:if>
-								
-								<!-- Hiển thị các số trang -->
+
+
 								<c:forEach var="i" begin="${startPage}" end="${endPage}">
 									<c:choose>
 										<c:when test="${i == currentPage}">
@@ -727,8 +713,7 @@ body {
 										</c:otherwise>
 									</c:choose>
 								</c:forEach>
-								
-								<!-- Hiển thị ... nếu có trang sau endPage -->
+
 								<c:if test="${endPage < totalPages}">
 									<c:if test="${endPage < totalPages - 1}">
 										<span class="ellipsis">...</span>
@@ -736,31 +721,32 @@ body {
 									<a href="adminProducts?page=${totalPages}" class="page-number">${totalPages}</a>
 								</c:if>
 							</div>
-							
-							<!-- Nút Trang sau -->
+
+
 							<c:choose>
 								<c:when test="${currentPage < totalPages}">
-									<a href="adminProducts?page=${currentPage + 1}" class="page-btn" title="Trang sau">
-										<i class="fas fa-chevron-right"></i>
+									<a href="adminProducts?page=${currentPage + 1}"
+										class="page-btn" title="Trang sau"> <i
+										class="fas fa-chevron-right"></i>
 									</a>
 								</c:when>
 								<c:otherwise>
-									<span class="page-btn disabled">
-										<i class="fas fa-chevron-right"></i>
+									<span class="page-btn disabled"> <i
+										class="fas fa-chevron-right"></i>
 									</span>
 								</c:otherwise>
 							</c:choose>
-							
-							<!-- Nút Trang cuối -->
+
+
 							<c:choose>
 								<c:when test="${currentPage < totalPages}">
-									<a href="adminProducts?page=${totalPages}" class="page-btn" title="Trang cuối">
-										<i class="fas fa-angle-double-right"></i>
+									<a href="adminProducts?page=${totalPages}" class="page-btn"
+										title="Trang cuối"> <i class="fas fa-angle-double-right"></i>
 									</a>
 								</c:when>
 								<c:otherwise>
-									<span class="page-btn disabled">
-										<i class="fas fa-angle-double-right"></i>
+									<span class="page-btn disabled"> <i
+										class="fas fa-angle-double-right"></i>
 									</span>
 								</c:otherwise>
 							</c:choose>
@@ -772,7 +758,7 @@ body {
 	</div>
 
 	<script>
-		// Hàm xác nhận xóa sản phẩm
+		
 		function confirmDelete(productId) {
 			if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
 				window.location.href = "deleteProduct?id=" + productId + "&page=${currentPage}";

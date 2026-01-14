@@ -22,14 +22,13 @@ import com.kachikun.shop.model.User;
 public class AdminHomeServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
-    // Khởi tạo các DAO
     private UserDAO userDAO = new UserDAO();
     private ProductDAO productDAO = new ProductDAO();
     private OrderDAO orderDAO = new OrderDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // 1. KIỂM TRA ĐĂNG NHẬP & QUYỀN ADMIN
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
@@ -42,8 +41,6 @@ public class AdminHomeServlet extends HttpServlet {
             return;
         }
 
-        // 2. LẤY CÁC CHỈ SỐ CƠ BẢN (DASHBOARD CARDS)
-
         int totalUsers = 0;
         int totalProducts = 0;
         int todayOrders = 0;
@@ -53,15 +50,12 @@ public class AdminHomeServlet extends HttpServlet {
             totalUsers = userDAO.getTotalUsers();
             totalProducts = productDAO.getTotalProducts();
             
-            todayOrders = orderDAO.getTodayOrdersCount(); // Hoặc hàm getTodayOrdersCount() nếu bạn đặt tên khác
-            // Giả sử bạn chưa viết hàm getTodayRevenue, tôi tạm để 0. 
-            // Nếu viết rồi thì bỏ comment dòng dưới:
+            todayOrders = orderDAO.getTodayOrdersCount();
             todayRevenue = orderDAO.getTodayRevenue(); 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // 3. THỐNG KÊ DOANH THU 12 THÁNG (CHO BIỂU ĐỒ TỔNG)
         Map<String, Double> monthlyRevenue = orderDAO.getRevenueLast12Months();
 
         double totalYearRevenue = 0;
@@ -78,8 +72,6 @@ public class AdminHomeServlet extends HttpServlet {
             avgRevenue = totalYearRevenue / monthlyRevenue.size();
         }
 
-        // 4. THỐNG KÊ CHI TIẾT THEO NGÀY (CHO BẢNG DỮ LIỆU)
-
         LocalDate now = LocalDate.now();
         int selectedMonth = now.getMonthValue();
         int selectedYear = now.getYear();
@@ -92,35 +84,28 @@ public class AdminHomeServlet extends HttpServlet {
                 selectedMonth = Integer.parseInt(monthParam);
                 selectedYear = Integer.parseInt(yearParam);
             } catch (NumberFormatException e) {
-                // Nếu param lỗi thì giữ nguyên mặc định
             }
         }
 
-        // B. Lấy danh sách chi tiết ngày từ DAO
         List<DailyStat> dailyStats = orderDAO.getDailyStatistics(selectedMonth, selectedYear);
         
-        // C. Tính toán logic điều hướng (Tháng trước / Tháng sau)
         int prevMonth = (selectedMonth == 1) ? 12 : selectedMonth - 1;
         int prevYear = (selectedMonth == 1) ? selectedYear - 1 : selectedYear;
         
         int nextMonth = (selectedMonth == 12) ? 1 : selectedMonth + 1;
         int nextYear = (selectedMonth == 12) ? selectedYear + 1 : selectedYear;
 
-        // 5. GỬI DỮ LIỆU SANG JSP
         
-        // Thông tin cơ bản
         request.setAttribute("totalUsers", totalUsers);
         request.setAttribute("totalProducts", totalProducts);
         request.setAttribute("todayOrders", todayOrders);
         request.setAttribute("todayRevenue", todayRevenue);
         
-        // Thông tin biểu đồ 12 tháng
         request.setAttribute("monthlyRevenue", monthlyRevenue);
         request.setAttribute("totalYearRevenue", totalYearRevenue);
         request.setAttribute("maxRevenue", maxRevenue);
         request.setAttribute("avgRevenue", avgRevenue);
         
-        // Thông tin chi tiết ngày & Điều hướng
         request.setAttribute("dailyStats", dailyStats);
         request.setAttribute("selectedMonth", selectedMonth);
         request.setAttribute("selectedYear", selectedYear);
@@ -129,7 +114,6 @@ public class AdminHomeServlet extends HttpServlet {
         request.setAttribute("nextMonth", nextMonth);
         request.setAttribute("nextYear", nextYear);
 
-        // Forward
         request.getRequestDispatcher("adminHome.jsp").forward(request, response);
     }
 

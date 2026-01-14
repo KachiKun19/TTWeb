@@ -298,7 +298,7 @@ body {
 </style>
 </head>
 <body>
-	<!-- Kiểm tra quyền admin -->
+	
 	<c:if test="${empty user or user.role ne 1}">
 		<c:redirect url="login" />
 	</c:if>
@@ -354,7 +354,7 @@ body {
 				</a>
 			</div>
 
-			<!-- Hiển thị thông báo lỗi nếu có -->
+			
 			<c:if test="${not empty errorMessage}">
 				<div class="alert alert-error">
 					<i class="fas fa-exclamation-circle"></i> ${errorMessage}

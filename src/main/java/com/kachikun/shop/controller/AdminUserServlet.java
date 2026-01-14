@@ -15,7 +15,6 @@ public class AdminUserServlet extends HttpServlet {
     private UserDAO userDAO = new UserDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Kiểm tra đăng nhập và quyền admin
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login");
@@ -28,20 +27,16 @@ public class AdminUserServlet extends HttpServlet {
             return;
         }
         
-        // Lấy danh sách người dùng theo vai trò
-        List<User> adminList = userDAO.getUsersByRole(1); // Admin
-        List<User> userList = userDAO.getUsersByRole(0); // Người dùng thường
+        List<User> adminList = userDAO.getUsersByRole(1); 
+        List<User> userList = userDAO.getUsersByRole(0); 
         
-        // Truyền dữ liệu sang JSP
         request.setAttribute("adminList", adminList);
         request.setAttribute("userList", userList);
         
-        // Chuyển đến trang quản lý người dùng
         request.getRequestDispatcher("adminUsers.jsp").forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Kiểm tra đăng nhập và quyền admin
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login");
@@ -54,7 +49,6 @@ public class AdminUserServlet extends HttpServlet {
             return;
         }
         
-        // Xác định hành động
         String action = request.getParameter("action");
         
         if ("add".equals(action)) {
@@ -64,20 +58,17 @@ public class AdminUserServlet extends HttpServlet {
         } else if ("updateRole".equals(action)) {
             handleUpdateRole(request, response);
         } else {
-            // Nếu không có action hợp lệ, chuyển về trang danh sách
             response.sendRedirect("adminUsers");
         }
     }
     
     private void handleAddUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Lấy thông tin từ form
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
         String roleStr = request.getParameter("role");
         
-        // Validate dữ liệu
         if (username == null || username.trim().isEmpty() || 
             password == null || password.trim().isEmpty()) {
             request.setAttribute("errorMessage", "Tên đăng nhập và mật khẩu là bắt buộc!");
@@ -88,7 +79,6 @@ public class AdminUserServlet extends HttpServlet {
         try {
             int role = Integer.parseInt(roleStr);
             
-            // Tạo đối tượng User mới
             User newUser = new User();
             newUser.setUsername(username);
             newUser.setPassword(password);
@@ -96,7 +86,6 @@ public class AdminUserServlet extends HttpServlet {
             newUser.setEmail(email);
             newUser.setRole(role);
             
-            // Thêm vào database
             boolean success = userDAO.register(newUser);
             
             if (success) {
@@ -114,7 +103,6 @@ public class AdminUserServlet extends HttpServlet {
     }
     
     private void handleDeleteUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Lấy ID người dùng cần xóa
         String userIdStr = request.getParameter("id");
         
         if (userIdStr == null || userIdStr.trim().isEmpty()) {
@@ -125,7 +113,6 @@ public class AdminUserServlet extends HttpServlet {
         try {
             int userId = Integer.parseInt(userIdStr);
             
-            // Không cho phép xóa chính mình
             HttpSession session = request.getSession(false);
             User currentUser = (User) session.getAttribute("user");
             if (currentUser.getId() == userId) {
@@ -133,7 +120,6 @@ public class AdminUserServlet extends HttpServlet {
                 return;
             }
             
-            // Xóa người dùng
             boolean success = userDAO.deleteUser(userId);
             
             if (success) {
@@ -151,7 +137,6 @@ public class AdminUserServlet extends HttpServlet {
     }
     
     private void handleUpdateRole(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Lấy thông tin cập nhật
         String userIdStr = request.getParameter("id");
         String newRoleStr = request.getParameter("newRole");
         
@@ -164,7 +149,6 @@ public class AdminUserServlet extends HttpServlet {
             int userId = Integer.parseInt(userIdStr);
             int newRole = Integer.parseInt(newRoleStr);
             
-            // Không cho phép thay đổi vai trò của chính mình
             HttpSession session = request.getSession(false);
             User currentUser = (User) session.getAttribute("user");
             if (currentUser.getId() == userId) {
@@ -172,14 +156,12 @@ public class AdminUserServlet extends HttpServlet {
                 return;
             }
             
-            // Lấy thông tin người dùng
             User user = userDAO.getUserById(userId);
             if (user == null) {
                 response.sendRedirect("adminUsers?error=user_not_found");
                 return;
             }
             
-            // Cập nhật vai trò
             user.setRole(newRole);
             boolean success = userDAO.updateUser(user);
             

@@ -15,7 +15,7 @@
 	rel="stylesheet">
 
 <style>
-/* --- GIỮ NGUYÊN CSS CỦA ADMINHOME --- */
+
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -131,7 +131,7 @@ body {
 	padding: 30px;
 }
 
-/* --- CSS BỔ SUNG CHO BẢNG CONTACT (THEO STYLE ADMINHOME) --- */
+
 .page-header {
     margin-bottom: 25px;
     border-bottom: 2px solid #eee;
@@ -178,7 +178,7 @@ tr:hover {
     background-color: #f0f7f7;
 }
 
-/* Badge trạng thái */
+
 .status-badge {
     padding: 5px 12px;
     border-radius: 20px;
@@ -189,17 +189,17 @@ tr:hover {
 
 .status-unread {
     background-color: #fff5f5;
-    color: #e53e3e; /* Màu đỏ */
+    color: #e53e3e; 
     border: 1px solid #fed7d7;
 }
 
 .status-read {
     background-color: #f0fff4;
-    color: #38a169; /* Màu xanh lá */
+    color: #38a169; 
     border: 1px solid #c6f6d5;
 }
 
-/* Nút hành động */
+
 .btn-action {
     background-color: #2d7e7e;
     color: white;

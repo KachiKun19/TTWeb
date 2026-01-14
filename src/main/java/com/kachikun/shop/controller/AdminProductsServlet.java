@@ -16,7 +16,6 @@ public class AdminProductsServlet extends HttpServlet {
     private ProductDAO productDAO = new ProductDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Kiểm tra đăng nhập và quyền admin
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login");
@@ -29,7 +28,6 @@ public class AdminProductsServlet extends HttpServlet {
             return;
         }
         
-        // Lấy số trang từ tham số, mặc định là trang 1
         String pageParam = request.getParameter("page");
         int currentPage = 1;
         if (pageParam != null && !pageParam.isEmpty()) {
@@ -41,27 +39,21 @@ public class AdminProductsServlet extends HttpServlet {
             }
         }
         
-        // Số sản phẩm mỗi trang
         int pageSize = 10;
         
-        // Lấy tổng số sản phẩm
         int totalProducts = productDAO.getTotalProducts();
         
-        // Tính tổng số trang
         int totalPages = 0;
         if (totalProducts > 0) {
             totalPages = (int) Math.ceil((double) totalProducts / pageSize);
         }
         
-        // Đảm bảo currentPage không vượt quá totalPages
         if (totalPages > 0 && currentPage > totalPages) {
             currentPage = totalPages;
         }
         
-        // Lấy danh sách sản phẩm theo trang
         List<Product> productList = productDAO.getProductsByPage(currentPage, pageSize);
         
-        // Debug log
         System.out.println("=== DEBUG: Admin Products Pagination ===");
         System.out.println("Current Page: " + currentPage);
         System.out.println("Total Pages: " + totalPages);
@@ -69,13 +61,11 @@ public class AdminProductsServlet extends HttpServlet {
         System.out.println("Product List Size: " + (productList != null ? productList.size() : 0));
         System.out.println("================================");
         
-        // Truyền dữ liệu sang JSP
         request.setAttribute("productList", productList);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalProducts", totalProducts);
         
-        // Chuyển đến trang quản lý sản phẩm
         request.getRequestDispatcher("adminProducts.jsp").forward(request, response);
     }
 

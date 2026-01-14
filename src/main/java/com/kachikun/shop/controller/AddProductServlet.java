@@ -71,7 +71,6 @@ public class AddProductServlet extends HttpServlet {
         String categoryIdStr = request.getParameter("categoryId");
         String brandIdStr = request.getParameter("brandId");
         
-        // Validate dữ liệu
         if (name == null || name.trim().isEmpty() || priceStr == null || priceStr.trim().isEmpty()) {
             request.setAttribute("errorMessage", "Tên sản phẩm và giá là bắt buộc!");
             doGet(request, response);
@@ -79,7 +78,6 @@ public class AddProductServlet extends HttpServlet {
         }
         
         try {
-            // Parse dữ liệu
             double price = Double.parseDouble(priceStr);
             int stock = stockStr != null && !stockStr.trim().isEmpty() ? Integer.parseInt(stockStr) : 0;
             int categoryId = categoryIdStr != null && !categoryIdStr.trim().isEmpty() ? Integer.parseInt(categoryIdStr) : 0;
@@ -96,7 +94,6 @@ public class AddProductServlet extends HttpServlet {
             product.setMaterial(material);
             product.setSize(size);
             
-            // Tạo đối tượng Category và Brand nếu có ID
             if (categoryId > 0) {
                 Category category = new Category();
                 category.setId(categoryId);
@@ -108,8 +105,6 @@ public class AddProductServlet extends HttpServlet {
                 brand.setId(brandId);
                 product.setBrand(brand);
             }
-            
-            // Thêm sản phẩm vào database
             boolean success = productDAO.insertProduct(product);
             
             if (success) {

@@ -51,8 +51,7 @@ public class ContactDAO {
                 msg.setSubject(rs.getString("subject"));
                 msg.setMessage(rs.getString("message"));
                 msg.setCreatedAt(rs.getTimestamp("created_at"));
-                msg.setStatus(rs.getString("status")); // 'Chưa đọc' hoặc 'Đã xem'
-                
+                msg.setStatus(rs.getString("status"));
                 list.add(msg);
             }
         } catch (Exception e) {

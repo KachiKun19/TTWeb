@@ -22,16 +22,14 @@ public class AjaxFilterServlet extends HttpServlet {
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html;charset=UTF-8");
 
-		// Lấy danh sách các Brand ID được tích
 		String category = request.getParameter("category");
 		String[] brandIds = request.getParameterValues("brand");
 		String[] connections = request.getParameterValues("connection");
 		String[] materials = request.getParameterValues("material");
 		String[] sizes = request.getParameterValues("size");
 
-		// XỬ LÝ INDEX (PHÂN TRANG)
 		String indexPage = request.getParameter("index");
-		int index = 1; // Mặc định là trang 1
+		int index = 1;
 		try {
 			if (indexPage != null && !indexPage.isEmpty()) {
 				index = Integer.parseInt(indexPage);
@@ -40,20 +38,18 @@ public class AjaxFilterServlet extends HttpServlet {
 					index = 1;
 			}
 		} catch (Exception e) {
-			index = 1; // Nếu lỗi parse số thì về trang 1
+			index = 1;
 		}
 
 		ProductDAO dao = new ProductDAO();
-		// Đếm tổng số sản phẩm sau khi lọc - đếm trang
+
 		int total = dao.countFilteredProducts(brandIds, connections, materials, sizes, category);
 		int endPage = total / 3;
 		if (total % 3 != 0)
 			endPage++;
 
-		// Gọi hàm DAO
 		List<Product> list = dao.filterProducts(brandIds, connections, materials, sizes, category, index);
 
-		// Trả về HTML
 		PrintWriter out = response.getWriter();
 		out.println("<input type='hidden' id='ajax-total-res' value='" + total + "' />");
 
@@ -70,9 +66,9 @@ public class AjaxFilterServlet extends HttpServlet {
 			out.println("<div class='relative block'>");
 			out.println("<a href='product-detail?id=" + p.getId() + "'>"); // Mở thẻ link detail
 			out.println("<img src='images/" + p.getImage() + "' class='w-full h-56 object-contain p-4' />");
-			out.println("</a>"); 
+			out.println("</a>");
 
-			// Nút chọn nhanh 
+			// Nút chọn nhanh
 			out.println("<div class='absolute inset-x-4 bottom-4'>");
 			out.println("<a href='add-to-cart?id=" + p.getId()
 					+ "' class='block w-full bg-blue-600 text-white font-semibold py-2 rounded-lg text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300'>+ Chọn nhanh</a>");
@@ -89,7 +85,6 @@ public class AjaxFilterServlet extends HttpServlet {
 
 			out.println("</div>");
 		}
-		// số trang
 		if (endPage > 1) {
 			out.println("<div class='col-span-1 sm:col-span-2 lg:col-span-3 flex justify-center mt-8 space-x-2 py-4'>");
 			for (int i = 1; i <= endPage; i++) {

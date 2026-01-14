@@ -16,7 +16,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* Animation xuất hiện nhẹ nhàng */
+        
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -25,7 +25,7 @@
             animation: fadeInUp 0.8s ease-out forwards;
         }
         
-        /* Hiệu ứng nền mờ cho cột trái */
+        
         .glass-panel {
             background: rgba(17, 24, 39, 0.85);
             backdrop-filter: blur(10px);

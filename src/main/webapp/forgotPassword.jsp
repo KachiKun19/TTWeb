@@ -201,7 +201,7 @@
     </div>
 
     <script>
-        // Auto focus và chuyển giữa các ô OTP
+        
         const otpInputs = document.querySelectorAll('.otp-input');
         otpInputs.forEach((input, index) => {
             input.addEventListener('input', (e) => {
@@ -217,7 +217,7 @@
             });
         });
         
-        // Paste OTP
+        
         document.addEventListener('paste', (e) => {
             const activeElement = document.activeElement;
             if (activeElement && activeElement.classList.contains('otp-input')) {
@@ -241,31 +241,31 @@
             var btnSubmit = document.getElementById("btnSubmit");
             var msg = "";
 
-            // 1. Kiểm tra độ dài
+            
             if (password.length < 6) {
                 msg = "Mật khẩu phải có ít nhất 6 ký tự.";
             } 
-            // 2. Kiểm tra có số không (Tùy chọn)
+            
             else if (!/\d/.test(password)) {
                 msg = "Mật khẩu phải chứa ít nhất 1 số.";
             }
-            // 3. Kiểm tra chữ hoa (Tùy chọn)
+            
             else if (!/[A-Z]/.test(password)) {
                 msg = "Mật khẩu phải chứa ít nhất 1 chữ hoa.";
             }
-            // 4. Kiểm tra trùng khớp
+            
             else if (password !== confirmPassword && confirmPassword.length > 0) {
                 msg = "Mật khẩu xác nhận không khớp.";
             }
 
-            // Hiển thị lỗi
+            
             if (msg !== "") {
                 errorDiv.style.display = "block";
                 errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + msg;
-                return false; // Chặn submit
+                return false; 
             } else {
                 errorDiv.style.display = "none";
-                return true; // Cho phép submit
+                return true; 
             }
         }
     </script>

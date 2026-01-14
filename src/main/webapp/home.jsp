@@ -7,11 +7,11 @@
 <%@ page import="java.util.List"%>
 
 <%
-// gọi danh sách category từ DAO
+
 CategoryDAO dao = new CategoryDAO();
 List<Category> list = dao.getAllCategories();
 
-// Gán vào biến để bên dưới dùng được
+
 request.setAttribute("listCategories", list);
 %>
 <!DOCTYPE html>

@@ -468,7 +468,7 @@ body {
 </style>
 </head>
 <body>
-	<!-- Kiểm tra quyền admin -->
+	
 	<c:if test="${empty user or user.role ne 1}">
 		<c:redirect url="login" />
 	</c:if>
@@ -521,7 +521,7 @@ body {
 				</button>
 			</div>
 
-			<!-- Thông báo thành công -->
+			
 			<c:if test="${param.success eq 'add_success'}">
 				<div class="alert alert-success">
 					<i class="fas fa-check-circle"></i> Người dùng đã được thêm thành công!
@@ -540,7 +540,7 @@ body {
 				</div>
 			</c:if>
 
-			<!-- Thông báo lỗi -->
+			
 			<c:if test="${param.error eq 'add_failed'}">
 				<div class="alert alert-error">
 					<i class="fas fa-exclamation-circle"></i> Không thể thêm người dùng. Tên đăng nhập có thể đã tồn tại!
@@ -571,7 +571,7 @@ body {
 				</div>
 			</c:if>
 
-			<!-- Form thêm người dùng mới (ẩn mặc định) -->
+			
 			<div id="addUserForm" class="add-user-form" style="display: none;">
 				<h3 class="form-title">
 					<i class="fas fa-user-plus"></i> Thêm Người Dùng Mới
@@ -624,9 +624,9 @@ body {
 				</form>
 			</div>
 
-			<!-- Hiển thị danh sách người dùng -->
+			
 			<div class="users-container">
-				<!-- Cột Quản trị viên -->
+				
 				<div class="user-section">
 					<div class="section-header">
 						<h3>
@@ -680,7 +680,7 @@ body {
 					</ul>
 				</div>
 				
-				<!-- Cột Người dùng thường -->
+				
 				<div class="user-section">
 					<div class="section-header">
 						<h3>
@@ -731,7 +731,7 @@ body {
 	</div>
 
 	<script>
-		// Hiển thị/ẩn form thêm người dùng
+		
 		function toggleAddForm() {
 			var form = document.getElementById('addUserForm');
 			if (form.style.display === 'none' || form.style.display === '') {
@@ -741,10 +741,10 @@ body {
 			}
 		}
 		
-		// Xác nhận xóa người dùng
+		
 		function confirmDelete(userId) {
 			if (confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
-				// Tạo form ẩn để gửi request POST
+				
 				var form = document.createElement('form');
 				form.method = 'POST';
 				form.action = 'adminUsers';
@@ -766,14 +766,14 @@ body {
 			}
 		}
 		
-		// Thay đổi vai trò người dùng
+		
 		function changeRole(userId, newRole) {
 			var message = newRole === 1 ? 
 				"Bạn có chắc chắn muốn thăng cấp người dùng này thành Quản trị viên?" :
 				"Bạn có chắc chắn muốn hạ cấp Quản trị viên này thành người dùng thường?";
 			
 			if (confirm(message)) {
-				// Tạo form ẩn để gửi request POST
+				
 				var form = document.createElement('form');
 				form.method = 'POST';
 				form.action = 'adminUsers';
@@ -801,7 +801,7 @@ body {
 			}
 		}
 		
-		// Tự động ẩn thông báo sau 5 giây
+		
 		setTimeout(function() {
 			var alerts = document.querySelectorAll('.alert');
 			alerts.forEach(function(alert) {
@@ -809,7 +809,7 @@ body {
 			});
 		}, 5000);
 		
-		// Validate form thêm người dùng
+		
 		document.querySelector('#addUserForm form').addEventListener('submit', function(e) {
 			var username = document.getElementById('username').value.trim();
 			var password = document.getElementById('password').value.trim();

@@ -15,7 +15,7 @@
 	rel="stylesheet">
 
 <style>
-/* CSS cho báo cáo doanh thu theo tháng */
+
 .trend-badge {
     display: inline-flex;
     align-items: center;
@@ -29,14 +29,14 @@
 }
 
 .trend-up {
-    background-color: #e6f8eb; /* Nền xanh nhạt */
-    color: #00b84c;            /* Chữ xanh đậm */
+    background-color: #e6f8eb; 
+    color: #00b84c;            
     border: 1px solid #00b84c;
 }
 
 .trend-down {
-    background-color: #ffeef0; /* Nền đỏ nhạt */
-    color: #fa3e3e;            /* Chữ đỏ đậm */
+    background-color: #ffeef0; 
+    color: #fa3e3e;            
     border: 1px solid #fa3e3e;
 }
 
@@ -46,11 +46,11 @@
     border: 1px solid #dee2e6;
 }
 
-/* 2. Thanh hiệu suất (Progress Bar) */
+
 .progress-container {
     width: 100%;
-    background-color: #e9ecef; /* Màu nền xám của thanh */
-    height: 10px;              /* Độ dày */
+    background-color: #e9ecef; 
+    height: 10px;              
     border-radius: 5px;
     overflow: hidden;
     margin-bottom: 5px;
@@ -65,7 +65,7 @@
     background-size: 1rem 1rem;
 }
 
-/* Màu sắc thanh hiệu suất */
+
 .bg-success-gradient { background-color: #28a745; background-image: linear-gradient(90deg, #20c997 0%, #28a745 100%); }
 .bg-warning-gradient { background-color: #ffc107; background-image: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%); }
 .bg-danger-gradient  { background-color: #dc3545; background-image: linear-gradient(90deg, #ff6b6b 0%, #dc3545 100%); }
@@ -178,35 +178,35 @@
 
 .chart-bar-container {
     background-color: #e9ecef;
-    border-radius: 15px; /* Bo tròn mạnh hơn cho đẹp */
+    border-radius: 15px; 
     height: 30px;
-    position: relative; /* QUAN TRỌNG: Để làm mốc tọa độ cho text */
+    position: relative; 
     overflow: hidden;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* Thanh màu: Chỉ làm nhiệm vụ hiển thị màu, không chứa chữ */
+
 .chart-bar {
     height: 100%;
-    border-radius: 15px; /* Bo tròn theo container */
+    border-radius: 15px; 
     transition: width 1s ease-in-out;
-    /* Giữ nguyên các màu background gradient cũ của bạn ở đây */
+    
 }
 
-/* Dòng chữ: Nằm nổi lên trên, tách biệt với thanh màu */
+
 .bar-label {
-    position: absolute; /* Tách khỏi dòng chảy layout bình thường */
-    top: 50%;           /* Căn giữa dọc */
-    right: 15px;        /* Luôn nằm bên phải cách lề 15px */
-    transform: translateY(-50%); /* Căn chỉnh chính xác giữa tâm */
+    position: absolute; 
+    top: 50%;           
+    right: 15px;        
+    transform: translateY(-50%); 
     
-    color: #333;        /* MÀU CHỮ ĐẬM (để nhìn rõ trên nền xám nhạt) */
+    color: #333;        
     font-size: 12px;
     font-weight: 700;
-    white-space: nowrap; /* Cấm xuống dòng */
-    z-index: 10;         /* Nổi lên trên thanh màu */
+    white-space: nowrap; 
+    z-index: 10;         
     
-    /* VIỀN SÁNG QUANH CHỮ: Giúp chữ đọc được ngay cả khi thanh màu đè lên */
+    
     text-shadow: 
         -1px -1px 0 #fff,  
          1px -1px 0 #fff,
@@ -231,7 +231,7 @@
     font-size: 16px;
 }
 
-/* Animation cho chart bars */
+
 @keyframes slideIn {
     from { width: 0; }
     to { width: var(--bar-width); }
@@ -535,7 +535,7 @@ body {
 	</div>
 
 	<script>
-		// Hiển thị thời gian hiện tại
+		
 		function updateCurrentTime() {
 			const now = new Date();
 			const options = {
@@ -550,17 +550,17 @@ body {
 		setInterval(updateCurrentTime, 1000);
 		
 		function loadMonth(month, year) {
-	        // Hiển thị hiệu ứng đang tải (nếu thích)
+	        
 	        const container = document.getElementById("daily-stats-container");
 	        container.style.opacity = "0.5"; 
 
-	        // Gọi Servlet bằng fetch
+	        
 	        fetch("loadDailyStats?month=" + month + "&year=" + year)
-	            .then(response => response.text()) // Nhận về HTML
+	            .then(response => response.text()) 
 	            .then(html => {
-	                // Nhét HTML mới vào khung
+	                
 	                container.innerHTML = html;
-	                container.style.opacity = "1"; // Hiện rõ lại
+	                container.style.opacity = "1"; 
 	            })
 	            .catch(error => {
 	                console.error('Lỗi:', error);

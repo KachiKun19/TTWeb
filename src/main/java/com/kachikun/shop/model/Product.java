@@ -39,11 +39,9 @@ public class Product {
 		this.size = size;
 	}
 
-	// Constructor không tham số
 	public Product() {
 	}
 
-	// Constructor đầy đủ
 	public Product(int id, String name, String description, double price, String image,int stock, Brand brand,
 			Category category) {
 		this.id = id;

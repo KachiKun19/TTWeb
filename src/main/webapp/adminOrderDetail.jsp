@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* --- GIỮ NGUYÊN CSS CHUNG CỦA TRANG ADMIN --- */
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Montserrat', 'Arial', sans-serif; background-color: #f5f7fa; color: #333; line-height: 1.6; }
 
@@ -35,7 +35,7 @@ body { font-family: 'Montserrat', 'Arial', sans-serif; background-color: #f5f7fa
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
 .page-header h2 { font-size: 24px; color: #2d7e7e; }
 
-/* --- CSS RIÊNG CHO TRANG CHI TIẾT --- */
+
 .detail-container { background-color: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
 
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }

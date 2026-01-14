@@ -34,7 +34,6 @@ public class OrderDetail {
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
     
-    //tinh tien
     public double getTotalMoney() {
         return this.price * this.quantity;
     }

@@ -21,7 +21,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
 <style>
-/* CSS riêng cho trang giỏ hàng để số lượng đẹp hơn */
+
 .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button
 	{
 	-webkit-appearance: none;
@@ -529,7 +529,6 @@
 							class="text-xl font-bold text-gray-800 mb-4 uppercase border-b pb-2">
 							Thông tin chuyển khoản</h3>
 
-						<!-- Thêm QR Code -->
 						<div class="mt-4 mb-6 text-center">
 							<img src="images/qr.jpg" alt="QR Code Thanh Toán"
 								class="mx-auto w-48 h-48 border border-gray-200 rounded-lg shadow-md">
@@ -539,7 +538,6 @@
 
 						<div
 							class="text-left bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-inner mx-1">
-							<!-- ... phần thông tin tài khoản hiện có ... -->
 							<div class="mb-4 text-center">
 								<p
 									class="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-1">
@@ -610,12 +608,12 @@
 	<script src="script.js"></script>
 
 	<script>
-		// 1. Hàm cho nút bấm (+/-)
+		
 		function updateQuantityAjax(productId, mod) {
 			callAjax('ajaxUpdateCart?id=' + productId + '&mod=' + mod, productId);
 		}
 
-		// 2. Hàm cho ô nhập liệu (Direct Input)
+		
 		function updateQuantityDirectly(productId, inputElement) {
 			let newQty = inputElement.value;
 			if (newQty === "" || isNaN(newQty) || parseInt(newQty) < 1) {
@@ -626,14 +624,14 @@
 			callAjax('ajaxUpdateCart?id=' + productId + '&qty=' + newQty, productId);
 		}
 
-		// 3. Hàm gọi AJAX & Hiển thị lỗi
+		
 		function callAjax(url, productId) {
 			const qtyInput = document.getElementById("qty-" + productId);
 			const itemTotalSpan = document.getElementById("item-total-" + productId);
 			const rowDiv = document.getElementById("row-" + productId);
 			const cartTotalSpan = document.getElementById("cart-total-display");
 			
-			// Lấy khung lỗi (Luôn tồn tại trong DOM)
+			
 			const errorAlert = document.getElementById("error-alert");
 			const errorMsg = document.getElementById("error-msg");
 
@@ -641,26 +639,26 @@
 				.then(response => response.json())
 				.then(data => {
 					if (data.status === 'error') {
-						// --- CÓ LỖI ---
+						
 						if(errorMsg) errorMsg.innerText = data.message;
 						if(errorAlert) {
-							errorAlert.classList.remove("hidden"); // Hiện khung đỏ
-							errorAlert.scrollIntoView({behavior: "smooth", block: "center"}); // Cuộn tới lỗi
+							errorAlert.classList.remove("hidden"); 
+							errorAlert.scrollIntoView({behavior: "smooth", block: "center"}); 
 						}
 						if (data.currentQty && qtyInput) {
-							qtyInput.value = data.currentQty; // Reset số lượng
+							qtyInput.value = data.currentQty; 
 						}
 						
 					} else if (data.status === 'removed') {
-						// --- XÓA SP ---
+						
 						if(errorAlert) errorAlert.classList.add("hidden");
 						if(rowDiv) rowDiv.remove();
 						if(cartTotalSpan) cartTotalSpan.innerText = data.cartTotal;
 						updateCartCount(data.cartSize);
 						
 					} else {
-						// --- UPDATE OK ---
-						if(errorAlert) errorAlert.classList.add("hidden"); // Ẩn lỗi
+						
+						if(errorAlert) errorAlert.classList.add("hidden"); 
 						if(qtyInput) qtyInput.value = data.newQty;
 						if(itemTotalSpan) itemTotalSpan.innerText = data.itemTotal;
 						if(cartTotalSpan) cartTotalSpan.innerText = data.cartTotal;

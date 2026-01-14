@@ -17,10 +17,10 @@
     
     <style>
         .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-        .st-processing { background-color: #fef3c7; color: #d97706; } /* Vàng */
-        .st-shipping { background-color: #dbeafe; color: #2563eb; } /* Xanh dương */
-        .st-completed { background-color: #d1fae5; color: #059669; } /* Xanh lá */
-        .st-cancelled { background-color: #fee2e2; color: #dc2626; } /* Đỏ */
+        .st-processing { background-color: #fef3c7; color: #d97706; } 
+        .st-shipping { background-color: #dbeafe; color: #2563eb; } 
+        .st-completed { background-color: #d1fae5; color: #059669; } 
+        .st-cancelled { background-color: #fee2e2; color: #dc2626; } 
     </style>
 </head>
 <body class="bg-gray-50 font-['Montserrat'] flex flex-col min-h-screen">

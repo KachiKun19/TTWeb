@@ -30,11 +30,10 @@ public class ForgotPasswordServlet extends HttpServlet {
 	private UserDAO userDAO = new UserDAO();
 	private UserService userService = new UserService();
 
-	// Cấu hình email (thay bằng email của bạn)
-	private final String FROM_EMAIL = "tranhung2642005@gmail.com"; // Email gửi
-	private final String FROM_PASSWORD = "ffrq vsur riyq nblb"; // App Password nếu dùng Gmail
+	private final String FROM_EMAIL = "tranhung2642005@gmail.com";
+	private final String FROM_PASSWORD = "ffrq vsur riyq nblb";
 	private final String SMTP_HOST = "smtp.gmail.com";
-	private final String SMTP_PORT = "587"; // Hoặc 465 cho SSL
+	private final String SMTP_PORT = "587";
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -42,7 +41,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 		HttpSession session = request.getSession();
 
 		if ("request".equals(action)) {
-			// Bước 1: Yêu cầu OTP
+
 			String email = request.getParameter("email");
 			User user = userDAO.getUserByEmail(email);
 			if (user == null) {
@@ -51,12 +50,10 @@ public class ForgotPasswordServlet extends HttpServlet {
 				return;
 			}
 
-			// Tạo OTP ngẫu nhiên 6 chữ số
 			String otp = generateOTP();
 			session.setAttribute("otp", otp);
 			session.setAttribute("email", email);
 
-			// Gửi email
 			boolean sent = sendEmail(email, "Mã OTP đặt lại mật khẩu",
 					"Mã OTP của bạn là: " + otp + ". Hiệu lực 5 phút.");
 			if (sent) {
@@ -69,7 +66,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 			request.getRequestDispatcher("forgotPassword.jsp").forward(request, response);
 
 		} else if ("verify".equals(action)) {
-			// Bước 2: Verify OTP và update password
+
 			String inputOtp = request.getParameter("otp1") + request.getParameter("otp2") + request.getParameter("otp3")
 					+ request.getParameter("otp4") + request.getParameter("otp5") + request.getParameter("otp6");
 			String storedOtp = (String) session.getAttribute("otp");
@@ -84,12 +81,11 @@ public class ForgotPasswordServlet extends HttpServlet {
 				request.setAttribute("step", "verify");
 				request.setAttribute("email", email);
 				request.getRequestDispatcher("forgotPassword.jsp").forward(request, response);
-				return; // Dừng lại ngay, không cho lưu
+				return;
 			}
 
 			if (storedOtp != null && storedOtp.equals(inputOtp)) {
 
-				// 1. Băm mật khẩu mới trước
 				boolean updated = userService.recoverPassword(email, newPassword);
 
 				if (updated) {
@@ -111,7 +107,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 			}
 
 		} else if ("resend".equals(action)) {
-			// ... (Giữ nguyên logic Resend) ...
+
 			String email = request.getParameter("email");
 			String otp = generateOTP();
 			session.setAttribute("otp", otp);
@@ -165,7 +161,6 @@ public class ForgotPasswordServlet extends HttpServlet {
 			md.update(password.getBytes());
 			byte[] byteData = md.digest();
 
-			// Chuyển đổi byte sang mã Hex
 			StringBuilder sb = new StringBuilder();
 			for (byte b : byteData) {
 				sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));

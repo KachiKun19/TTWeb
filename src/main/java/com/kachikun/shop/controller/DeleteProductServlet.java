@@ -15,7 +15,7 @@ public class DeleteProductServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// Kiểm tra đăng nhập và quyền admin
+
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("user") == null) {
 			response.sendRedirect("login");
@@ -28,7 +28,6 @@ public class DeleteProductServlet extends HttpServlet {
 			return;
 		}
 
-		// Lấy ID sản phẩm cần xóa
 		String productIdStr = request.getParameter("id");
 		String pageParam = request.getParameter("page");
 
@@ -40,10 +39,8 @@ public class DeleteProductServlet extends HttpServlet {
 		try {
 			int productId = Integer.parseInt(productIdStr);
 
-			// Xóa sản phẩm
 			boolean success = productDAO.deleteProduct(productId);
 
-			// Chuyển hướng về trang trước đó
 			if (pageParam != null && !pageParam.isEmpty()) {
 				if (success) {
 					response.sendRedirect("adminProducts?page=" + pageParam + "&success=delete_success");

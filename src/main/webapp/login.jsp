@@ -14,7 +14,7 @@
 	rel="stylesheet">
 
 <style>
-/* --- GIỮ NGUYÊN CSS CŨ --- */
+
 * {
 	box-sizing: border-box;
 }
@@ -327,18 +327,18 @@ to {
 
 }
 
-/* --- CSS MỚI CHO LOGO TRONG OVERLAY --- */
+
 .overlay-logo {
-	width: 120px; /* Kích thước logo */
+	width: 120px; 
 	height: auto;
-	margin-bottom: 20px; /* Cách chữ Xin chào 20px */
-	/* Mẹo: Dùng filter này để biến logo màu đen/xanh thành màu TRẮNG tinh */
-	/* Nếu logo bạn đã trắng sẵn rồi thì xóa dòng này đi nhé */
+	margin-bottom: 20px; 
+	
+	
 	filter: brightness(0) invert(1);
 	transition: transform 0.5s ease;
 }
 
-/* Hiệu ứng khi hover vào vùng overlay thì logo phóng to nhẹ */
+
 .overlay-panel:hover .overlay-logo {
 	transform: scale(1.1) rotate(-5deg);
 }
@@ -442,70 +442,70 @@ to {
     const signInButton = document.getElementById('signIn');
     const container = document.getElementById('container');
 
-    // Chuyển tab khi bấm nút
+    
     signUpButton.addEventListener('click', () => container.classList.add("right-panel-active"));
     signInButton.addEventListener('click', () => container.classList.remove("right-panel-active"));
 
-    // --- ĐOẠN MỚI THÊM: TỰ ĐỘNG CHUYỂN TAB DỰA VÀO KẾT QUẢ ---
     
-    // Lấy tham số từ URL
+    
+    
     const urlParams = new URLSearchParams(window.location.search);
     const msg = urlParams.get('msg');
     
-    // Nếu có lỗi đăng ký (registerError được set từ Servlet) -> Bật tab Đăng ký
+    
     <c:if test="${not empty registerError}">
         container.classList.add("right-panel-active");
     </c:if>
 
-    // Nếu Đăng ký thành công (có msg trên URL) -> Bật tab Đăng nhập để họ nhập nick
+    
     if (msg) {
         container.classList.remove("right-panel-active");
-        // Có thể alert nhẹ 1 cái cho chắc
-        // alert(decodeURIComponent(msg)); 
+        
+        
     }
     
     function showStrengthBar() {
         var password = document.getElementById("regPass").value;
         var strengthBar = document.getElementById("password-strength");
         
-        // Logic tính điểm đơn giản
+        
         var score = 0;
         if (password.length >= 8) score++;
         if (/[A-Z]/.test(password)) score++;
         if (/[0-9]/.test(password)) score++;
         if (/[^A-Za-z0-9]/.test(password)) score++;
 
-        // Đổi màu thanh
+        
         if (password.length === 0) strengthBar.style.backgroundColor = "transparent";
         else if (score < 3) strengthBar.style.backgroundColor = "red";
         else if (score < 4) strengthBar.style.backgroundColor = "orange";
         else strengthBar.style.backgroundColor = "green";
     }
 
-    // 2. XỬ LÝ KHI BẤM NÚT ĐĂNG KÝ (Quan trọng)
+    
     document.getElementById("registerForm").addEventListener("submit", function(event) {
         var password = document.getElementById("regPass").value;
         var msg = document.getElementById("password-msg");
         
-        // Regex mật khẩu mạnh: 8 ký tự, 1 hoa, 1 thường, 1 số, 1 ký tự đặc biệt
+        
         var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
 
         if (!strongRegex.test(password)) {
-            // A. Chặn không cho gửi đi
+            
             event.preventDefault(); 
             
-            // B. Hiện thông báo lỗi
+            
             msg.style.display = "block";
             msg.innerText = "Mật khẩu yếu! Cần 8 ký tự, có chữ Hoa, Thường, Số và Ký tự đặc biệt.";
             
-            // C. XÓA TRẮNG ô mật khẩu (Theo yêu cầu của bạn)
+            
             document.getElementById("regPass").value = ""; 
             document.getElementById("rePass").value = ""; 
             
-            // D. Đưa con trỏ chuột quay lại ô mật khẩu để nhập luôn
+            
             document.getElementById("regPass").focus(); 
             
-            // E. Reset thanh màu về trong suốt
+            
             document.getElementById("password-strength").style.backgroundColor = "transparent";
         }
     });
