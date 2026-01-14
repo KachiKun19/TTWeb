@@ -630,9 +630,6 @@ body {
 										</td>
 										<td>
 											<div class="action-buttons">
-												<button class="edit-btn" onclick="editProduct(${product.id})">
-													<i class="fas fa-edit"></i> Sửa
-												</button>
 												<button class="delete-btn"
 													onclick="confirmDelete(${product.id})">
 													<i class="fas fa-trash"></i> Xóa
@@ -782,13 +779,6 @@ body {
 			}
 		}
 
-		// Hàm chuyển đến trang sửa sản phẩm (chưa triển khai)
-		function editProduct(productId) {
-			alert("Chức năng sửa sản phẩm đang được phát triển!");
-			// window.location.href = "editProduct?id=" + productId + "&page=${currentPage}";
-		}
-
-		// Tự động ẩn thông báo sau 5 giây
 		setTimeout(function() {
 			var alerts = document.querySelectorAll('.alert');
 			alerts.forEach(function(alert) {

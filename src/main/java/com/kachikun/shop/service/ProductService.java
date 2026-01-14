@@ -9,11 +9,12 @@ import com.kachikun.shop.dao.ProductDAO;
 
 public class ProductService {
 	private ProductDAO productDAO = new ProductDAO();
-	
+
 	public List<Product> getAllProducts() {
 		return productDAO.getAllProducts();
 	}
+
 	public Product getproductById(int id) {
-	    return productDAO.getProductById(id); 
+		return productDAO.getProductById(id);
 	}
 }
