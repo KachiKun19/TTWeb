@@ -336,14 +336,7 @@
 							tin thanh toán</h2>
 
 						<form action="checkout" method="post" class="space-y-4">
-							<div class="flex justify-between items-center mb-6">
-								<span class="text-gray-600">Tạm tính:</span> <span
-									class="font-bold text-xl text-black"> <span
-									id="cart-total-display"> <fmt:formatNumber
-											value="${totalMoney}" type="currency" currencySymbol="₫" />
-								</span>
-								</span>
-							</div>
+							
 
 							<hr class="border-dashed">
 
@@ -423,11 +416,11 @@
 	<footer class="footer">
 		<div class="container">
 			<div>
-				<h3>GROUP 14</h3>
+				<h3>Kachi-Kun Shop</h3>
 				<p>
 					Linh Trung Ward<br /> Thu Duc - Ho Chi Minh City - Viet Nam<br />
 					<strong>Phone:</strong> +0862210723<br /> <strong>Email:</strong>
-					group14@gmail.com
+					Kachi-Kun-Shop@gmail.com
 				</p>
 				<div class="social-icons">
 					<a href="#"><i class="fab fa-twitter"></i></a> <a href="#"><i
@@ -440,7 +433,7 @@
 			<div>
 				<h3>Useful Links</h3>
 				<p>
-					<a href="home">Home</a>
+					<a href="#">Home</a>
 				</p>
 				<p>
 					<a href="#">About us</a>
@@ -484,12 +477,11 @@
 			</div>
 		</div>
 	</footer>
-
 	<div class="footer-bottom">
 		<p>
-			© Copyright <strong>GROUP 14</strong>. All Rights Reserved
+			© Copyright <strong>Kachi-Kun-Shop</strong>
 		</p>
-		<p>Designed by GROUP 14</p>
+		<p>Designed by Kachi-Kun-Shop</p>
 	</div>
 
 	<c:if test="${not empty msg}">

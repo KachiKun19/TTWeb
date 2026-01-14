@@ -8,7 +8,7 @@ public class DBConnection {
 	private static final String DB_URL = "jdbc:sqlserver://localhost:1433;" + "databaseName=GamingGear;"
 			+ "encrypt=true;trustServerCertificate=true;";
 	private static final String USER = "sa";
-	private static final String PASS = "tranhung2005";
+	private static final String PASS = "khanhnhay2k5vcl";
 
 	// Hàm lấy kết nối
 	public static Connection getConnection() {

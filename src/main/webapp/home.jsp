@@ -280,11 +280,11 @@ request.setAttribute("listCategories", list);
 	<footer class="footer">
 		<div class="container">
 			<div>
-				<h3>Hung Khanh</h3>
+				<h3>Kachi-Kun Shop</h3>
 				<p>
 					Linh Trung Ward<br /> Thu Duc - Ho Chi Minh City - Viet Nam<br />
 					<strong>Phone:</strong> +0862210723<br /> <strong>Email:</strong>
-					group14@gmail.com
+					Kachi-Kun-Shop@gmail.com
 				</p>
 				<div class="social-icons">
 					<a href="#"><i class="fab fa-twitter"></i></a> <a href="#"><i
@@ -343,9 +343,9 @@ request.setAttribute("listCategories", list);
 	</footer>
 	<div class="footer-bottom">
 		<p>
-			© Copyright <strong>Hung Khanh</strong>
+			© Copyright <strong>Kachi-Kun-Shop</strong>
 		</p>
-		<p>Designed by Hung Khanh</p>
+		<p>Designed by Kachi-Kun-Shop</p>
 	</div>
 
 	<script src="https://cdn.tailwindcss.com"></script>
