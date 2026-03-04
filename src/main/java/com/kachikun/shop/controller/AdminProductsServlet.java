@@ -54,7 +54,6 @@ public class AdminProductsServlet extends HttpServlet {
         
         List<Product> productList = productDAO.getProductsByPage(currentPage, pageSize);
         
-        System.out.println("=== DEBUG: Admin Products Pagination ===");
         System.out.println("Current Page: " + currentPage);
         System.out.println("Total Pages: " + totalPages);
         System.out.println("Total Products: " + totalProducts);

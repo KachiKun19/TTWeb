@@ -215,7 +215,7 @@ request.setAttribute("listCategories", list);
 				<p class="banner-subtitle">Store cho các streamer và game thủ
 					lựa chọn!</p>
 				<h1 class="banner-title">
-					 <br />Mouse Edition
+					 <br />Kachi-Kun Shop Edition
 				</h1>
 				<a href="products" class="banner-button">Xem thêm</a>
 			</div>

@@ -78,7 +78,7 @@ public class AjaxFilterServlet extends HttpServlet {
 			out.println("<div class='p-4'>");
 			out.println("<h3 class='font-semibold text-base h-16 overflow-hidden line-clamp-2'>");
 			out.println("<a href='product-detail?id=" + p.getId() + "' class='hover:text-blue-600'>" + p.getName()
-					+ "</a>"); // Link cho tên
+					+ "</a>");
 			out.println("</h3>");
 			out.println("<p class='text-lg font-bold text-gray-800 mt-2'>" + nf.format(p.getPrice()) + "₫</p>");
 			out.println("</div>");
