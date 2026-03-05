@@ -20,92 +20,51 @@ import java.util.List;
 import java.util.Map;
 
 public class OrderDAO {
-	public boolean createOrder(User user, List<CartItem> cart, double totalPrice, String fullname, String phone,
-			String address, String paymentMethod) {
-		Connection conn = null;
-		PreparedStatement psOrder = null;
-		PreparedStatement psDetail = null;
-		PreparedStatement psStock = null;
-		boolean result = false;
+	public boolean createOrder(User user, List<CartItem> cart, double totalPrice, String fullname, String phone, String address, String paymentMethod) {
+        String sqlOrder = "INSERT INTO Orders (user_id, total_price, status, order_date, recipient_name, recipient_phone, shipping_address, payment_method) VALUES (?, ?, N'Đang xử lý', GETDATE(), ?, ?, ?, ?)";
+        String sqlDetail = "INSERT INTO OrderDetails (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
+        String sqlUpdateStock = "UPDATE Products SET stock_quantity = stock_quantity - ? WHERE id = ?";
 
-		try {
-			conn = DBConnection.getConnection();
-			conn.setAutoCommit(false);
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement psDetail = conn.prepareStatement(sqlDetail);
+                 PreparedStatement psStock = conn.prepareStatement(sqlUpdateStock)) {
+                
+                psOrder.setInt(1, user.getId());
+                psOrder.setDouble(2, totalPrice);
+                psOrder.setString(3, fullname);
+                psOrder.setString(4, phone);
+                psOrder.setString(5, address);
+                psOrder.setString(6, paymentMethod);
+                psOrder.executeUpdate();
 
-			String sqlOrder = "INSERT INTO Orders (user_id, total_price, status, order_date, recipient_name, recipient_phone, shipping_address, payment_method) VALUES (?, ?, ?, GETDATE(), ?, ?, ?, ?)";
+                ResultSet rs = psOrder.getGeneratedKeys();
+                if (rs.next()) {
+                    int orderId = rs.getInt(1);
+                    for (CartItem item : cart) {
+                        psDetail.setInt(1, orderId);
+                        psDetail.setInt(2, item.getProduct().getId());
+                        psDetail.setDouble(3, item.getProduct().getPrice());
+                        psDetail.setInt(4, item.getQuantity());
+                        psDetail.addBatch();
 
-			psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
-			psOrder.setInt(1, user.getId());
-			psOrder.setDouble(2, totalPrice);
-			psOrder.setString(3, "Đang xử lý");
-			psOrder.setString(4, fullname);
-			psOrder.setString(5, phone);
-			psOrder.setString(6, address);
-			psOrder.setString(7, paymentMethod);
-
-			psOrder.executeUpdate();
-
-			ResultSet rs = psOrder.getGeneratedKeys();
-			int orderId = 0;
-			if (rs.next()) {
-				orderId = rs.getInt(1);
-			}
-
-			if (orderId > 0 && cart != null) {
-				String sqlDetail = "INSERT INTO OrderDetails (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
-
-				String sqlUpdateStock = "UPDATE Products SET stock_quantity = stock_quantity - ? WHERE id = ?";
-
-				psDetail = conn.prepareStatement(sqlDetail);
-				psStock = conn.prepareStatement(sqlUpdateStock);
-
-				for (CartItem item : cart) {
-
-					psDetail.setInt(1, orderId);
-					psDetail.setInt(2, item.getProduct().getId());
-					psDetail.setDouble(3, item.getProduct().getPrice());
-					psDetail.setInt(4, item.getQuantity());
-					psDetail.addBatch();
-
-					psStock.setInt(1, item.getQuantity());
-					psStock.setInt(2, item.getProduct().getId());
-					psStock.executeUpdate();
-				}
-
-				psDetail.executeBatch();
-			}
-
-			conn.commit();
-			result = true;
-			System.out.println("Tạo đơn hàng thành công! Mã đơn: " + orderId);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			try {
-				if (conn != null)
-					conn.rollback();
-				System.out.println("Đơn hàng đã bị hủy do lỗi.");
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		} finally {
-
-			try {
-				if (psStock != null)
-					psStock.close();
-				if (psDetail != null)
-					psDetail.close();
-				if (psOrder != null)
-					psOrder.close();
-				if (conn != null) {
-					conn.setAutoCommit(true);
-					conn.close();
-				}
-			} catch (Exception e) {
-			}
-		}
-		return result;
-	}
+                        psStock.setInt(1, item.getQuantity());
+                        psStock.setInt(2, item.getProduct().getId());
+                        psStock.addBatch();
+                    }
+                    psDetail.executeBatch();
+                    psStock.executeBatch();
+                }
+                conn.commit();
+                return true;
+            } catch (Exception e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
+    }
 
 	public boolean updateStatus(int orderId, String status) {
 		String sql = "UPDATE Orders SET status = ? WHERE id = ?";
@@ -245,19 +204,15 @@ public class OrderDAO {
 		return list;
 	}
 
-	public boolean userCancelOrder(int orderId) {
-		String sql = "UPDATE Orders SET status = N'Đã hủy' WHERE id = ? AND status = N'Đang xử lý'";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, orderId);
-			int rows = ps.executeUpdate();
-			return rows > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
+	public boolean userCancelOrder(int orderId, int userId) {
+        String sql = "UPDATE Orders SET status = N'Đã hủy' WHERE id = ? AND user_id = ? AND status = N'Đang xử lý'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) { e.printStackTrace(); return false; }
+    }
 
 	public Map<String, Double> getRevenueLast12Months() {
 

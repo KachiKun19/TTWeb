@@ -33,7 +33,7 @@ public class OrderHistoryServlet extends HttpServlet {
 
 		if ("cancel".equals(action) && idStr != null) {
 			int orderId = Integer.parseInt(idStr);
-			boolean cancelled = orderDAO.userCancelOrder(orderId);
+			boolean cancelled = orderDAO.userCancelOrder(orderId, user.getId());
 			if (cancelled) {
 				request.setAttribute("msg", "Đã hủy đơn hàng #" + orderId + " thành công.");
 			} else {
