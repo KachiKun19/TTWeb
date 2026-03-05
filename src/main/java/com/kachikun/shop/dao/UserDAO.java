@@ -3,6 +3,7 @@ package com.kachikun.shop.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,53 +12,32 @@ import com.kachikun.shop.utils.DBConnection;
 
 public class UserDAO {
 	public User checkLogin(String username, String password) {
-		String sql = "SELECT * FROM Users WHERE username = ? AND password = ?";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, username);
-			ps.setString(2, password);
-
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				User u = new User();
-				u.setId(rs.getInt("id"));
-				u.setUsername(rs.getString("username"));
-				u.setFullName(rs.getString("full_name"));
-				u.setEmail(rs.getString("email"));
-				u.setRole(rs.getInt("role"));
-				return u;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-
-	}
+        String sql = "SELECT * FROM Users WHERE username = ? AND password = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, password);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUser(rs);
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
 
 	public boolean register(User u) {
-
-		String sql = "INSERT INTO Users (username, password, email, full_name, role) VALUES (?, ?, ?, ?, ?)";
-
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-
-			ps.setString(1, u.getUsername());
-			ps.setString(2, u.getPassword());
-			ps.setString(3, u.getEmail());
-			ps.setString(4, u.getFullName());
-			ps.setInt(5, u.getRole());
-
-			int row = ps.executeUpdate();
-			return row > 0;
-
-		} catch (Exception e) {
-			System.out.println("--- LỖI SQL KHI ĐĂNG KÝ ---");
-			e.printStackTrace();
-			return false;
-		}
-	}
+        String sql = "INSERT INTO Users (username, password, email, full_name, role) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, u.getUsername());
+            ps.setString(2, u.getPassword());
+            ps.setString(3, u.getEmail());
+            ps.setString(4, u.getFullName());
+            ps.setInt(5, u.getRole());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) { e.printStackTrace(); return false; }
+    }
 
 
 	public List<User> getAllUsers() {
@@ -230,19 +210,16 @@ public class UserDAO {
 	}
 
 	public boolean isUsernameExists(String username) {
-		try {
-			Connection conn = DBConnection.getConnection();
-			String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, username);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next())
-				return rs.getInt(1) > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
+    }
 
 	public boolean isEmailExists(String email) {
 		try {
@@ -273,5 +250,14 @@ public class UserDAO {
 		}
 		return false;
 	}
+	private User mapUser(ResultSet rs) throws SQLException {
+        User u = new User();
+        u.setId(rs.getInt("id"));
+        u.setUsername(rs.getString("username"));
+        u.setFullName(rs.getString("full_name"));
+        u.setEmail(rs.getString("email"));
+        u.setRole(rs.getInt("role"));
+        return u;
+    }
 
 }

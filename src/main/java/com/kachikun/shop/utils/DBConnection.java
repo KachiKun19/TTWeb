@@ -10,7 +10,6 @@ public class DBConnection {
 	private static final String USER = "sa";
 	private static final String PASS = "khanhnhay2k5vcl";
 
-	// Hàm lấy kết nối
 	public static Connection getConnection() {
 		Connection conn = null;
 		try {
