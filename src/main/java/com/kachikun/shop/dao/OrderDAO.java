@@ -205,14 +205,67 @@ public class OrderDAO {
 	}
 
 	public boolean userCancelOrder(int orderId, int userId) {
-        String sql = "UPDATE Orders SET status = N'Đã hủy' WHERE id = ? AND user_id = ? AND status = N'Đang xử lý'";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, orderId);
-            ps.setInt(2, userId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
-    }
+	    String sqlUpdateOrder = "UPDATE Orders SET status = N'Đã hủy' WHERE id = ? AND user_id = ? AND status = N'Đang xử lý'";
+	    String sqlGetItems = "SELECT product_id, quantity FROM OrderDetails WHERE order_id = ?";
+	    String sqlRestoreStock = "UPDATE Products SET stock_quantity = stock_quantity + ? WHERE id = ?";
+
+	    Connection conn = null;
+	    try {
+	        conn = DBConnection.getConnection();
+	        conn.setAutoCommit(false); // Bắt đầu Transaction
+
+	        // 1. Cập nhật trạng thái đơn hàng
+	        try (PreparedStatement psOrder = conn.prepareStatement(sqlUpdateOrder)) {
+	            psOrder.setInt(1, orderId);
+	            psOrder.setInt(2, userId);
+	            int rows = psOrder.executeUpdate();
+	            
+	            if (rows == 0) {
+	                conn.rollback(); // Đơn hàng không đủ điều kiện hủy (vĩ dụ: đã giao)
+	                return false;
+	            }
+	        }
+
+	        // 2. Lấy danh sách sản phẩm để hoàn kho
+	        List<OrderDetail> items = new ArrayList<>();
+	        try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems)) {
+	            psItems.setInt(1, orderId);
+	            ResultSet rs = psItems.executeQuery();
+	            while (rs.next()) {
+	                OrderDetail d = new OrderDetail();
+	                Product p = new Product();
+	                p.setId(rs.getInt("product_id"));
+	                d.setProduct(p);
+	                d.setQuantity(rs.getInt("quantity"));
+	                items.add(d);
+	            }
+	        }
+
+	        // 3. Hoàn kho hàng loạt
+	        try (PreparedStatement psStock = conn.prepareStatement(sqlRestoreStock)) {
+	            for (OrderDetail item : items) {
+	                psStock.setInt(1, item.getQuantity());
+	                psStock.setInt(2, item.getProduct().getId());
+	                psStock.addBatch();
+	            }
+	            psStock.executeBatch();
+	        }
+
+	        conn.commit(); // Hoàn tất mọi thay đổi
+	        return true;
+
+	    } catch (Exception e) {
+	        if (conn != null) {
+	            try { conn.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
+	        }
+	        e.printStackTrace();
+	        return false;
+	    } finally {
+	        if (conn != null) {
+	            try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
+	        }
+	    }
+	}
 
 	public Map<String, Double> getRevenueLast12Months() {
 
