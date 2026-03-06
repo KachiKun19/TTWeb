@@ -13,42 +13,51 @@ import com.kachikun.shop.utils.DBConnection;
 import com.kachikun.shop.model.Category;
 
 public class ProductDAO {
+	
+	private Product mapProduct(ResultSet rs) throws SQLException {
+	    Product p = new Product();
+	    p.setId(rs.getInt("id"));
+	    p.setName(rs.getString("name"));
+	    p.setDescription(rs.getString("description"));
+	    p.setPrice(rs.getDouble("price"));
+	    p.setImage(rs.getString("image"));
+	    p.setStock(rs.getInt("stock_quantity"));
+	    p.setConnectionType(rs.getString("connection_type"));
+	    p.setMaterial(rs.getString("material"));
+	    p.setSize(rs.getString("product_size"));
+
+	    Category c = new Category();
+	    c.setId(rs.getInt("category_id"));
+	    c.setName(rs.getString("cat_name")); 
+	    p.setCategory(c);
+
+	    Brand b = new Brand();
+	    b.setId(rs.getInt("brand_id"));
+	    b.setName(rs.getString("brand_name"));
+	    p.setBrand(b);
+
+	    return p;
+	}
+	
 	public List<Product> getAllProducts() {
-		List<Product> list = new ArrayList<>();
-		String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name, b.logo as brand_logo " + "FROM Products p "
-				+ "INNER JOIN Categories c ON p.category_id = c.id " + "INNER JOIN Brands b ON p.brand_id = b.id";
+	    List<Product> list = new ArrayList<>();
+	    String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name " +
+	                 "FROM Products p " +
+	                 "INNER JOIN Categories c ON p.category_id = c.id " +
+	                 "INNER JOIN Brands b ON p.brand_id = b.id";
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
 
-			while (rs.next()) {
-				Product p = new Product();
-				p.setId(rs.getInt("id"));
-				p.setName(rs.getString("name"));
-				p.setDescription(rs.getString("description"));
-				p.setImage(rs.getString("image"));
-				p.setStock(rs.getInt("stock_quantity"));
-				p.setPrice(rs.getDouble("price"));
-
-				Category c = new Category();
-				c.setId(rs.getInt("category_id"));
-				c.setName(rs.getString("cat_name"));
-				p.setCategory(c);
-
-				Brand b = new Brand();
-				b.setId(rs.getInt("brand_id"));
-				b.setName(rs.getString("brand_name"));
-				b.setLogo(rs.getString("brand_logo"));
-				p.setBrand(b);
-
-				list.add(p);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
+	        while (rs.next()) {
+	            list.add(mapProduct(rs));
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Lỗi khi lấy danh sách sản phẩm: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return list;
 	}
 
 	public List<Product> findByCategoryName(String categoryName) {
@@ -82,44 +91,27 @@ public class ProductDAO {
 		return list;
 	}
 
-	public List<Product> findByName(String keyword) {
-		List<Product> list = new ArrayList<>();
-		String sql = "SELECT p.*, c.name as cat_name FROM Products p "
-				+ "INNER JOIN Categories c ON p.category_id = c.id " + "WHERE p.name LIKE ?";
+	public List<Product> findByName(String name) {
+	    List<Product> list = new ArrayList<>();
+	    String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name " +
+	                 "FROM Products p " +
+	                 "INNER JOIN Categories c ON p.category_id = c.id " +
+	                 "INNER JOIN Brands b ON p.brand_id = b.id " +
+	                 "WHERE p.name LIKE ?";
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, "%" + keyword + "%");
-			ResultSet rs = ps.executeQuery();
-
-			while (rs.next()) {
-				Product p = new Product();
-
-				p.setId(rs.getInt("id"));
-				p.setName(rs.getString("name"));
-				p.setPrice(rs.getDouble("price"));
-				p.setStock(rs.getInt("stock_quantity"));
-
-				p.setImage(rs.getString("image"));
-				p.setDescription(rs.getString("description"));
-
-				Category c = new Category();
-				c.setId(rs.getInt("category_id"));
-				c.setName(rs.getString("cat_name"));
-				p.setCategory(c);
-
-				Brand b = new Brand();
-				b.setId(rs.getInt("brand_id"));
-				p.setBrand(b);
-
-				list.add(p);
-			}
-			conn.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+	        
+	        ps.setString(1, "%" + name + "%");
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                list.add(mapProduct(rs));
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return list;
 	}
 
 	public List<Product> pagingProduct(int index) {
@@ -221,45 +213,25 @@ public class ProductDAO {
 	}
 
 	public Product getProductById(int id) {
-		String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name, b.logo as brand_logo " + "FROM Products p "
-				+ "INNER JOIN Categories c ON p.category_id = c.id " + "INNER JOIN Brands b ON p.brand_id = b.id "
-				+ "WHERE p.id = ?";
+	    String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name " +
+	                 "FROM Products p " +
+	                 "INNER JOIN Categories c ON p.category_id = c.id " +
+	                 "INNER JOIN Brands b ON p.brand_id = b.id " +
+	                 "WHERE p.id = ?";
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-
-			if (rs.next()) {
-				Product p = new Product();
-				p.setId(rs.getInt("id"));
-				p.setName(rs.getString("name"));
-				p.setDescription(rs.getString("description"));
-				p.setImage(rs.getString("image"));
-				p.setStock(rs.getInt("stock_quantity"));
-				p.setPrice(rs.getDouble("price"));
-				p.setConnectionType(rs.getString("connection_type"));
-				p.setMaterial(rs.getString("material"));
-				p.setSize(rs.getString("product_size"));
-
-				Category c = new Category();
-				c.setId(rs.getInt("category_id"));
-				c.setName(rs.getString("cat_name"));
-				p.setCategory(c);
-
-				Brand b = new Brand();
-				b.setId(rs.getInt("brand_id"));
-				b.setName(rs.getString("brand_name"));
-				b.setLogo(rs.getString("brand_logo"));
-				p.setBrand(b);
-
-				return p;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+	        
+	        ps.setInt(1, id);
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                return mapProduct(rs);
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return null;
 	}
 
 	public List<Product> filterProducts(String[] brandIds, String[] connections, String[] materials, String[] sizes,
@@ -422,113 +394,69 @@ public class ProductDAO {
 		return 0;
 	}
 
-	public boolean insertProduct(Product product) {
-		String sql = "INSERT INTO Products (name, description, price, image, stock_quantity, "
-				+ "connection_type, material, product_size, category_id, brand_id) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	public boolean insertProduct(Product p) {
+	    String sql = "INSERT INTO Products (name, description, price, image, stock_quantity, " +
+	                 "category_id, brand_id, connection_type, material, size) " +
+	                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
 
-			ps.setString(1, product.getName());
-			ps.setString(2, product.getDescription());
-			ps.setDouble(3, product.getPrice());
-			ps.setString(4, product.getImage());
-			ps.setInt(5, product.getStock());
-			ps.setString(6, product.getConnectionType());
-			ps.setString(7, product.getMaterial());
-			ps.setString(8, product.getSize());
+	        ps.setString(1, p.getName());
+	        ps.setString(2, p.getDescription());
+	        ps.setDouble(3, p.getPrice());
+	        ps.setString(4, p.getImage());
+	        ps.setInt(5, p.getStock());
+	        ps.setInt(6, p.getCategory().getId());
+	        ps.setInt(7, p.getBrand().getId());
+	        ps.setString(8, p.getConnectionType());
+	        ps.setString(9, p.getMaterial());
+	        ps.setString(10, p.getSize());
 
-			if (product.getCategory() != null && product.getCategory().getId() > 0) {
-				ps.setInt(9, product.getCategory().getId());
-			} else {
-				ps.setNull(9, java.sql.Types.INTEGER);
-			}
-
-			if (product.getBrand() != null && product.getBrand().getId() > 0) {
-				ps.setInt(10, product.getBrand().getId());
-			} else {
-				ps.setNull(10, java.sql.Types.INTEGER);
-			}
-
-			int rowsAffected = ps.executeUpdate();
-			conn.commit();
-			return rowsAffected > 0;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	        return ps.executeUpdate() > 0;
+	    } catch (Exception e) {
+	        System.err.println("Lỗi khi thêm sản phẩm: " + e.getMessage());
+	        e.printStackTrace();
+	        return false;
+	    }
 	}
 
-	public boolean deleteProduct(int productId) {
-		String sql = "DELETE FROM Products WHERE id = ?";
-
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, productId);
-
-			int rowsAffected = ps.executeUpdate();
-			conn.commit();
-			return rowsAffected > 0;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public boolean deleteProduct(int id) {
+	    String sql = "DELETE FROM Products WHERE id = ?";
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+	        
+	        ps.setInt(1, id);
+	        return ps.executeUpdate() > 0;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
 	}
-
-	
 
 	public List<Product> getProductsByPage(int page, int pageSize) {
-		List<Product> list = new ArrayList<>();
+	    List<Product> list = new ArrayList<>();
+	    int offset = (page - 1) * pageSize;
+	    String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name " +
+	                 "FROM Products p " +
+	                 "INNER JOIN Categories c ON p.category_id = c.id " +
+	                 "INNER JOIN Brands b ON p.brand_id = b.id " +
+	                 "ORDER BY p.id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-		int offset = (page - 1) * pageSize;
-
-		String sql = "SELECT p.*, c.name as cat_name, b.name as brand_name " + "FROM Products p "
-				+ "LEFT JOIN Categories c ON p.category_id = c.id " + "LEFT JOIN Brands b ON p.brand_id = b.id "
-				+ "ORDER BY p.id ASC " + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, offset);
-			ps.setInt(2, pageSize);
-
-			ResultSet rs = ps.executeQuery();
-
-			while (rs.next()) {
-				Product p = new Product();
-				p.setId(rs.getInt("id"));
-				p.setName(rs.getString("name"));
-				p.setDescription(rs.getString("description"));
-				p.setImage(rs.getString("image"));
-				p.setStock(rs.getInt("stock_quantity"));
-				p.setPrice(rs.getDouble("price"));
-
-				Category c = new Category();
-				c.setId(rs.getInt("category_id"));
-				c.setName(rs.getString("cat_name"));
-				p.setCategory(c);
-
-				Brand b = new Brand();
-				b.setId(rs.getInt("brand_id"));
-				b.setName(rs.getString("brand_name"));
-				p.setBrand(b);
-
-				list.add(p);
-			}
-
-			System.out
-					.println("DAO: Fetched " + list.size() + " products for page " + page + " (offset=" + offset + ")");
-
-		} catch (Exception e) {
-			System.err.println("Error in getProductsByPage: " + e.getMessage());
-			e.printStackTrace();
-		}
-		return list;
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+	        
+	        ps.setInt(1, offset);
+	        ps.setInt(2, pageSize);
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                list.add(mapProduct(rs));
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return list;
 	}
 
 	public int getTotalProducts() {
