@@ -235,163 +235,142 @@ public class ProductDAO {
 	}
 
 	public List<Product> filterProducts(String[] brandIds, String[] connections, String[] materials, String[] sizes,
-			String category, int index) {
-		List<Product> list = new ArrayList<>();
+	        String category, int index) {
+	    List<Product> list = new ArrayList<>();
+	    StringBuilder sql = new StringBuilder(
+	            "SELECT p.*, c.name as cat_name, b.name as brand_name, b.logo as brand_logo " +
+	            "FROM Products p " +
+	            "INNER JOIN Categories c ON p.category_id = c.id " +
+	            "INNER JOIN Brands b ON p.brand_id = b.id WHERE 1=1");
 
-		StringBuilder sql = new StringBuilder(
-				"SELECT p.*, c.name as cat_name, b.name as brand_name, b.logo as brand_logo " + "FROM Products p "
-						+ "INNER JOIN Categories c ON p.category_id = c.id "
-						+ "INNER JOIN Brands b ON p.brand_id = b.id WHERE 1=1");
+	    List<Object> params = new ArrayList<>();
 
-		if (category != null && !category.isEmpty()) {
-			sql.append(" AND c.name LIKE N'%").append(category).append("%'");
-		}
+	    if (category != null && !category.isEmpty()) {
+	        sql.append(" AND c.name LIKE ?");
+	        params.add("%" + category + "%");
+	    }
 
-		if (brandIds != null && brandIds.length > 0) {
-			sql.append(" AND brand_id IN (");
-			for (int i = 0; i < brandIds.length; i++) {
-				sql.append(brandIds[i]);
-				if (i < brandIds.length - 1)
-					sql.append(",");
-			}
-			sql.append(")");
-		}
+	    if (brandIds != null && brandIds.length > 0) {
+	        sql.append(" AND p.brand_id IN (");
+	        for (int i = 0; i < brandIds.length; i++) {
+	            sql.append("?");
+	            params.add(Integer.parseInt(brandIds[i]));
+	            if (i < brandIds.length - 1) sql.append(",");
+	        }
+	        sql.append(")");
+	    }
 
-		if (connections != null && connections.length > 0) {
-			sql.append(" AND (");
-			for (int i = 0; i < connections.length; i++) {
-				sql.append("connection_type LIKE '%").append(connections[i]).append("%'");
-				if (i < connections.length - 1)
-					sql.append(" OR ");
-			}
-			sql.append(")");
-		}
+	    if (connections != null && connections.length > 0) {
+	        sql.append(" AND (");
+	        for (int i = 0; i < connections.length; i++) {
+	            sql.append("p.connection_type LIKE ?");
+	            params.add("%" + connections[i] + "%");
+	            if (i < connections.length - 1) sql.append(" OR ");
+	        }
+	        sql.append(")");
+	    }
 
-		if (materials != null && materials.length > 0) {
-			sql.append(" AND (");
-			for (int i = 0; i < materials.length; i++) {
-				sql.append("material LIKE '%").append(materials[i]).append("%'");
-				if (i < materials.length - 1)
-					sql.append(" OR ");
-			}
-			sql.append(")");
-		}
+	    if (materials != null && materials.length > 0) {
+	        sql.append(" AND (");
+	        for (int i = 0; i < materials.length; i++) {
+	            sql.append("p.material LIKE ?");
+	            params.add("%" + materials[i] + "%");
+	            if (i < materials.length - 1) sql.append(" OR ");
+	        }
+	        sql.append(")");
+	    }
 
-		if (sizes != null && sizes.length > 0) {
-			sql.append(" AND (");
-			for (int i = 0; i < sizes.length; i++) {
-				sql.append("product_size = '").append(sizes[i]).append("'");
-				if (i < sizes.length - 1)
-					sql.append(" OR ");
-			}
-			sql.append(")");
-		}
+	    sql.append(" ORDER BY p.id OFFSET ? ROWS FETCH NEXT 3 ROWS ONLY");
+	    params.add((index - 1) * 3);
 
-		sql.append(" ORDER BY p.id OFFSET ").append((index - 1) * 3).append(" ROWS FETCH NEXT 3 ROWS ONLY");
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+	        
+	        for (int i = 0; i < params.size(); i++) {
+	            ps.setObject(i + 1, params.get(i));
+	        }
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			java.sql.Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql.toString());
-
-			while (rs.next()) {
-				Product p = new Product();
-				p.setId(rs.getInt("id"));
-				p.setName(rs.getString("name"));
-				p.setDescription(rs.getString("description"));
-				p.setImage(rs.getString("image"));
-				p.setStock(rs.getInt("stock_quantity"));
-				p.setPrice(rs.getDouble("price"));
-
-				Category c = new Category();
-				c.setId(rs.getInt("category_id"));
-				c.setName(rs.getString("cat_name"));
-				p.setCategory(c);
-
-				Brand b = new Brand();
-				b.setId(rs.getInt("brand_id"));
-				b.setName(rs.getString("brand_name"));
-				b.setLogo(rs.getString("brand_logo"));
-				p.setBrand(b);
-
-				try {
-					p.setConnectionType(rs.getString("connection_type"));
-				} catch (Exception e) {
-				}
-				try {
-					p.setMaterial(rs.getString("material"));
-				} catch (Exception e) {
-				}
-				try {
-					p.setSize(rs.getString("product_size"));
-				} catch (Exception e) {
-				}
-
-				list.add(p);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                list.add(mapProduct(rs)); 
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return list;
 	}
 
 	public int countFilteredProducts(String[] brandIds, String[] connections, String[] materials, String[] sizes,
-			String category) {
-		StringBuilder sql = new StringBuilder(
-				"SELECT count(*) FROM Products p " + "INNER JOIN Categories c ON p.category_id = c.id "
-						+ "INNER JOIN Brands b ON p.brand_id = b.id WHERE 1=1");
+	        String category) {
+	    StringBuilder sql = new StringBuilder(
+	            "SELECT count(*) FROM Products p " +
+	            "INNER JOIN Categories c ON p.category_id = c.id " +
+	            "INNER JOIN Brands b ON p.brand_id = b.id WHERE 1=1");
 
-		if (category != null && !category.isEmpty()) {
+	    List<Object> params = new ArrayList<>();
 
-			sql.append(" AND c.name LIKE N'%").append(category).append("%'");
-		}
+	    if (category != null && !category.isEmpty()) {
+	        sql.append(" AND c.name LIKE ?");
+	        params.add("%" + category + "%");
+	    }
 
-		if (brandIds != null && brandIds.length > 0) {
-			sql.append(" AND brand_id IN (");
-			for (int i = 0; i < brandIds.length; i++) {
-				sql.append(brandIds[i]).append(i < brandIds.length - 1 ? "," : "");
-			}
-			sql.append(")");
-		}
+	    if (brandIds != null && brandIds.length > 0) {
+	        sql.append(" AND p.brand_id IN (");
+	        for (int i = 0; i < brandIds.length; i++) {
+	            sql.append("?");
+	            params.add(Integer.parseInt(brandIds[i]));
+	            if (i < brandIds.length - 1) sql.append(",");
+	        }
+	        sql.append(")");
+	    }
 
-		if (connections != null && connections.length > 0) {
-			sql.append(" AND (");
-			for (int i = 0; i < connections.length; i++) {
-				sql.append("connection_type LIKE '%").append(connections[i]).append("%'");
-				if (i < connections.length - 1)
-					sql.append(" OR ");
-			}
-			sql.append(")");
-		}
-		if (materials != null && materials.length > 0) {
-			sql.append(" AND (");
-			for (int i = 0; i < materials.length; i++) {
-				sql.append("material LIKE '%").append(materials[i]).append("%'");
-				if (i < materials.length - 1)
-					sql.append(" OR ");
-			}
-			sql.append(")");
-		}
-		if (sizes != null && sizes.length > 0) {
-			sql.append(" AND (");
-			for (int i = 0; i < sizes.length; i++) {
-				sql.append("product_size = '").append(sizes[i]).append("'");
-				if (i < sizes.length - 1)
-					sql.append(" OR ");
-			}
-			sql.append(")");
-		}
+	    if (connections != null && connections.length > 0) {
+	        sql.append(" AND (");
+	        for (int i = 0; i < connections.length; i++) {
+	            sql.append("p.connection_type LIKE ?");
+	            params.add("%" + connections[i] + "%");
+	            if (i < connections.length - 1) sql.append(" OR ");
+	        }
+	        sql.append(")");
+	    }
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			java.sql.Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql.toString());
-			if (rs.next())
-				return rs.getInt(1);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return 0;
+	    if (materials != null && materials.length > 0) {
+	        sql.append(" AND (");
+	        for (int i = 0; i < materials.length; i++) {
+	            sql.append("p.material LIKE ?");
+	            params.add("%" + materials[i] + "%");
+	            if (i < materials.length - 1) sql.append(" OR ");
+	        }
+	        sql.append(")");
+	    }
+	    
+	    if (sizes != null && sizes.length > 0) {
+	        sql.append(" AND p.product_size IN (");
+	        for (int i = 0; i < sizes.length; i++) {
+	            sql.append("?");
+	            params.add(sizes[i]);
+	            if (i < sizes.length - 1) sql.append(",");
+	        }
+	        sql.append(")");
+	    }
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+	        
+	        for (int i = 0; i < params.size(); i++) {
+	            ps.setObject(i + 1, params.get(i));
+	        }
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getInt(1);
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return 0;
 	}
 
 	public boolean insertProduct(Product p) {
