@@ -30,5 +30,6 @@
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/poi-ooxml-5.5.1.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/poi-ooxml-full-5.5.1.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/xmlbeans-5.3.0.jar"/>
+	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jbcrypt-0.4.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

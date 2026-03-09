@@ -250,10 +250,29 @@ public class UserDAO {
 		}
 		return false;
 	}
+	public User getUserByUsername(String username) {
+	    String sql = "SELECT * FROM Users WHERE username = ?";
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+	        
+	        ps.setString(1, username);
+	        
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                return mapUser(rs);
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+	
 	private User mapUser(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));
         u.setUsername(rs.getString("username"));
+        u.setPassword(rs.getString("password"));
         u.setFullName(rs.getString("full_name"));
         u.setEmail(rs.getString("email"));
         u.setRole(rs.getInt("role"));

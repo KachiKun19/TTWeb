@@ -3,78 +3,58 @@ package com.kachikun.shop.service;
 import java.util.List;
 import com.kachikun.shop.model.User;
 import com.kachikun.shop.dao.UserDAO;
-import com.kachikun.shop.utils.MD5;
+import com.kachikun.shop.utils.BCryptUtils;
 
 public class UserService {
-	private UserDAO userDAO = new UserDAO();
+    private UserDAO userDAO = new UserDAO();
 
-	public User login(String username, String password) {
+    public User login(String username, String password) {
+        User user = userDAO.getUserByUsername(username); 
+        
+        if (user != null && BCryptUtils.checkPassword(password, user.getPassword())) {
+            return user;
+        }
+        return null;
+    }
 
-		String hashedPassword = MD5.encrypt(password);
-		return userDAO.checkLogin(username, hashedPassword);
-	}
+    public String register(String username, String password, String email, String fullName, int role) {
+        if (username == null || password == null)
+            return "Vui lòng nhập đủ thông tin!";
 
-	public String register(String username, String password, String email, String fullName, int role) {
-		if (username == null || password == null)
-			return "Vui lòng nhập đủ thông tin!";
+        if (password.length() < 6) {
+            return "Mật khẩu quá ngắn! Phải từ 6 ký tự trở lên.";
+        }
 
-		if (password.length() < 6) {
-			return "Mật khẩu quá ngắn! Phải từ 6 ký tự trở lên.";
-		}
+        if (userDAO.isUsernameExists(username))
+            return "Tên đăng nhập đã tồn tại!";
+        if (userDAO.isEmailExists(email))
+            return "Email đã được sử dụng!";
 
-		if (userDAO.isUsernameExists(username))
-			return "Tên đăng nhập đã tồn tại!";
-		if (userDAO.isEmailExists(email))
-			return "Email đã được sử dụng!";
+        String hashedPassword = BCryptUtils.hashPassword(password);
 
-		String hashedPassword = MD5.encrypt(password);
+        User u = new User();
+        u.setUsername(username);
+        u.setPassword(hashedPassword);
+        u.setEmail(email);
+        u.setFullName(fullName);
+        u.setRole(role);
 
-		User u = new User();
-		u.setUsername(username);
-		u.setPassword(hashedPassword);
-		u.setEmail(email);
-		u.setFullName(fullName);
-		u.setRole(role);
+        boolean success = userDAO.register(u);
 
-		boolean success = userDAO.register(u);
+        if (success) {
+            return "Success";
+        } else {
+            return "Lỗi hệ thống! Không thể lưu vào Database (Kiểm tra Console Eclipse).";
+        }
+    }
 
-		if (success) {
-			return "Success";
-		} else {
+    public boolean recoverPassword(String email, String newPassword) {
+        String hashedPassword = BCryptUtils.hashPassword(newPassword);
+        return userDAO.updatePassword(email, hashedPassword);
+    }
 
-			return "Lỗi hệ thống! Không thể lưu vào Database (Kiểm tra Console Eclipse).";
-		}
-	}
-
-	public List<User> getAllUsers() {
-		return userDAO.getAllUsers();
-	}
-
-	public List<User> getAdmins() {
-		return userDAO.getUsersByRole(1);
-	}
-
-	public List<User> getRegularUsers() {
-		return userDAO.getUsersByRole(0);
-	}
-
-	public boolean updateUserRole(int userId, int newRole) {
-		User user = userDAO.getUserById(userId);
-		if (user != null) {
-			user.setRole(newRole);
-			return userDAO.updateUser(user);
-		}
-		return false;
-	}
-
-	public boolean deleteUser(int userId) {
-		return userDAO.deleteUser(userId);
-	}
-
-	public boolean recoverPassword(String email, String newPassword) {
-
-		String hashedPassword = MD5.encrypt(newPassword);
-
-		return userDAO.updatePassword(email, hashedPassword);
-	}
+    public List<User> getAllUsers() { return userDAO.getAllUsers(); }
+    public List<User> getAdmins() { return userDAO.getUsersByRole(1); }
+    public List<User> getRegularUsers() { return userDAO.getUsersByRole(0); }
+    public boolean deleteUser(int userId) { return userDAO.deleteUser(userId); }
 }
