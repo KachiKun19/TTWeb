@@ -540,28 +540,10 @@ body {
 				</div>
 			</c:if>
 
-
+			
 			<c:if test="${param.error eq 'add_failed'}">
 				<div class="alert alert-error">
-					<i class="fas fa-exclamation-circle"></i> Không thể thêm người dùng. Vui lòng thử lại!
-				</div>
-			</c:if>
-
-			<c:if test="${param.error eq 'username_exists'}">
-				<div class="alert alert-error">
-					<i class="fas fa-exclamation-circle"></i> Tên đăng nhập đã tồn tại!
-				</div>
-			</c:if>
-
-			<c:if test="${param.error eq 'email_exists'}">
-				<div class="alert alert-error">
-					<i class="fas fa-exclamation-circle"></i> Email này đã được sử dụng bởi tài khoản khác!
-				</div>
-			</c:if>
-
-			<c:if test="${param.error eq 'password_too_short'}">
-				<div class="alert alert-error">
-					<i class="fas fa-exclamation-circle"></i> Mật khẩu quá ngắn! Phải có ít nhất 6 ký tự.
+					<i class="fas fa-exclamation-circle"></i> Không thể thêm người dùng. Tên đăng nhập có thể đã tồn tại!
 				</div>
 			</c:if>
 			

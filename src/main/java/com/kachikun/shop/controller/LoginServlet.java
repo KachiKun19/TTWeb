@@ -24,22 +24,13 @@ public class LoginServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.setCharacterEncoding("UTF-8");
-
 		String u = request.getParameter("username");
 		String p = request.getParameter("password");
 
 		User user = userService.login(u, p);
 
 		if (user != null) {
-			// Xóa session cũ
-			HttpSession oldSession = request.getSession(false);
-			if (oldSession != null) {
-				oldSession.invalidate();
-			}
-
-			// Tạo session mới
-			HttpSession session = request.getSession(true);
+			HttpSession session = request.getSession();
 			session.setAttribute("user", user);
 
 			if (user.getRole() == 1) {
