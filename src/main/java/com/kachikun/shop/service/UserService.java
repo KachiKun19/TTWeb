@@ -9,12 +9,35 @@ public class UserService {
     private UserDAO userDAO = new UserDAO();
 
     public User login(String username, String password) {
-        User user = userDAO.getUserByUsername(username); 
-        
+        User user = userDAO.getUserByUsername(username);
+
         if (user != null && BCryptUtils.checkPassword(password, user.getPassword())) {
             return user;
         }
         return null;
+    }
+
+    // Kiểm tra sơ bộ trước khi gửi OTP — không tạo tài khoản
+    public String preCheck(String username, String password, String email) {
+        if (username == null || username.trim().isEmpty())
+            return "Vui lòng nhập tên đăng nhập!";
+        if (password == null || password.length() < 8)
+            return "Mật khẩu quá ngắn! Phải từ 8 ký tự trở lên.";
+        if (!password.matches(".*[A-Z].*"))
+            return "Mật khẩu phải chứa ít nhất 1 chữ hoa!";
+        if (!password.matches(".*[0-9].*"))
+            return "Mật khẩu phải chứa ít nhất 1 chữ số!";
+        if (!password.matches(".*[!@#$%^&*].*"))
+            return "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt (!@#$%^&*)!";
+        if (email == null || email.trim().isEmpty())
+            return "Email không được để trống!";
+        if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))
+            return "Email không đúng định dạng!";
+        if (userDAO.isUsernameExists(username))
+            return "Tên đăng nhập đã tồn tại!";
+        if (userDAO.isEmailExists(email))
+            return "Email đã được sử dụng!";
+        return "OK";
     }
 
     public String register(String username, String password, String email, String fullName, int role) {
@@ -24,6 +47,12 @@ public class UserService {
         if (password.length() < 6) {
             return "Mật khẩu quá ngắn! Phải từ 6 ký tự trở lên.";
         }
+
+        if (email == null || email.trim().isEmpty())
+            return "Email không được để trống!";
+
+        if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))
+            return "Email không đúng định dạng!";
 
         if (userDAO.isUsernameExists(username))
             return "Tên đăng nhập đã tồn tại!";
