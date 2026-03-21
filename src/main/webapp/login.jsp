@@ -505,10 +505,13 @@
 	const urlParams = new URLSearchParams(window.location.search);
 	const msg = urlParams.get('msg');
 
-	// Mở panel đăng ký nếu có lỗi hoặc đang ở bước OTP
+	// Mở panel đăng ký nếu có lỗi, đang ở bước OTP, hoặc URL có #signup
 	<c:if test="${not empty registerError or registerStep eq 'otp'}">
 	container.classList.add("right-panel-active");
 	</c:if>
+	if (window.location.hash === '#signup') {
+		container.classList.add("right-panel-active");
+	}
 
 	// Auto-focus và chuyển ô khi nhập OTP
 	const otpBoxes = document.querySelectorAll('.otp-box');
