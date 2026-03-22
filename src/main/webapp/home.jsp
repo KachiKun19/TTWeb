@@ -178,7 +178,7 @@
 
 						<ul class="py-1 text-sm text-gray-700" aria-labelledby="cartDropdownButton">
 							<li>
-								<a href="cart.jsp" class="block px-4 py-3 hover:bg-pink-50 hover:text-pink-600 transition flex items-center group">
+								<a href="cart" class="block px-4 py-3 hover:bg-pink-50 hover:text-pink-600 transition flex items-center group">
                     <span class="bg-pink-100 text-pink-600 w-8 h-8 rounded-full flex items-center justify-center mr-3 group-hover:bg-pink-200 transition">
                         <i class="fas fa-shopping-cart text-xs"></i>
                     </span>
