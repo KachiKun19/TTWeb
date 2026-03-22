@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class OrderDAO {
 
-	// ── Tạo đơn hàng mới ──────────────────────────────────────────────────────
+	// ── Tạo đơn hàng mới
 	public boolean createOrder(User user, List<CartItem> cart, double totalPrice,
 							   String fullname, String phone, String address,
 							   String paymentMethod) {
@@ -73,13 +73,7 @@ public class OrderDAO {
 		return false;
 	}
 
-	// ── Admin cập nhật trạng thái (có validate flow hợp lệ) ──────────────────
-	/**
-	 * Chuyển trạng thái đơn hàng theo đúng chiều flow:
-	 *   Đang xử lý → Đang giao hàng → Đã giao → Hoàn thành
-	 * Ghi nhận shipped_at / delivered_at tự động.
-	 * Trả về false nếu chuyển sai chiều hoặc không tìm thấy đơn.
-	 */
+	// ── Admin cập nhật trạng thái
 	public boolean adminUpdateStatus(int orderId, String newStatus) {
 		// 1. Lấy status hiện tại
 		String currentStatus = getStatusById(orderId);
@@ -131,12 +125,12 @@ public class OrderDAO {
 		return null;
 	}
 
-	// ── updateStatus (giữ lại tương thích với code cũ) ────────────────────────
+	// ── updateStatus
 	public boolean updateStatus(int orderId, String status) {
 		return adminUpdateStatus(orderId, status);
 	}
 
-	// ── User hủy đơn (chỉ khi "Đang xử lý") + hoàn stock ────────────────────
+	// ── User hủy đơn (chỉ khi "Đang xử lý") + hoàn stock
 	public boolean userCancelOrder(int orderId, int userId) {
 		return userCancelOrder(orderId, userId, null);
 	}
@@ -152,7 +146,7 @@ public class OrderDAO {
 			conn = DBConnection.getConnection();
 			conn.setAutoCommit(false);
 
-			// 1. Cập nhật trạng thái + lý do hủy
+			// Cập nhật trạng thái + lý do hủy
 			try (PreparedStatement ps = conn.prepareStatement(sqlUpdate)) {
 				ps.setString(1, reason != null ? reason : "Khách hủy đơn");
 				ps.setInt(2, orderId);
@@ -175,7 +169,7 @@ public class OrderDAO {
 				}
 			}
 
-			// 3. Hoàn kho từng sản phẩm (batch)
+			//Hoàn kho từng sản phẩm (batch)
 			try (PreparedStatement ps = conn.prepareStatement(sqlRestock)) {
 				for (OrderDetail item : items) {
 					ps.setInt(1, item.getQuantity());
@@ -249,7 +243,6 @@ public class OrderDAO {
 		return false;
 	}
 
-	// ── Lấy chi tiết đơn hàng ────────────────────────────────────────────────
 	public List<OrderDetail> getOrderDetail(int orderId) {
 		List<OrderDetail> list = new ArrayList<>();
 		String sql = "SELECT d.*, p.name, p.image "
@@ -277,7 +270,6 @@ public class OrderDAO {
 		return list;
 	}
 
-	// ── Map helper: đọc 3 cột mới vào Order ────────────────────────────────
 	private Order mapOrder(ResultSet rs) throws Exception {
 		Order o = new Order();
 		o.setId(rs.getInt("id"));
@@ -300,7 +292,6 @@ public class OrderDAO {
 		return o;
 	}
 
-	// ── Lấy tất cả đơn (Admin) ───────────────────────────────────────────────
 	public List<Order> getAllOrders() {
 		List<Order> list = new ArrayList<>();
 		String sql = "SELECT * FROM Orders ORDER BY order_date DESC";
@@ -312,7 +303,6 @@ public class OrderDAO {
 		return list;
 	}
 
-	// ── Lấy đơn theo ID ─────────────────────────────────────────────────────
 	public Order getOrderById(int id) {
 		String sql = "SELECT * FROM Orders WHERE id = ?";
 		try (Connection conn = DBConnection.getConnection();
@@ -323,8 +313,6 @@ public class OrderDAO {
 		} catch (Exception e) { e.printStackTrace(); }
 		return null;
 	}
-
-	// ── Lấy đơn của user (lịch sử mua hàng) ─────────────────────────────────
 	public List<Order> getOrdersByUserId(int userId) {
 		List<Order> list = new ArrayList<>();
 		String sql = "SELECT * FROM Orders WHERE user_id = ? ORDER BY id DESC";

@@ -20,30 +20,39 @@ public class OrderHistoryServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8");
 
 		HttpSession session = request.getSession(false);
 		if (session == null || session.getAttribute("user") == null) {
-			response.sendRedirect("login.jsp");
-			return;
+			response.sendRedirect("login.jsp"); return;
 		}
 		User user = (User) session.getAttribute("user");
 
 		String action = request.getParameter("action");
-		String idStr = request.getParameter("id");
+		String idStr  = request.getParameter("id");
 
+		// Hủy đơn từ ng dùng
 		if ("cancel".equals(action) && idStr != null) {
 			int orderId = Integer.parseInt(idStr);
-			boolean cancelled = orderDAO.userCancelOrder(orderId, user.getId());
+			String reason = request.getParameter("cancel_reason");
+			if (reason == null || reason.trim().isEmpty()) reason = "Khách hủy đơn";
+
+			boolean cancelled = orderDAO.userCancelOrder(orderId, user.getId(), reason);
 			if (cancelled) {
 				request.setAttribute("msg", "Đã hủy đơn hàng #" + orderId + " thành công.");
 			} else {
-				request.setAttribute("error", "Không thể hủy đơn hàng này (Đã giao hoặc đang vận chuyển).");
+				request.setAttribute("error",
+						"Không thể hủy đơn hàng #" + orderId + ". Đơn đã được xử lý hoặc đang giao!");
 			}
 		}
 
 		List<Order> myOrders = orderDAO.getOrdersByUserId(user.getId());
 		request.setAttribute("myOrders", myOrders);
-
 		request.getRequestDispatcher("orderHistory.jsp").forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
 	}
 }
