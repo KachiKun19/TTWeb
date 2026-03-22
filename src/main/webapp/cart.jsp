@@ -362,8 +362,6 @@
                                     class="block text-xs font-bold text-gray-700 uppercase mb-1">Số
                                 điện thoại *</label> <input type="number" name="phone" pattern="0[0-9]{9}"
                                                             placeholder="09xxxxxxx" required
-<%--                                                            oninvalid="this.setCustomValidity('Số điện thoại phải đủ 10 số và bắt đầu bằng 0!')"--%>
-<%--                                                            oninput="this.setCustomValidity('')"--%>
                                                             class="w-full text-sm p-2.5 border b	order-gray-300 rounded focus:ring-black focus:border-black">
                         </div>
 

@@ -10,38 +10,38 @@ import com.kachikun.shop.model.ContactMessage;
 import com.kachikun.shop.utils.DBConnection;
 
 public class ContactDAO {
-    
+
     public boolean insertMessage(ContactMessage msg) {
         String sql = "INSERT INTO ContactMessages (full_name, email, phone, subject, message, status, created_at) VALUES (?, ?, ?, ?, ?, N'Chưa đọc', GETDATE())";
-        
+
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
-            
+
             ps.setString(1, msg.getFullName());
             ps.setString(2, msg.getEmail());
             ps.setString(3, msg.getPhone());
             ps.setString(4, msg.getSubject());
             ps.setString(5, msg.getMessage());
-            
+
             int row = ps.executeUpdate();
             return row > 0;
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
-    
+
     public List<ContactMessage> getAllMessages() {
         List<ContactMessage> list = new ArrayList<>();
         String sql = "SELECT * FROM ContactMessages ORDER BY created_at DESC";
-        
+
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            
+
             while (rs.next()) {
                 ContactMessage msg = new ContactMessage();
                 msg.setId(rs.getInt("id"));
@@ -71,5 +71,51 @@ public class ContactDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void updateReply(int id, String reply) {
+        String sql = "UPDATE ContactMessages SET reply=? WHERE id=?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, reply);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ContactMessage getById(int id) {
+        ContactMessage c = null;
+
+        String sql = "SELECT * FROM ContactMessages WHERE id = ?";
+
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                c = new ContactMessage();
+                c.setId(rs.getInt("id"));
+                c.setFullName(rs.getString("full_name"));
+                c.setEmail(rs.getString("email"));
+                c.setPhone(rs.getString("phone"));
+                c.setSubject(rs.getString("subject"));
+                c.setMessage(rs.getString("message"));
+                c.setReply(rs.getString("reply"));
+                c.setStatus(rs.getString("status"));
+                c.setCreatedAt(rs.getTimestamp("created_at"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return c;
     }
 }
