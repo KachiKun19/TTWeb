@@ -127,7 +127,7 @@
     </c:choose>
   </div>
 
-  <%-- ── THÔNG TIN GIAO HÀNG ──────────────────────────────────────────── --%>
+  <%-- xem tiến trình--%>
   <div class="bg-white rounded-2xl shadow-sm p-6">
     <h2 class="text-lg font-bold text-gray-800 mb-4">Thông tin giao hàng</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -156,7 +156,7 @@
     </div>
   </div>
 
-  <%-- ── DANH SÁCH SẢN PHẨM ───────────────────────────────────────────── --%>
+  <%-- ── xem sản phẩm --%>
   <div class="bg-white rounded-2xl shadow-sm p-6">
     <h2 class="text-lg font-bold text-gray-800 mb-4">Sản phẩm trong đơn</h2>
     <div class="space-y-3">
