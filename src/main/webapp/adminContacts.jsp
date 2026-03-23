@@ -189,13 +189,13 @@ tr:hover {
 
 .status-unread {
     background-color: #fff5f5;
-    color: #e53e3e; 
+    color: #e53e3e;
     border: 1px solid #fed7d7;
 }
 
 .status-read {
     background-color: #f0fff4;
-    color: #38a169; 
+    color: #38a169;
     border: 1px solid #c6f6d5;
 }
 
@@ -234,6 +234,30 @@ tr:hover {
 		width: 100%;
 		margin-bottom: 20px;
 	}
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 500px;
+    border-radius: 10px;
+}
+
+.close {
+    float: right;
+    cursor: pointer;
+    font-size: 20px;
 }
 </style>
 </head>
@@ -277,7 +301,7 @@ tr:hover {
 		</div>
 
 		<div class="main-content">
-			
+
             <div class="page-header">
                 <h2><i class="fas fa-envelope"></i> Hộp thư góp ý & Liên hệ</h2>
                 <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">
@@ -320,7 +344,7 @@ tr:hover {
                                 </td>
                                 <td>
                                     <div style="font-size: 0.85rem;">
-                                        <i class="far fa-clock"></i> 
+                                        <i class="far fa-clock"></i>
                                         <fmt:formatDate value="${msg.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
                                     </div>
                                 </td>
@@ -329,7 +353,7 @@ tr:hover {
                                         <c:when test="${msg.status == 'Chưa đọc'}">
                                             <span class="status-badge status-unread">Chưa đọc</span>
                                             <div style="margin-top: 5px;">
-                                                <a href="adminContacts?action=markRead&id=${msg.id}" class="btn-action" title="Đánh dấu đã xem">
+                                                <a href="adminContacts?action=markRead&id=${msg.id}" class="btn-action">
                                                     <i class="fas fa-check"></i> Xử lý
                                                 </a>
                                             </div>
@@ -337,14 +361,20 @@ tr:hover {
                                         <c:otherwise>
                                             <span class="status-badge status-read">Đã xem</span>
                                         </c:otherwise>
+
                                     </c:choose>
-                                    <a href="adminReply?id=${msg.id}" class="btn-action">
-                                        <i class="fas fa-reply"></i> Trả lời
-                                    </a>
+
+                                    <!-- NÚT XEM -->
+                                    <div style="margin-top:5px;">
+                                        <a href="javascript:void(0)" class="btn-action"
+                                           onclick="openModal('${msg.id}', '${msg.fullName}', '${msg.email}', '${msg.message}')">
+                                            <i class="fas fa-eye"></i> Xem
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         </c:forEach>
-                        
+
                         <c:if test="${empty messages}">
                             <tr>
                                 <td colspan="6" style="text-align: center; padding: 40px; color: #888;">
@@ -359,6 +389,52 @@ tr:hover {
 
 		</div>
 	</div>
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
 
+            <h3>Chi tiết phản hồi</h3>
+            <p><b>Người gửi:</b> <span id="modalName"></span></p>
+            <p><b>Email:</b> <span id="modalEmail"></span></p>
+
+            <p><b>Nội dung:</b></p>
+            <p id="modalMessage"
+               style="background:#f5f7fa; padding:10px; border-radius:5px;"></p>
+
+            <!-- FORM TRẢ LỜI -->
+            <form action="adminReply" method="post">
+                <input type="hidden" name="id" id="replyId">
+
+                <textarea name="reply" placeholder="Nhập phản hồi..."
+                          style="width:100%; height:100px; margin-top:10px;" required></textarea>
+
+                <button type="submit" class="btn-action" style="margin-top:10px;">
+                    <i class="fas fa-paper-plane"></i> Gửi phản hồi
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id, name, email, message) {
+            document.getElementById("modalName").innerText = name;
+            document.getElementById("modalEmail").innerText = email;
+            document.getElementById("modalMessage").innerText = message;
+
+            document.getElementById("replyId").value = id;
+
+            document.getElementById("messageModal").style.display = "block";
+        }
+
+        document.querySelector(".close").onclick = function () {
+            document.getElementById("messageModal").style.display = "none";
+        }
+
+        window.onclick = function (e) {
+            if (e.target.classList.contains("modal")) {
+                document.getElementById("messageModal").style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>

@@ -74,7 +74,7 @@ public class ContactDAO {
     }
 
     public void updateReply(int id, String reply) {
-        String sql = "UPDATE ContactMessages SET reply=? WHERE id=?";
+        String sql = "UPDATE ContactMessages SET reply = ?, status = N'Đã trả lời' WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
