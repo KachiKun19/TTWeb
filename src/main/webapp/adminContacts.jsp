@@ -338,6 +338,9 @@ tr:hover {
                                             <span class="status-badge status-read">Đã xem</span>
                                         </c:otherwise>
                                     </c:choose>
+                                    <a href="adminReply?id=${msg.id}" class="btn-action">
+                                        <i class="fas fa-reply"></i> Trả lời
+                                    </a>
                                 </td>
                             </tr>
                         </c:forEach>

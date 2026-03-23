@@ -11,15 +11,18 @@ public class ContactMessage {
     private String message;
     private Timestamp createdAt;
     private String status;
+    private String reply;
 
     public ContactMessage() {}
 
-    public ContactMessage(String fullName, String email, String phone, String subject, String message) {
+    public ContactMessage(String fullName, String email, String phone, String subject, String message ) {
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
         this.subject = subject;
         this.message = message;
+        this.reply = reply;
+
     }
 
     public int getId() { return id; }
@@ -38,4 +41,6 @@ public class ContactMessage {
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getReply() { return reply; }
+    public void setReply(String reply) { this.reply = reply; }
 }
