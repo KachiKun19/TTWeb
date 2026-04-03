@@ -8,260 +8,268 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kachikun.shop.model.User;
-import com.kachikun.shop.utils.DBConnection;
 
-public class UserDAO {
-	public boolean register(User u) {
-		String sql = "INSERT INTO Users (username, password, email, full_name, role) VALUES (?, ?, ?, ?, ?)";
-		try (Connection conn = DBConnection.getConnection();
-			 PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setString(1, u.getUsername());
-			ps.setString(2, u.getPassword());
-			ps.setString(3, u.getEmail());
-			ps.setString(4, u.getFullName());
-			ps.setInt(5, u.getRole());
-			return ps.executeUpdate() > 0;
-		} catch (Exception e) { e.printStackTrace(); return false; }
-	}
+public class UserDAO extends BaseDAO {
+    public boolean register(User newUser) {
+        String sql = "INSERT INTO Users (username, password, email, full_name, role) " + "VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newUser.getUsername());
+            ps.setString(2, newUser.getPassword());
+            ps.setString(3, newUser.getEmail());
+            ps.setString(4, newUser.getFullName());
+            ps.setInt(5, newUser.getRole());
 
+            return ps.executeUpdate() > 0;
 
-	public List<User> getAllUsers() {
-		List<User> users = new ArrayList<>();
-		String sql = "SELECT * FROM Users ORDER BY id DESC";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				User u = new User();
-				u.setId(rs.getInt("id"));
-				u.setUsername(rs.getString("username"));
-				u.setFullName(rs.getString("full_name"));
-				u.setEmail(rs.getString("email"));
-				u.setRole(rs.getInt("role"));
-				users.add(u);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return users;
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-	public User getUserById(int id) {
-		String sql = "SELECT * FROM Users WHERE id = ?";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				User u = new User();
-				u.setId(rs.getInt("id"));
-				u.setUsername(rs.getString("username"));
-				u.setFullName(rs.getString("full_name"));
-				u.setEmail(rs.getString("email"));
-				u.setRole(rs.getInt("role"));
-				return u;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    /**
+     * Lấy toàn bộ danh sách người dùng, sắp xếp mới nhất trước.
+     */
+    public List<User> getAllUsers() {
 
-	public boolean updateUser(User u) {
-		String sql = "UPDATE Users SET full_name = ?, email = ?, role = ? WHERE id = ?";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, u.getFullName());
-			ps.setString(2, u.getEmail());
-			ps.setInt(3, u.getRole());
-			ps.setInt(4, u.getId());
-			int rowsAffected = ps.executeUpdate();
-			return rowsAffected > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+        String sql = "SELECT * FROM Users ORDER BY id DESC";
+        List<User> userList = new ArrayList<>();
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
-	public boolean deleteUser(int id) {
-		String sql = "DELETE FROM Users WHERE id = ?";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, id);
-			int rowsAffected = ps.executeUpdate();
-			return rowsAffected > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+            while (rs.next()) {
+                userList.add(mapUserWithoutPassword(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userList;
+    }
 
-	public List<User> getUsersByRole(int role) {
-		List<User> users = new ArrayList<>();
-		String sql = "SELECT * FROM Users WHERE role = ? ORDER BY id DESC";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, role);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				User u = new User();
-				u.setId(rs.getInt("id"));
-				u.setUsername(rs.getString("username"));
-				u.setFullName(rs.getString("full_name"));
-				u.setEmail(rs.getString("email"));
-				u.setRole(rs.getInt("role"));
-				users.add(u);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return users;
-	}
+    /**
+     * Tìm người dùng theo ID.
+     */
+    public User getUserById(int userId) {
+        String sql = "SELECT * FROM Users WHERE id = ?";
 
-	public User getUserByEmail(String email) {
-		String sql = "SELECT * FROM Users WHERE email = ?";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, email);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				User u = new User();
-				u.setId(rs.getInt("id"));
-				u.setUsername(rs.getString("username"));
-				u.setFullName(rs.getString("full_name"));
-				u.setEmail(rs.getString("email"));
-				u.setRole(rs.getInt("role"));
-				return u;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-	public boolean updatePassword(String email, String newPassword) {
-		String sql = "UPDATE Users SET password = ? WHERE email = ?";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, newPassword);
-			ps.setString(2, email);
-			int rowsAffected = ps.executeUpdate();
-			return rowsAffected > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUserWithoutPassword(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	public int getTotalUsers() {
-		int total = 0;
-		String sql = "SELECT COUNT(*) as total FROM Users";
+    /**
+     * Tìm người dùng theo tên đăng nhập (dùng khi login).
+     */
+    public User getUserByUsername(String username) {
+        String sql = "SELECT * FROM Users WHERE username = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				total = rs.getInt("total");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return total;
-	}
+            ps.setString(1, username);
 
-	public int getNewUsersToday() {
-		int count = 0;
-		String sql = "SELECT COUNT(*) as count FROM Users WHERE CAST(created_at AS DATE) = CAST(GETDATE() AS DATE)";
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUser(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				count = rs.getInt("count");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return count;
-	}
+    /**
+     * Tìm người dùng theo email
+     */
+    public User getUserByEmail(String email) {
+        String sql = "SELECT * FROM Users WHERE email = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-	public boolean isUsernameExists(String username) {
-		String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
-		try (Connection conn = DBConnection.getConnection();
-			 PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setString(1, username);
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) return rs.getInt(1) > 0;
-			}
-		} catch (Exception e) { e.printStackTrace(); }
-		return false;
-	}
+            ps.setString(1, email);
 
-	public boolean isEmailExists(String email) {
-		try {
-			Connection conn = DBConnection.getConnection();
-			String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, email);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next())
-				return rs.getInt(1) > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUserWithoutPassword(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	public boolean isFullnameExists(String fullname) {
-		try {
-			Connection conn = DBConnection.getConnection();
-			String sql = "SELECT COUNT(*) FROM Users WHERE full_name = ?";
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, fullname);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next())
-				return rs.getInt(1) > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-	public User getUserByUsername(String username) {
-		String sql = "SELECT * FROM Users WHERE username = ?";
-		try (Connection conn = DBConnection.getConnection();
-			 PreparedStatement ps = conn.prepareStatement(sql)) {
+    /**
+     * Lấy danh sách người dùng theo vai trò
+     * role 0 = User , 1 = Admin
+     */
+    public List<User> getUsersByRole(int role) {
+        String sql = "SELECT * FROM Users WHERE role = ? ORDER BY id DESC";
+        List<User> userList = new ArrayList<>();
 
-			ps.setString(1, username);
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					return mapUser(rs);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+            ps.setInt(1, role);
 
-	private User mapUser(ResultSet rs) throws SQLException {
-		User u = new User();
-		u.setId(rs.getInt("id"));
-		u.setUsername(rs.getString("username"));
-		u.setPassword(rs.getString("password"));
-		u.setFullName(rs.getString("full_name"));
-		u.setEmail(rs.getString("email"));
-		u.setRole(rs.getInt("role"));
-		return u;
-	}
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    userList.add(mapUserWithoutPassword(rs));
+                }
+            }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return userList;
+    }
+
+    /**
+     * Cập nhật thông tin người dùng
+     */
+    public boolean updateUser(User updatedUser) {
+        String sql = "UPDATE Users SET full_name = ?, email = ?, role = ? WHERE id = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, updatedUser.getFullName());
+            ps.setString(2, updatedUser.getEmail());
+            ps.setInt(3, updatedUser.getRole());
+            ps.setInt(4, updatedUser.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Đặt lại mật khẩu mới cho người dùng theo email.
+     */
+    public boolean updatePassword(String email, String newHashedPassword) {
+        String sql = "UPDATE Users SET password = ? WHERE email = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newHashedPassword);
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Xóa người dùng theo ID.
+     */
+    public boolean deleteUser(int userId) {
+        String sql = "DELETE FROM Users WHERE id = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Kiểm tra tên đăng nhập đã được dùng chưa.
+     */
+    public boolean isUsernameExists(String username) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Kiểm tra email đã được đăng ký chưa.
+     */
+    public boolean isEmailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Đếm tổng số người dùng trong hệ thống.
+     */
+    public int getTotalUsers() {
+        String sql = "SELECT COUNT(*) AS total FROM Users";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) return rs.getInt("total");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Có Password
+     */
+    private User mapUser(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setId(rs.getInt("id"));
+        user.setUsername(rs.getString("username"));
+        user.setPassword(rs.getString("password"));
+        user.setFullName(rs.getString("full_name"));
+        user.setEmail(rs.getString("email"));
+        user.setRole(rs.getInt("role"));
+        return user;
+    }
+
+    /**
+     * Không có Password
+     */
+    private User mapUserWithoutPassword(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setId(rs.getInt("id"));
+        user.setUsername(rs.getString("username"));
+        user.setFullName(rs.getString("full_name"));
+        user.setEmail(rs.getString("email"));
+        user.setRole(rs.getInt("role"));
+        return user;
+    }
 }
