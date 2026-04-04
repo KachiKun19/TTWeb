@@ -504,6 +504,13 @@
                            required autocomplete="off" min="0"/>
                 </div>
             </c:if>
+            <div style="display:flex; align-items:center; width:100%; margin: 4px 0;">
+                <input type="checkbox" id="rememberMe" name="rememberMe"
+                       style="width:auto; margin:0 8px 0 0; cursor:pointer;"/>
+                <label for="rememberMe" style="font-size:13px; color:#555; cursor:pointer; margin:0;">
+                    Nhớ đăng nhập
+                </label>
+            </div>
             <a href="forgotPassword.jsp">Quên mật khẩu?</a>
             <button type="submit">Đăng Nhập</button>
         </form>
