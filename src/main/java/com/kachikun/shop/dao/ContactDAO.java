@@ -7,16 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kachikun.shop.model.ContactMessage;
-import com.kachikun.shop.utils.DBConnection;
 
-public class ContactDAO {
+public class ContactDAO extends BaseDAO {
 
     public boolean insertMessage(ContactMessage msg) {
         String sql = "INSERT INTO ContactMessages (full_name, email, phone, subject, message, status, created_at) VALUES (?, ?, ?, ?, ?, N'Chưa đọc', GETDATE())";
 
-        try {
-            Connection conn = DBConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, msg.getFullName());
             ps.setString(2, msg.getEmail());
@@ -37,10 +35,9 @@ public class ContactDAO {
         List<ContactMessage> list = new ArrayList<>();
         String sql = "SELECT * FROM ContactMessages ORDER BY created_at DESC";
 
-        try {
-            Connection conn = DBConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 ContactMessage msg = new ContactMessage();
@@ -62,9 +59,9 @@ public class ContactDAO {
 
     public void updateStatus(int id, String status) {
         String sql = "UPDATE ContactMessages SET status = ? WHERE id = ?";
-        try {
-            Connection conn = DBConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, status);
             ps.setInt(2, id);
             ps.executeUpdate();
@@ -76,7 +73,7 @@ public class ContactDAO {
     public void updateReply(int id, String reply) {
         String sql = "UPDATE ContactMessages SET reply=? WHERE id=?";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, reply);
@@ -92,24 +89,24 @@ public class ContactDAO {
 
         String sql = "SELECT * FROM ContactMessages WHERE id = ?";
 
-        try {
-            Connection conn = DBConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, id);
 
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                c = new ContactMessage();
-                c.setId(rs.getInt("id"));
-                c.setFullName(rs.getString("full_name"));
-                c.setEmail(rs.getString("email"));
-                c.setPhone(rs.getString("phone"));
-                c.setSubject(rs.getString("subject"));
-                c.setMessage(rs.getString("message"));
-                c.setReply(rs.getString("reply"));
-                c.setStatus(rs.getString("status"));
-                c.setCreatedAt(rs.getTimestamp("created_at"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    c = new ContactMessage();
+                    c.setId(rs.getInt("id"));
+                    c.setFullName(rs.getString("full_name"));
+                    c.setEmail(rs.getString("email"));
+                    c.setPhone(rs.getString("phone"));
+                    c.setSubject(rs.getString("subject"));
+                    c.setMessage(rs.getString("message"));
+                    c.setReply(rs.getString("reply"));
+                    c.setStatus(rs.getString("status"));
+                    c.setCreatedAt(rs.getTimestamp("created_at"));
+                }
             }
 
         } catch (Exception e) {
