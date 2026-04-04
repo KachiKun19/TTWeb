@@ -44,10 +44,7 @@ public class ProductDAO extends BaseDAO {
         return product;
     }
 
-    /**
-     * Lấy toàn bộ sản phẩm không phân trang
-     * Dùng cho trang chủ hoặc thống kê admin
-     */
+    // lấy toàn bộ sản phẩm để panging cho adminProduct
     public List<Product> getAllProducts() {
         String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
                 + "FROM Products p "
@@ -69,9 +66,7 @@ public class ProductDAO extends BaseDAO {
         return productList;
     }
 
-    /**
-     * Tìm sản phẩm theo ID.
-     */
+    //tìm bằng id
     public Product getProductById(int productId) {
         String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
                 + "FROM Products p "
@@ -93,22 +88,23 @@ public class ProductDAO extends BaseDAO {
         return null;
     }
 
-    /**
-     * Tìm sản phẩm
-     */
+    // search tên sp - loại sp
     public List<Product> findByName(String keyword) {
         String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
                 + "FROM Products p "
                 + "INNER JOIN Categories c ON p.category_id = c.id "
                 + "INNER JOIN Brands b ON p.brand_id = b.id "
-                + "WHERE p.name LIKE ?";
+                + "WHERE p.name LIKE ? OR b.name LIKE ? OR c.name LIKE ?";
 
         List<Product> productList = new ArrayList<>();
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, "%" + keyword + "%");
+            String kw = "%" + keyword + "%";
+            ps.setString(1, kw);
+            ps.setString(2, kw);
+            ps.setString(3, kw);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) productList.add(mapProduct(rs));
             }
@@ -119,9 +115,7 @@ public class ProductDAO extends BaseDAO {
         return productList;
     }
 
-    /**
-     * Tìm sản phẩm theo tên danh mục
-     */
+    // search sp theo danh mục
     public List<Product> findByCategoryName(String categoryName) {
         String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
                 + "FROM Products p "
@@ -145,9 +139,7 @@ public class ProductDAO extends BaseDAO {
         return productList;
     }
 
-    /**
-     * Lấy sản phẩm theo trang — không lọc danh mục.
-     */
+    // chỉ lấy ra sản phẩm , ko lọc
     public List<Product> pagingProduct(int pageIndex) {
         String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name, b.logo AS brand_logo "
                 + "FROM Products p "
@@ -172,9 +164,7 @@ public class ProductDAO extends BaseDAO {
         return productList;
     }
 
-    /**
-     * Lấy sản phẩm theo trang trong một danh mục cụ thể.
-     */
+    // lấy sp theo trang trong danh mục
     public List<Product> pagingProductByCategory(String categoryName, int pageIndex) {
         String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name, b.logo AS brand_logo "
                 + "FROM Products p "
@@ -201,9 +191,7 @@ public class ProductDAO extends BaseDAO {
         return productList;
     }
 
-    /**
-     * Lấy sản phẩm theo trang với kích thước trang tuỳ chỉnh.
-     */
+    // lấy sp theo trang
     public List<Product> getProductsByPage(int pageIndex, int pageSize) {
         String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
                 + "FROM Products p "
@@ -335,7 +323,6 @@ public class ProductDAO extends BaseDAO {
             sql.append(") ");
         }
 
-        // ORDER BY + OFFSET chỉ thêm khi không phải COUNT
         if (!isCount) {
             if ("price_asc".equals(sort)) {
                 sql.append("ORDER BY p.price ASC ");
@@ -359,9 +346,8 @@ public class ProductDAO extends BaseDAO {
         return ps;
     }
 
-    /**
-     * Đếm tổng số sản phẩm — dùng để tính tổng trang ở admin.
-     */
+
+    // Đếm tổng sp để tính tổng trang ở admin
     public int getTotalProducts() {
         String sql = "SELECT COUNT(*) AS total FROM Products";
 
@@ -377,9 +363,8 @@ public class ProductDAO extends BaseDAO {
         return 0;
     }
 
-    /**
-     * Đếm số sản phẩm thuộc một danh mục — dùng để tính số trang lọc theo danh mục.
-     */
+
+    //Đếm sp trong danh mục để tính số trang lọc theo danh mục
     public int countProductsByCategory(String categoryName) {
         String sql = "SELECT COUNT(*) FROM Products p "
                 + "INNER JOIN Categories c ON p.category_id = c.id "
@@ -399,9 +384,7 @@ public class ProductDAO extends BaseDAO {
         return 0;
     }
 
-    /**
-     * Thêm sản phẩm mới vào database.
-     */
+    //thêm sp vào database
     public boolean insertProduct(Product product) {
         String sql = "INSERT INTO Products "
                 + "(name, description, price, image, stock_quantity, "
@@ -423,7 +406,6 @@ public class ProductDAO extends BaseDAO {
             ps.setString(10, product.getSize());
 
             return ps.executeUpdate() > 0;
-
         } catch (Exception e) {
             System.err.println("Lỗi khi thêm sản phẩm: " + e.getMessage());
             e.printStackTrace();
@@ -431,9 +413,7 @@ public class ProductDAO extends BaseDAO {
         }
     }
 
-    /**
-     * Xóa sản phẩm theo ID.
-     */
+    // xóa sp
     public boolean deleteProduct(int productId) {
         String sql = "DELETE FROM Products WHERE id = ?";
 

@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: ADMIN
-  Date: 25/3/2026
-  Time: 1:53 PM
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
@@ -13,34 +6,69 @@
 
 <c:choose>
     <c:when test="${empty products}">
-        <div class="col-span-3 text-center py-12">
+        <div class="col-span-3 text-center py-12 text-gray-400">
+            <i class="fas fa-search text-4xl mb-3 block"></i>
             Không tìm thấy sản phẩm nào phù hợp.
         </div>
     </c:when>
     <c:otherwise>
         <c:forEach var="p" items="${products}">
-            <div class="product-card border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group product-item">
+
+            <div class="product-card border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group product-item relative">
+
+                    <%-- Hết hàng: badge đỏ góc trên trái --%>
+                <c:if test="${p.stock <= 0}">
+                    <div class="absolute top-2 left-2 z-10 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
+                        Hết hàng
+                    </div>
+                </c:if>
+                    <%-- Còn ít (1-5 cái): cam cảnh báo --%>
+                <c:if test="${p.stock > 0 && p.stock <= 5}">
+                    <div class="absolute top-2 left-2 z-10 bg-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded">
+                        Còn ${p.stock} cái
+                    </div>
+                </c:if>
 
                 <div class="relative block">
                     <a href="product-detail?id=${p.id}">
-                        <img src="images/${p.image}" class="w-full h-56 object-contain p-4" alt="${p.name}"/>
+                        <img src="images/${p.image}"
+                             class="w-full h-56 object-contain p-4 ${p.stock <= 0 ? 'opacity-50 grayscale' : ''}"
+                             alt="${p.name}"/>
                     </a>
-                    <div class="absolute inset-x-4 bottom-4">
-                        <a href="add-to-cart?id=${p.id}"
-                           class="block w-full bg-blue-600 text-white font-semibold py-2 rounded-lg text-center
-                                  opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            + Chọn nhanh
-                        </a>
-                    </div>
+
+                        <%-- chỉ hiện khi còn hàng --%>
+                    <c:if test="${p.stock > 0}">
+                        <div class="absolute inset-x-4 bottom-4">
+                            <a href="add-to-cart?id=${p.id}"
+                               class="block w-full bg-blue-600 text-white font-semibold py-2 rounded-lg text-center
+                                      opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                + Chọn nhanh
+                            </a>
+                        </div>
+                    </c:if>
                 </div>
 
                 <div class="p-4">
                     <h3 class="font-semibold text-base h-16 overflow-hidden line-clamp-2">
                         <a href="product-detail?id=${p.id}" class="hover:text-blue-600">${p.name}</a>
                     </h3>
-                    <p class="text-lg font-bold text-gray-800 mt-2">
-                        <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/>₫
-                    </p>
+
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-lg font-bold text-gray-800">
+                            <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/>₫
+                        </p>
+                        <c:choose>
+                            <c:when test="${p.stock <= 0}">
+                                <span class="text-xs text-red-500 font-medium">Hết hàng</span>
+                            </c:when>
+                            <c:when test="${p.stock <= 5}">
+                                <span class="text-xs text-orange-500 font-medium">Còn ít</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="text-xs text-green-600 font-medium">Còn hàng</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
 
             </div>
@@ -70,4 +98,3 @@
         </c:forEach>
     </div>
 </c:if>
-
