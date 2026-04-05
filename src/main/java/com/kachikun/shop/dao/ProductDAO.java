@@ -21,6 +21,9 @@ public class ProductDAO extends BaseDAO {
         product.setPrice(rs.getDouble("price"));
         product.setImage(rs.getString("image"));
         product.setStock(rs.getInt("stock_quantity"));
+        product.setSoldCount(rs.getInt("sold_count"));
+        product.setAverageRating(rs.getDouble("average_rating"));
+        product.setReviewCount(rs.getInt("review_count"));
         product.setConnectionType(rs.getString("connection_type"));
         product.setMaterial(rs.getString("material"));
         product.setSize(rs.getString("product_size"));
