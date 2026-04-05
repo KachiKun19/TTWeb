@@ -224,7 +224,11 @@ public class OrderDAO extends BaseDAO {
 
             ps.setString(1, newStatus);
             ps.setInt(2, orderId);
-            return ps.executeUpdate() > 0;
+            boolean ok = ps.executeUpdate() > 0;
+            if (ok && Order.STATUS_COMPLETED.equals(newStatus)) {
+                updateSoldCount(orderId);
+            }
+            return ok;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -595,5 +599,20 @@ public class OrderDAO extends BaseDAO {
             e.printStackTrace();
         }
         return revenueMap;
+    }
+
+    // cập nhật số lg sp bán
+    private void updateSoldCount(int orderId) {
+        String sql = "UPDATE Products SET sold_count = sold_count + od.quantity "
+                + "FROM Products p "
+                + "INNER JOIN OrderDetails od ON od.product_id = p.id "
+                + "WHERE od.order_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

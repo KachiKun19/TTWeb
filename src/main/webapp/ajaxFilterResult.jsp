@@ -54,6 +54,18 @@
                     </h3>
 
                     <div class="flex items-center justify-between mt-2">
+                        <div class="flex items-center gap-1">
+                            <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                <%-- Giả sử bạn đã thêm averageRating vào Model --%>
+                            <span class="text-xs font-semibold text-gray-700">${p.averageRating > 0 ? p.averageRating : '5.0'}</span>
+                        </div>
+                        <div class="text-[11px] text-gray-500">
+                                <%-- Giả sử bạn đã thêm soldCount vào Model --%>
+                            Đã bán: ${p.soldCount > 0 ? p.soldCount : '0'}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-2">
                         <p class="text-lg font-bold text-gray-800">
                             <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/>₫
                         </p>
