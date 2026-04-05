@@ -83,8 +83,8 @@ public class Order {
     public String getStatusColor() {
         if (STATUS_PENDING.equals(status))   return "text-yellow-700 bg-yellow-100";
         if (STATUS_SHIPPING.equals(status))  return "text-blue-700   bg-blue-100";
-        if (STATUS_DELIVERED.equals(status)
-                || STATUS_COMPLETED.equals(status)) return "text-green-700  bg-green-100";
+        if (STATUS_DELIVERED.equals(status))   return "text-green-700  bg-green-100";
+        if (STATUS_COMPLETED.equals(status)) return "bg-yellow-100 text-yellow-600";
         if (STATUS_CANCELLED.equals(status)) return "text-red-700    bg-red-100";
         return "text-gray-600 bg-gray-100";
     }

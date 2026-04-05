@@ -23,7 +23,11 @@ public class OrderDAO extends BaseDAO {
 
     private Order mapOrder(ResultSet rs) throws SQLException {
         Order order = new Order();
-        order.setId(rs.getInt("id"));
+        int id = rs.getInt("id");
+        if (rs.wasNull()) {
+            return null;
+        }
+        order.setId(id);
         order.setTotalPrice(rs.getDouble("total_price"));
         order.setStatus(rs.getString("status"));
         order.setOrderDate(rs.getDate("order_date"));
@@ -613,6 +617,48 @@ public class OrderDAO extends BaseDAO {
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public boolean completeOrderByUser(int orderId, int userId) {
+        String updateSql = "UPDATE Orders SET status = N'Hoàn thành', delivered_at = GETDATE() "
+                + "WHERE id = ? AND user_id = ? AND status = N'Đã giao'";
+
+        String soldSql = "UPDATE Products SET sold_count = sold_count + od.quantity "
+                + "FROM Products p "
+                + "INNER JOIN OrderDetails od ON od.product_id = p.id "
+                + "WHERE od.order_id = ?";
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+
+            // Chuyển trạng thái
+            try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+                ps.setInt(1, orderId);
+                ps.setInt(2, userId);
+                if (ps.executeUpdate() == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            //  Cập nhật sold_count
+            try (PreparedStatement ps = conn.prepareStatement(soldSql)) {
+                ps.setInt(1, orderId);
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+
+        } catch (Exception e) {
+            if (conn != null) try { conn.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
         }
     }
 }

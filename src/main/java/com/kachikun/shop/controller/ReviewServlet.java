@@ -1,5 +1,6 @@
 package com.kachikun.shop.controller;
 
+import com.kachikun.shop.dao.OrderDAO;
 import com.kachikun.shop.dao.ReviewDAO;
 import com.kachikun.shop.model.Review;
 import com.kachikun.shop.model.User;
@@ -16,6 +17,7 @@ import java.io.IOException;
 public class ReviewServlet extends HttpServlet {
 
     private final ReviewDAO reviewDAO = new ReviewDAO();
+    private final OrderDAO  orderDAO  = new OrderDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -24,13 +26,14 @@ public class ReviewServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession(false);
 
+        // Kiểm tra đăng nhập
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login");
             return;
         }
 
         User user = (User) session.getAttribute("user");
-        // thông tin từ dánh giá
+
         String productIdStr = request.getParameter("productId");
         String ratingStr    = request.getParameter("rating");
         String comment      = request.getParameter("comment");
@@ -51,23 +54,18 @@ public class ReviewServlet extends HttpServlet {
         }
 
         if (rating < 1 || rating > 5) {
-            response.sendRedirect("product-detail?id=" + productId + "&reviewError=invalid");
+            response.sendRedirect("order-history?reviewError=invalid");
             return;
         }
 
-        if (!reviewDAO.hasPurchased(productId, user.getId())) {
-            response.sendRedirect("product-detail?id=" + productId + "&reviewError=notPurchased");
-            return;
-        }
-
-        //Lấy order_id chưa review
+        // Lấy order_id hợp lệ
         int orderId = reviewDAO.getEligibleOrderId(productId, user.getId());
         if (orderId == -1) {
-            // Đã review tất cả đơn có sản phẩm này
-            response.sendRedirect("product-detail?id=" + productId + "&reviewError=alreadyReviewed");
+            response.sendRedirect("order-history?reviewError=notEligible");
             return;
         }
-        // lưu review vào database
+
+        // Lưu review
         Review review = new Review();
         review.setProductId(productId);
         review.setUserId(user.getId());
@@ -78,9 +76,12 @@ public class ReviewServlet extends HttpServlet {
         boolean ok = reviewDAO.insertReview(review);
 
         if (ok) {
-            response.sendRedirect("product-detail?id=" + productId + "&reviewSuccess=1");
+            if (reviewDAO.isAllProductsReviewed(orderId, user.getId())) {
+                orderDAO.completeOrderByUser(orderId, user.getId());
+            }
+            response.sendRedirect("order-history?reviewSuccess=1");
         } else {
-            response.sendRedirect("product-detail?id=" + productId + "&reviewError=failed");
+            response.sendRedirect("order-history?reviewError=failed");
         }
     }
 }
