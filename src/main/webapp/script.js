@@ -1,6 +1,5 @@
-
 const backgroundElement = document.getElementById("banner-background");
-const dots = document.querySelectorAll(".slider-nav .dot"); 
+const dots = document.querySelectorAll(".slider-nav .dot");
 
 
 if (backgroundElement && dots.length > 0) {
@@ -10,22 +9,22 @@ if (backgroundElement && dots.length > 0) {
 		"https://cdn2.fptshop.com.vn/unsafe/0x0/hinh_nen_may_tinh_bang_9_a5b793ee3d.jpg",
 		"https://cdn2.fptshop.com.vn/unsafe/0x0/hinh_nen_may_tinh_bang_11_90150a3686.jpg",
 	];
-	let currentIndex = 0; 
-	let slideInterval; 
+	let currentIndex = 0;
+	let slideInterval;
 
 	/**
 
-	 * @param {number} index 
+	 * @param {number} index
 	 */
 	function updateSlider(index) {
-		
+
 		backgroundElement.style.backgroundImage = `url('${images[index]}')`;
 
-		
+
 		dots.forEach((dot) => {
-			dot.classList.remove("active"); 
+			dot.classList.remove("active");
 		});
-		dots[index].classList.add("active"); 
+		dots[index].classList.add("active");
 
 		currentIndex = index;
 	}
@@ -36,8 +35,8 @@ if (backgroundElement && dots.length > 0) {
 	}
 
 	function startSlideShow() {
-		clearInterval(slideInterval); 
-		slideInterval = setInterval(nextSlide, 5000); 
+		clearInterval(slideInterval);
+		slideInterval = setInterval(nextSlide, 5000);
 	}
 
 	dots.forEach((dot) => {
@@ -46,13 +45,13 @@ if (backgroundElement && dots.length > 0) {
 
 			if (targetIndex !== currentIndex) {
 				updateSlider(targetIndex);
-				startSlideShow(); 
+				startSlideShow();
 			}
 		});
 	});
 
-	updateSlider(0); 
-	startSlideShow(); 
+	updateSlider(0);
+	startSlideShow();
 }
 
 
@@ -84,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	if (userBtn && userDropdown) {
 		userBtn.addEventListener("click", function(e) {
-			e.stopPropagation(); 
+			e.stopPropagation();
 			userDropdown.classList.toggle("hidden");
 		});
 		document.addEventListener("click", function(e) {
@@ -97,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 function initCustomAccordion() {
-	
+
 	const buttons = document.querySelectorAll(
 		"#filter-heading-brands button, #filter-heading-connection button, #filter-heading-material button,#filter-heading-size button"
 	);
@@ -122,20 +121,20 @@ initCustomAccordion();
 
 
 function initPageSlider() {
-	
+
 	const navButtons = document.querySelectorAll("a[data-target]");
 
 	navButtons.forEach((button) => {
 		button.addEventListener("click", (e) => {
 			e.preventDefault();
 
-			const targetPageId = button.dataset.target; 
+			const targetPageId = button.dataset.target;
 			const targetPage = document.getElementById(targetPageId);
 
-			
+
 			const currentPage = document.querySelector(".page-content.active");
 
-			
+
 			if (!targetPage || targetPage === currentPage) {
 				return;
 			}
@@ -148,7 +147,7 @@ function initPageSlider() {
 
 			setTimeout(() => {
 				currentPage.classList.remove("slide-out-left");
-			}, 400); 
+			}, 400);
 		});
 	});
 }
@@ -160,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const hash = window.location.hash.substring(1);
 
 	if (hash) {
-		
+
 		const targetId = "page-" + hash;
 		const targetPage = document.getElementById(targetId);
 
@@ -181,38 +180,38 @@ function searchByName(param) {
 	var txtSearch = param.value;
 	var resultContainer = document.getElementById("search-results");
 
-	
+
 	if (txtSearch.trim() === "") {
 		resultContainer.classList.add("hidden");
 		resultContainer.innerHTML = "";
 		return;
 	}
 
-	
+
 	fetch("ajaxSearch?txt=" + encodeURIComponent(txtSearch))
 		.then(response => response.text())
 		.then(data => {
-			
+
 			resultContainer.classList.remove("hidden");
-			
+
 			resultContainer.innerHTML = data;
 		})
 		.catch(error => console.error('Lỗi:', error));
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-	
+
 	const buttons = document.querySelectorAll(".add-to-cart");
 
 	buttons.forEach(btn => {
 		btn.addEventListener("click", function(e) {
-			e.preventDefault(); 
+			e.preventDefault();
 
-			
+
 			const productId = this.getAttribute("data-id");
 
-			
-			
+
+
 			window.location.href = "add-to-cart?id=" + productId;
 		});
 	});
@@ -224,25 +223,25 @@ document.addEventListener("DOMContentLoaded", function() {
 	const btnPrev = document.getElementById('btnPrev');
 	const btnNext = document.getElementById('btnNext');
 
-	
+
 	if (categoryList && btnPrev && btnNext) {
 
-		
+
 		btnNext.addEventListener('click', () => {
 			const item = categoryList.querySelector('.category-item');
-			
+
 			const val = item.offsetWidth + 20;
 
-			
+
 			categoryList.scrollLeft += val;
 		});
 
-		
+
 		btnPrev.addEventListener('click', () => {
 			const item = categoryList.querySelector('.category-item');
 			const val = item.offsetWidth + 20;
 
-			
+
 			categoryList.scrollLeft -= val;
 		});
 	}
@@ -250,49 +249,127 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 function filterProducts(index = 1) {
-		    let params = new URLSearchParams();
+	let params = new URLSearchParams();
 
-		    
-		    params.append("index", index);
-			
-			
-			const categoryInput = document.getElementById("current-category-slug");
-			    if (categoryInput && categoryInput.value) {
-			        params.append("category", categoryInput.value);
-			    }
 
-		    document.querySelectorAll('input[id^="filter-brand-"]:checked').forEach(chk => params.append("brand", chk.value));
-		    document.querySelectorAll('input[id^="filter-connection-"]:checked').forEach(chk => params.append("connection", chk.value));
-		    document.querySelectorAll('input[id^="filter-material-"]:checked').forEach(chk => params.append("material", chk.value));
-		    document.querySelectorAll('input[id^="filter-size-"]:checked').forEach(chk => params.append("size", chk.value));
+	params.append("index", index);
 
-		    
-		    fetch("ajaxFilter?" + params.toString())
-		        .then(response => response.text())
-		        .then(data => {
-		            const productGrid = document.getElementById("productGrid");
-		            if (productGrid) {
-		                productGrid.innerHTML = data;
-		            }
-					const defaultPagination = document.getElementById("default-pagination");
-					            if (defaultPagination) {
-					                defaultPagination.classList.add("hidden"); 
-					            }
-								
-								    const hiddenTotal = document.getElementById("ajax-total-res");
-								    const countDisplay = document.getElementById("count-display");
 
-								    if (hiddenTotal && countDisplay) {
-								        
-								        countDisplay.innerText = "Hiển thị " + hiddenTotal.value + " sản phẩm";
-									}
-		        })
-		        .catch(error => console.error('Lỗi lọc:', error));
+	const categoryInput = document.getElementById("current-category-slug");
+	if (categoryInput && categoryInput.value) {
+		params.append("category", categoryInput.value);
+	}
+
+	document.querySelectorAll('input[id^="filter-brand-"]:checked').forEach(chk => params.append("brand", chk.value));
+	document.querySelectorAll('input[id^="filter-connection-"]:checked').forEach(chk => params.append("connection", chk.value));
+	document.querySelectorAll('input[id^="filter-material-"]:checked').forEach(chk => params.append("material", chk.value));
+	document.querySelectorAll('input[id^="filter-size-"]:checked').forEach(chk => params.append("size", chk.value));
+
+
+	fetch("ajaxFilter?" + params.toString())
+		.then(response => response.text())
+		.then(data => {
+			const productGrid = document.getElementById("productGrid");
+			if (productGrid) {
+				productGrid.innerHTML = data;
+			}
+			const defaultPagination = document.getElementById("default-pagination");
+			if (defaultPagination) {
+				defaultPagination.classList.add("hidden");
+			}
+
+			const hiddenTotal = document.getElementById("ajax-total-res");
+			const countDisplay = document.getElementById("count-display");
+
+			if (hiddenTotal && countDisplay) {
+
+				countDisplay.innerText = "Hiển thị " + hiddenTotal.value + " sản phẩm";
+			}
+		})
+		.catch(error => console.error('Lỗi lọc:', error));
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+	const checkboxes = document.querySelectorAll('.filter-content input[type="checkbox"]');
+	checkboxes.forEach(chk => {
+		chk.addEventListener("change", () => filterProducts(1));
+	});
+});
+
+// model đánh giá
+function openCancelModal(orderId) {
+	const inputId = document.getElementById('cancelOrderId');
+	if (inputId) {
+		inputId.value = orderId;
+		document.getElementById('cancelModal').classList.remove('hidden');
+	}
+}
+
+function closeCancelModal() {
+	document.getElementById('cancelModal').classList.add('hidden');
+}
+
+async function openReviewModal(orderId, contextPath) {
+	const cleanId = orderId.toString().trim();
+	if (!cleanId) return;
+
+	document.getElementById('modalOrderId').textContent = cleanId;
+	document.getElementById('reviewModal').classList.remove('hidden');
+
+	try {
+		const res = await fetch(`${contextPath}/order-review?orderId=${cleanId}`);
+		if (!res.ok) throw new Error(`Lỗi: ${res.status}`);
+
+		const html = await res.text();
+		// innerHTML không chạy <script> nên dùng onclick="setRating(...)" trong fragment
+		document.getElementById('reviewContent').innerHTML = html;
+	} catch (e) {
+		console.error(e);
+		alert("Không thể tải form đánh giá.");
+	}
+}
+
+function closeReviewModal() {
+	document.getElementById('reviewModal').classList.add('hidden');
+}
+
+document.addEventListener('click', function (e) {
+	// Tìm phần tử star-btn gần nhất với vị trí click
+	const star = e.target.closest('.star-btn');
+	if (star) {
+		const container = star.closest('.star-container');
+		if (container) {
+			const productId = container.getAttribute('data-product-id');
+			const value = parseInt(star.getAttribute('data-value'));
+
+			if (productId && value) {
+				executeSetRating(productId, value);
+			}
 		}
+	}
+});
 
-		document.addEventListener("DOMContentLoaded", function() {
-		    const checkboxes = document.querySelectorAll('.filter-content input[type="checkbox"]');
-		    checkboxes.forEach(chk => {
-		        chk.addEventListener("change", () => filterProducts(1)); 
-		    });
+// Hàm logic xử lý (không cần phơi ra global window nếu dùng cách trên)
+function executeSetRating(productId, value) {
+	console.log('Đang chọn ' + value + ' sao cho SP: ' + productId);
+
+	const input = document.getElementById('rating-' + productId);
+	if (input) input.value = value;
+
+	const label = document.getElementById('rating-label-' + productId);
+	if (label) label.textContent = value + ' sao';
+
+	const starsContainer = document.getElementById('stars-' + productId);
+	if (starsContainer) {
+		const stars = starsContainer.querySelectorAll('.star-btn');
+		stars.forEach((s, index) => {
+			if (index < value) {
+				s.classList.add('text-yellow-400');
+				s.classList.remove('text-gray-300');
+			} else {
+				s.classList.remove('text-yellow-400');
+				s.classList.add('text-gray-300');
+			}
 		});
+	}
+}

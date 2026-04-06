@@ -1,7 +1,10 @@
 package com.kachikun.shop.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -10,13 +13,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import com.kachikun.shop.dao.OrderDAO;
+import com.kachikun.shop.dao.ProductDAO;
+import com.kachikun.shop.dao.ReviewDAO;
 import com.kachikun.shop.model.Order;
+import com.kachikun.shop.model.OrderDetail;
+import com.kachikun.shop.model.Product;
 import com.kachikun.shop.model.User;
 
 @WebServlet("/order-history")
 public class OrderHistoryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private OrderDAO orderDAO = new OrderDAO();
+	private OrderDAO  orderDAO  = new OrderDAO();
+	private ReviewDAO reviewDAO = new ReviewDAO();
+	private ProductDAO productDAO = new ProductDAO();
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -31,7 +40,7 @@ public class OrderHistoryServlet extends HttpServlet {
 		String action = request.getParameter("action");
 		String idStr  = request.getParameter("id");
 
-		// Hủy đơn từ ng dùng
+		// Hủy đơn
 		if ("cancel".equals(action) && idStr != null) {
 			int orderId = Integer.parseInt(idStr);
 			String reason = request.getParameter("cancel_reason");
@@ -41,13 +50,28 @@ public class OrderHistoryServlet extends HttpServlet {
 			if (cancelled) {
 				request.setAttribute("msg", "Đã hủy đơn hàng #" + orderId + " thành công.");
 			} else {
-				request.setAttribute("error",
-						"Không thể hủy đơn hàng #" + orderId + ". Đơn đã được xử lý hoặc đang giao!");
+				request.setAttribute("error", "Không thể hủy đơn hàng #" + orderId + ". Đơn đã được xử lý hoặc đang giao!");
 			}
 		}
 
+		// Lấy danh sách đơn hàng
 		List<Order> myOrders = orderDAO.getOrdersByUserId(user.getId());
+
+		Map<Integer, List<Product>> unreviewedMap = new HashMap<>();
+		for (Order o : myOrders) {
+			if ("Đã giao".equals(o.getStatus())) {
+				List<Integer> unreviewedIds = reviewDAO.getUnreviewedProductIds(o.getId(), user.getId());
+				List<Product> unreviewedProducts = new java.util.ArrayList<>();
+				for (int pid : unreviewedIds) {
+					Product p = productDAO.getProductById(pid);
+					if (p != null) unreviewedProducts.add(p);
+				}
+				unreviewedMap.put(o.getId(), unreviewedProducts);
+			}
+		}
+
 		request.setAttribute("myOrders", myOrders);
+		request.setAttribute("unreviewedMap", unreviewedMap);
 		request.getRequestDispatcher("orderHistory.jsp").forward(request, response);
 	}
 
