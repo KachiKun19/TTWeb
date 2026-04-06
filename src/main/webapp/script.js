@@ -373,3 +373,41 @@ function executeSetRating(productId, value) {
 		});
 	}
 }
+// gộp đánh giá sp
+async function submitBulkReviews() {
+	const orderId = document.getElementById('bulkOrderId').value;
+	const items = document.querySelectorAll('.review-item');
+	const reviews = [];
+
+	items.forEach(item => {
+		const productId = item.getAttribute('data-product-id');
+		const rating = item.querySelector('.product-rating').value;
+		const comment = item.querySelector('.product-comment').value;
+
+		reviews.push({
+			productId: productId,
+			rating: rating,
+			comment: comment
+		});
+	});
+
+	try {
+		const response = await fetch('review-bulk', { // Bạn sẽ tạo Servlet /review-bulk
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				orderId: orderId,
+				reviews: reviews
+			})
+		});
+
+		if (response.ok) {
+			alert("Cảm ơn bạn đã đánh giá đơn hàng!");
+			window.location.reload();
+		} else {
+			alert("Có lỗi xảy ra khi gửi đánh giá.");
+		}
+	} catch (error) {
+		console.error("Error:", error);
+	}
+}
