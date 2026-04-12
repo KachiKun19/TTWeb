@@ -59,7 +59,7 @@
 	</div>
 
 	<!-- Thông báo -->
-	<c:if test="${not empty msg}">
+	<c:if test="${not empty msg && not empty paymentMethod}">
 		<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
 			<i class="fa-solid fa-circle-check text-green-500"></i>
 			<span class="text-green-700 text-sm">${msg}</span>

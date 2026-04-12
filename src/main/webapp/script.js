@@ -392,7 +392,7 @@ async function submitBulkReviews() {
 	});
 
 	try {
-		const response = await fetch('review-bulk', { // Bạn sẽ tạo Servlet /review-bulk
+		const response = await fetch('review-bulk', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -402,10 +402,13 @@ async function submitBulkReviews() {
 		});
 
 		if (response.ok) {
-			alert("Cảm ơn bạn đã đánh giá đơn hàng!");
-			window.location.reload();
-		} else {
-			alert("Có lỗi xảy ra khi gửi đánh giá.");
+			const mainContent = document.getElementById('reviewMainContent');
+			const successMsg = document.getElementById('reviewSuccessMessage');
+
+			if(mainContent && successMsg) {
+				mainContent.classList.add('hidden');
+				successMsg.classList.remove('hidden');
+			}
 		}
 	} catch (error) {
 		console.error("Error:", error);
