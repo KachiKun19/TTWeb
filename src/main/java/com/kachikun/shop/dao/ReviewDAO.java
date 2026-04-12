@@ -162,4 +162,20 @@ public class ReviewDAO extends BaseDAO {
         r.setFullName(rs.getString("full_name"));
         return r;
     }
+
+    public boolean hasUserReviewedProduct(int productId, int userId, int orderId) {
+        String sql = "SELECT 1 FROM ProductReviews WHERE product_id = ? AND user_id = ? AND order_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ps.setInt(2, userId);
+            ps.setInt(3, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

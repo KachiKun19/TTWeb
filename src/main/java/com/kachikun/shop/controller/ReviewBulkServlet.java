@@ -3,6 +3,7 @@ package com.kachikun.shop.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.kachikun.shop.dao.OrderDAO;
 import com.kachikun.shop.dao.ReviewDAO;
 import com.kachikun.shop.model.Review;
 import com.kachikun.shop.model.User;
@@ -18,8 +19,8 @@ import java.io.IOException;
 
 @WebServlet("/review-bulk")
 public class ReviewBulkServlet extends HttpServlet {
-
     private final ReviewDAO reviewDAO = new ReviewDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -27,6 +28,7 @@ public class ReviewBulkServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
+
         if (user == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
@@ -49,30 +51,43 @@ public class ReviewBulkServlet extends HttpServlet {
             boolean allSuccess = true;
 
             for (int i = 0; i < reviewsArray.size(); i++) {
-                JsonObject revJson = reviewsArray.get(i).getAsJsonObject();
-                
-                Review r = new Review();
-                r.setOrderId(orderId);
-                r.setUserId(user.getId());
-                r.setProductId(revJson.get("productId").getAsInt());
-                r.setRating(revJson.get("rating").getAsInt());
-                r.setComment(revJson.get("comment").getAsString());
+                try {
+                    JsonObject revJson = reviewsArray.get(i).getAsJsonObject();
+                    Review r = new Review();
+                    r.setOrderId(orderId);
+                    r.setUserId(user.getId());
+                    r.setProductId(revJson.get("productId").getAsInt());
+                    r.setRating(Integer.parseInt(revJson.get("rating").getAsString()));
+                    r.setComment(revJson.get("comment").getAsString());
 
-                boolean ok = reviewDAO.insertReview(r);
-                if (!ok) allSuccess = false;
+                    boolean ok = reviewDAO.insertReview(r);
+                    if (!ok) {
+                        allSuccess = false;
+                    }
+                } catch (Exception e) {
+                    System.out.println("Lỗi xử lý sản phẩm: " + e.getMessage());
+                    allSuccess = false;
+                }
+            }
+
+            if (reviewDAO.isAllProductsReviewed(orderId, user.getId())) {
+                orderDAO.completeOrderByUser(orderId, user.getId());
+
+                if (session != null) {
+                    session.setAttribute("msg", "Cảm ơn bạn đã đánh giá toàn bộ đơn hàng!");
+                }
+            } else if (allSuccess) {
+                if (session != null) {
+                    session.setAttribute("msg", "Đánh giá của bạn đã được ghi nhận.");
+                }
             }
 
             response.setContentType("application/json");
-            if (allSuccess) {
-                response.getWriter().write("{\"status\": \"success\"}");
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("{\"status\": \"partial_error\"}");
-            }
+            response.getWriter().write("{\"status\": \"success\"}");
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }
