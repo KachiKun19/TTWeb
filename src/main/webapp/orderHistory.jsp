@@ -59,7 +59,7 @@
 	</div>
 
 	<!-- Thông báo -->
-	<c:if test="${not empty msg}">
+	<c:if test="${not empty msg && not empty paymentMethod}">
 		<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
 			<i class="fa-solid fa-circle-check text-green-500"></i>
 			<span class="text-green-700 text-sm">${msg}</span>
@@ -118,7 +118,6 @@
 								<div class="flex items-center gap-1">
 									<c:set var="s" value="${o.timelineStep}"/>
 
-									<!-- Bước 1 -->
 									<div class="flex items-center gap-1">
 										<div class="w-6 h-6 rounded-full flex items-center justify-center text-xs
                                             ${s >= 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}">
@@ -128,7 +127,6 @@
 									</div>
 									<div class="flex-1 h-0.5 ${s >= 2 ? 'bg-blue-400' : 'bg-gray-200'} mx-1"></div>
 
-									<!-- Bước 2 -->
 									<div class="flex items-center gap-1">
 										<div class="w-6 h-6 rounded-full flex items-center justify-center
                                             ${s >= 2 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}">
@@ -138,7 +136,7 @@
 									</div>
 									<div class="flex-1 h-0.5 ${s >= 3 ? 'bg-green-400' : 'bg-gray-200'} mx-1"></div>
 
-									<!-- Bước 3 -->
+
 									<div class="flex items-center gap-1">
 										<div class="w-6 h-6 rounded-full flex items-center justify-center
                                             ${s >= 3 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}">
@@ -148,13 +146,15 @@
 									</div>
 									<div class="flex-1 h-0.5 ${s >= 4 ? 'bg-green-600' : 'bg-gray-200'} mx-1"></div>
 
-									<!-- Bước 4 -->
 									<div class="flex items-center gap-1">
 										<div class="w-6 h-6 rounded-full flex items-center justify-center
                                             ${s >= 4 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-400'}">
 											<i class="fa-solid fa-star text-xs"></i>
 										</div>
-										<span class="text-xs ${s >= 4 ? 'text-gray-700' : 'text-gray-400'}">Hoàn thành</span>
+										<span class="px-3 py-1 rounded-full text-xs font-bold
+    											${o.status == 'Hoàn thành' ? 'bg-yellow-100 text-yellow-600' : o.statusColor}">
+												${o.status}
+										</span>
 									</div>
 								</div>
 							</div>
@@ -170,7 +170,6 @@
 							</div>
 						</c:if>
 
-						<!-- Footer: tổng tiền + actions -->
 						<div class="flex items-center justify-between px-5 py-4 border-t border-gray-100">
 							<div>
 								<span class="text-xs text-gray-400">Tổng tiền</span>
@@ -188,9 +187,17 @@
 									</a>
 								</c:if>
 
-								<!-- Nút hủy — chỉ khi Đang xử lý -->
+								<!-- Nút Đánh giá  -->
+								<c:if test="${o.status == 'Đã giao'}">
+									<button onclick="openReviewModal('${o.id}', '${pageContext.request.contextPath}')"
+											class="px-4 py-2 rounded-xl text-sm bg-purple-600 text-white ...">
+										<i class="fa-solid fa-star mr-1"></i>Đánh giá
+									</button>
+								</c:if>
+
+								<!-- Nút hủy  -->
 								<c:if test="${o.cancellable}">
-									<button onclick="openCancelModal(${o.id})"
+									<button onclick="openCancelModal('${o.id}')"
 											class="px-4 py-2 rounded-xl text-sm bg-red-50 text-red-600
                                                hover:bg-red-100 transition font-medium">
 										<i class="fa-solid fa-ban mr-1"></i>Hủy đơn
@@ -204,19 +211,29 @@
 		</c:otherwise>
 	</c:choose>
 </div>
+<!-- model đánh giá -->
+<div id="reviewModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 transition-all duration-300">
+	<div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl overflow-hidden transform transition-all scale-95 border border-gray-100">
 
-<script>
-	function openCancelModal(orderId) {
-		document.getElementById('cancelOrderId').value = orderId;
-		document.getElementById('cancelModal').classList.remove('hidden');
-	}
-	function closeCancelModal() {
-		document.getElementById('cancelModal').classList.add('hidden');
-	}
-	// Đóng modal khi click vào nền
-	document.getElementById('cancelModal').addEventListener('click', function(e) {
-		if (e.target === this) closeCancelModal();
-	});
-</script>
+		<div class="px-8 py-6 border-b flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
+			<div>
+				<h3 class="text-2xl font-extrabold text-gray-800 tracking-tight">
+					Đánh giá đơn hàng <span class="text-pink-600">#<span id="modalOrderId"></span></span>
+				</h3>
+				<p class="text-sm text-gray-500 mt-1">Chia sẻ trải nghiệm của bạn để giúp chúng tôi tốt hơn</p>
+			</div>
+			<button onclick="closeReviewModal()"
+					class="w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all text-2xl">
+				<i class="fa-solid fa-xmark"></i>
+			</button>
+		</div>
+
+		<div id="reviewContent" class="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar bg-white">
+		</div>
+	</div>
+</div>
+
+
+<script src="${pageContext.request.contextPath}/script.js"></script>
 </body>
 </html>
