@@ -126,7 +126,7 @@
         }
         .resend-link {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 12px;
             font-size: 13px;
         }
         a {
@@ -139,6 +139,37 @@
         }
         a:hover {
             text-decoration: underline;
+        }
+        .btn-resend {
+            background: transparent;
+            border: 1px solid #2d7e7e;
+            color: #2d7e7e;
+            box-shadow: none;
+            margin-top: 0;
+            font-size: 12px;
+            padding: 9px 28px;
+        }
+        .btn-resend:hover:not(:disabled) {
+            background: rgba(45, 126, 126, 0.08);
+            box-shadow: none;
+            transform: none;
+        }
+        .btn-resend:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .otp-timer-wrap {
+            text-align: center;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .alert-warning {
+            background-color: #fff7ed;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
         }
     </style>
 </head>
@@ -157,13 +188,25 @@
         </c:if>
         
         <c:choose>
-            <c:when test="${step == 'verify' || not empty email}">
+            <c:when test="${step == 'verify' || (step != 'reset' && not empty email)}">
                 <%-- Bước 2: Nhập OTP --%>
-                <p>Chúng tôi đã gửi mã OTP đến email: <strong>${email}</strong></p>
-                <form action="forgotPassword" method="post">
+                <p style="margin: 10px 0 12px;">Chúng tôi đã gửi mã OTP đến email:<br/><strong>${email}</strong></p>
+
+                <%-- Đồng hồ đếm ngược 5 phút --%>
+                <div class="otp-timer-wrap" id="otpTimerWrap">
+                    <i class="fas fa-clock" style="color:#2d7e7e;"></i>
+                    OTP hết hạn sau:
+                    <strong id="otpTimerDisplay" style="color:#2d7e7e; font-size:15px;">5:00</strong>
+                </div>
+                <div class="alert alert-error" id="otpExpiredMsg" style="display:none;">
+                    <i class="fas fa-hourglass-end"></i>
+                    Mã OTP đã hết hạn! Vui lòng nhấn <strong>Gửi lại OTP</strong> để nhận mã mới.
+                </div>
+
+                <form action="forgotPassword" method="post" id="verifyForm">
                     <input type="hidden" name="action" value="verify">
                     <input type="hidden" name="email" value="${email}">
-                    
+
                     <div class="otp-container">
                         <input type="text" name="otp1" class="otp-input" maxlength="1" required autocomplete="off">
                         <input type="text" name="otp2" class="otp-input" maxlength="1" required autocomplete="off">
@@ -172,18 +215,45 @@
                         <input type="text" name="otp5" class="otp-input" maxlength="1" required autocomplete="off">
                         <input type="text" name="otp6" class="otp-input" maxlength="1" required autocomplete="off">
                     </div>
-                    
-                    <input type="password" id="newPass" name="newPassword" placeholder="Mật khẩu mới" required oninput="validatePassword()">
-<input type="password" id="confirmPass" name="confirmPassword" placeholder="Xác nhận mật khẩu mới" required oninput="validatePassword()">
 
-<div id="passwordError" style="color: red; font-size: 12px; margin-bottom: 10px; display: none;"></div>
-
-<button type="submit" id="btnSubmit" onclick="return validatePassword()">Đặt lại mật khẩu</button>
+                    <button type="submit" id="btnSubmit">Xác nhận OTP</button>
                 </form>
-                
+
+                <%-- Form ẩn để gửi lại OTP bằng POST --%>
+                <form id="resendForm" action="forgotPassword" method="post" style="display:none;">
+                    <input type="hidden" name="action" value="resend">
+                    <input type="hidden" name="email" value="${email}">
+                </form>
+
                 <div class="resend-link">
-                    Không nhận được mã? <a href="forgotPassword?email=${email}&action=resend">Gửi lại mã OTP</a>
+                    <button type="button" id="resendBtn" class="btn-resend" disabled onclick="doResendOtp()">
+                        Gửi lại OTP
+                    </button>
+                    <div id="resendTimerWrap" style="margin-top:6px; font-size:12px; color:#888;">
+                        <i class="fas fa-rotate-right"></i>
+                        Có thể gửi lại sau: <strong id="resendCountdown" style="color:#2d7e7e;">60</strong>s
+                    </div>
                 </div>
+            </c:when>
+
+            <c:when test="${step == 'reset'}">
+                <%-- Bước 3: Đặt mật khẩu mới --%>
+                <p style="margin: 10px 0 20px;">
+                    <i class="fas fa-check-circle" style="color:#16a34a;"></i>
+                    Xác thực thành công! Vui lòng nhập mật khẩu mới cho tài khoản:<br/>
+                    <strong>${email}</strong>
+                </p>
+
+                <form action="forgotPassword" method="post" id="resetForm">
+                    <input type="hidden" name="action" value="reset">
+
+                    <input type="password" id="newPass" name="newPassword" placeholder="Mật khẩu mới" required oninput="validatePassword()">
+                    <input type="password" id="confirmPass" name="confirmPassword" placeholder="Xác nhận mật khẩu mới" required oninput="validatePassword()">
+
+                    <div id="passwordError" style="color: red; font-size: 12px; margin-bottom: 10px; display: none;"></div>
+
+                    <button type="submit" id="btnSubmit" onclick="return validatePassword()">Đặt lại mật khẩu</button>
+                </form>
             </c:when>
             
             <c:otherwise>
@@ -201,7 +271,8 @@
     </div>
 
     <script>
-        
+
+        // ── OTP input navigation ──────────────────────────────────────────
         const otpInputs = document.querySelectorAll('.otp-input');
         otpInputs.forEach((input, index) => {
             input.addEventListener('input', (e) => {
@@ -209,63 +280,134 @@
                     otpInputs[index + 1].focus();
                 }
             });
-            
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace' && !e.target.value && index > 0) {
                     otpInputs[index - 1].focus();
                 }
             });
         });
-        
-        
+
         document.addEventListener('paste', (e) => {
             const activeElement = document.activeElement;
             if (activeElement && activeElement.classList.contains('otp-input')) {
                 const pastedData = e.clipboardData.getData('text');
                 if (pastedData.length === 6) {
                     otpInputs.forEach((input, index) => {
-                        if (index < pastedData.length) {
-                            input.value = pastedData[index];
-                        }
+                        if (index < pastedData.length) input.value = pastedData[index];
                     });
                     otpInputs[5].focus();
                     e.preventDefault();
                 }
             }
         });
-        
+
+        // ── OTP timer + resend cooldown ───────────────────────────────────
+        (function () {
+            var sentAtEl = document.getElementById('otpTimerWrap');
+            if (!sentAtEl) return; // không ở bước verify
+
+            var OTP_SENT_AT = ${not empty otpSentAt ? otpSentAt : 0};
+            if (OTP_SENT_AT === 0) return;
+
+            var now = Date.now();
+            var elapsed = Math.floor((now - OTP_SENT_AT) / 1000);
+
+            var otpRemaining  = Math.max(0, 300 - elapsed); // 5 phút
+            var resendRemaining = Math.max(0, 60 - elapsed); // 60 giây
+
+            var timerWrap    = document.getElementById('otpTimerWrap');
+            var timerDisplay = document.getElementById('otpTimerDisplay');
+            var expiredMsg   = document.getElementById('otpExpiredMsg');
+            var btnSubmit    = document.getElementById('btnSubmit');
+            var resendBtn    = document.getElementById('resendBtn');
+            var resendCdEl   = document.getElementById('resendCountdown');
+
+            function fmt(s) {
+                var m = Math.floor(s / 60), sec = s % 60;
+                return m + ':' + (sec < 10 ? '0' : '') + sec;
+            }
+
+            function applyOtpExpired() {
+                timerWrap.style.display = 'none';
+                expiredMsg.style.display = 'block';
+                btnSubmit.disabled = true;
+                btnSubmit.style.opacity = '0.45';
+                btnSubmit.style.cursor = 'not-allowed';
+            }
+
+            var resendTimerWrap = document.getElementById('resendTimerWrap');
+
+            function applyResendReady() {
+                resendBtn.disabled = false;
+                resendTimerWrap.style.display = 'none';
+            }
+
+            // Render trạng thái ban đầu
+            if (otpRemaining === 0) {
+                applyOtpExpired();
+            } else {
+                timerDisplay.textContent = fmt(otpRemaining);
+            }
+
+            if (resendRemaining === 0) {
+                applyResendReady();
+            } else {
+                resendCdEl.textContent = resendRemaining;
+            }
+
+            if (otpRemaining === 0 && resendRemaining === 0) return;
+
+            var interval = setInterval(function () {
+                if (otpRemaining > 0)    otpRemaining--;
+                if (resendRemaining > 0) resendRemaining--;
+
+                // Cập nhật đồng hồ OTP
+                if (otpRemaining > 0) {
+                    timerDisplay.textContent = fmt(otpRemaining);
+                    if (otpRemaining <= 60) timerDisplay.style.color = '#dc2626';
+                } else {
+                    applyOtpExpired();
+                }
+
+                // Cập nhật đếm ngược gửi lại
+                if (resendRemaining > 0) {
+                    resendCdEl.textContent = resendRemaining;
+                } else {
+                    applyResendReady();
+                }
+
+                if (otpRemaining === 0 && resendRemaining === 0) clearInterval(interval);
+            }, 1000);
+        })();
+
+        function doResendOtp() {
+            document.getElementById('resendForm').submit();
+        }
+
+        // ── Validate password ─────────────────────────────────────────────
         function validatePassword() {
             var password = document.getElementById("newPass").value;
             var confirmPassword = document.getElementById("confirmPass").value;
             var errorDiv = document.getElementById("passwordError");
-            var btnSubmit = document.getElementById("btnSubmit");
             var msg = "";
 
-            
             if (password.length < 6) {
                 msg = "Mật khẩu phải có ít nhất 6 ký tự.";
-            } 
-            
-            else if (!/\d/.test(password)) {
+            } else if (!/\d/.test(password)) {
                 msg = "Mật khẩu phải chứa ít nhất 1 số.";
-            }
-            
-            else if (!/[A-Z]/.test(password)) {
+            } else if (!/[A-Z]/.test(password)) {
                 msg = "Mật khẩu phải chứa ít nhất 1 chữ hoa.";
-            }
-            
-            else if (password !== confirmPassword && confirmPassword.length > 0) {
+            } else if (password !== confirmPassword && confirmPassword.length > 0) {
                 msg = "Mật khẩu xác nhận không khớp.";
             }
 
-            
             if (msg !== "") {
                 errorDiv.style.display = "block";
                 errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + msg;
-                return false; 
+                return false;
             } else {
                 errorDiv.style.display = "none";
-                return true; 
+                return true;
             }
         }
     </script>
