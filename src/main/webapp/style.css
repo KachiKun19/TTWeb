@@ -475,6 +475,12 @@ ul {
 	color: #f82c97;
 }
 
+.nav-list>li>a.active {
+	color: #f82c97;
+	border-bottom: 2px solid #f82c97;
+	padding-bottom: 2px;
+}
+
 .filter-content {
 	max-height: 0;
 	overflow: hidden;

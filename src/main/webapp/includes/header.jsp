@@ -23,7 +23,7 @@
         <nav class="nav">
             <ul class="nav-list">
                 <li>
-                    <a href="#" class="flex items-center" data-dropdown-toggle="dropdownGaming">
+                    <a href="#" id="nav-gaming" class="flex items-center" data-dropdown-toggle="dropdownGaming">
                         Gaming Gear <i class="fas fa-chevron-down ml-1 text-xs"></i>
                     </a>
                     <div id="dropdownGaming"
@@ -42,7 +42,7 @@
                     </div>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center" data-dropdown-toggle="dropdownOffice">
+                    <a href="#" id="nav-office" class="flex items-center" data-dropdown-toggle="dropdownOffice">
                         Office Gear <i class="fas fa-chevron-down ml-1 text-xs"></i>
                     </a>
                     <div id="dropdownOffice"
@@ -61,7 +61,7 @@
                     </div>
                 </li>
                 <li>
-                    <a href="${not empty sessionScope.user ? 'contact.jsp' : 'login'}">Liên Hệ</a>
+                    <a id="nav-contact" href="${not empty sessionScope.user ? 'contact.jsp' : 'login'}">Liên Hệ</a>
                 </li>
             </ul>
         </nav>
@@ -155,6 +155,26 @@
         </div>
     </div>
 </header>
+
+<script>
+    (function () {
+        const path = window.location.pathname;
+        const params = new URLSearchParams(window.location.search);
+        const category = params.get('category') || '';
+        const gamingCategories = ['Chuột Gaming', 'Bàn phím cơ', 'Lót chuột'];
+        const officeCategories = ['Ghế công thái học', 'Tai nghe', 'Phụ kiện'];
+
+        if (path.includes('products') || path.includes('product')) {
+            if (gamingCategories.includes(category)) {
+                document.getElementById('nav-gaming').classList.add('active');
+            } else if (officeCategories.includes(category)) {
+                document.getElementById('nav-office').classList.add('active');
+            }
+        } else if (path.includes('contact')) {
+            document.getElementById('nav-contact').classList.add('active');
+        }
+    })();
+</script>
 
 <div id="cart-overlay" class="cart-overlay">
     <button id="close-cart" class="cart-overlay-close">&times;</button>
