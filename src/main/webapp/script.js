@@ -12,20 +12,12 @@ if (backgroundElement && dots.length > 0) {
 	let currentIndex = 0;
 	let slideInterval;
 
-	/**
-
-	 * @param {number} index
-	 */
 	function updateSlider(index) {
-
 		backgroundElement.style.backgroundImage = `url('${images[index]}')`;
-
-
 		dots.forEach((dot) => {
 			dot.classList.remove("active");
 		});
 		dots[index].classList.add("active");
-
 		currentIndex = index;
 	}
 
@@ -42,7 +34,6 @@ if (backgroundElement && dots.length > 0) {
 	dots.forEach((dot) => {
 		dot.addEventListener("click", () => {
 			let targetIndex = parseInt(dot.dataset.slide);
-
 			if (targetIndex !== currentIndex) {
 				updateSlider(targetIndex);
 				startSlideShow();
@@ -92,11 +83,16 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 		});
 	}
+
+	document.querySelectorAll('a[href="logout"]').forEach(function(logoutLink) {
+		logoutLink.addEventListener("click", function() {
+			sessionStorage.removeItem('kachikun_sort');
+		});
+	});
 });
 
 
 function initCustomAccordion() {
-
 	const buttons = document.querySelectorAll(
 		"#filter-heading-brands button, #filter-heading-connection button, #filter-heading-material button,#filter-heading-size button"
 	);
@@ -121,7 +117,6 @@ initCustomAccordion();
 
 
 function initPageSlider() {
-
 	const navButtons = document.querySelectorAll("a[data-target]");
 
 	navButtons.forEach((button) => {
@@ -131,18 +126,14 @@ function initPageSlider() {
 			const targetPageId = button.dataset.target;
 			const targetPage = document.getElementById(targetPageId);
 
-
 			const currentPage = document.querySelector(".page-content.active");
-
 
 			if (!targetPage || targetPage === currentPage) {
 				return;
 			}
 
 			currentPage.classList.add("slide-out-left");
-
 			currentPage.classList.remove("active");
-
 			targetPage.classList.add("active");
 
 			setTimeout(() => {
@@ -159,14 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	const hash = window.location.hash.substring(1);
 
 	if (hash) {
-
 		const targetId = "page-" + hash;
 		const targetPage = document.getElementById(targetId);
 
 		if (targetPage) {
-
 			const defaultActivePage = document.querySelector(".page-content.active");
-
 			if (defaultActivePage) {
 				defaultActivePage.classList.remove("active");
 			}
@@ -180,38 +168,28 @@ function searchByName(param) {
 	var txtSearch = param.value;
 	var resultContainer = document.getElementById("search-results");
 
-
 	if (txtSearch.trim() === "") {
 		resultContainer.classList.add("hidden");
 		resultContainer.innerHTML = "";
 		return;
 	}
 
-
 	fetch("ajaxSearch?txt=" + encodeURIComponent(txtSearch))
 		.then(response => response.text())
 		.then(data => {
-
 			resultContainer.classList.remove("hidden");
-
 			resultContainer.innerHTML = data;
 		})
 		.catch(error => console.error('Lỗi:', error));
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-
 	const buttons = document.querySelectorAll(".add-to-cart");
 
 	buttons.forEach(btn => {
 		btn.addEventListener("click", function(e) {
 			e.preventDefault();
-
-
 			const productId = this.getAttribute("data-id");
-
-
-
 			window.location.href = "add-to-cart?id=" + productId;
 		});
 	});
@@ -223,37 +201,30 @@ document.addEventListener("DOMContentLoaded", function() {
 	const btnPrev = document.getElementById('btnPrev');
 	const btnNext = document.getElementById('btnNext');
 
-
 	if (categoryList && btnPrev && btnNext) {
-
-
 		btnNext.addEventListener('click', () => {
 			const item = categoryList.querySelector('.category-item');
-
 			const val = item.offsetWidth + 20;
-
-
 			categoryList.scrollLeft += val;
 		});
-
 
 		btnPrev.addEventListener('click', () => {
 			const item = categoryList.querySelector('.category-item');
 			const val = item.offsetWidth + 20;
-
-
 			categoryList.scrollLeft -= val;
 		});
 	}
 });
 
 
+// filterProducts đọc sort từ sessionStorage
 function filterProducts(index = 1) {
 	let params = new URLSearchParams();
 
-
 	params.append("index", index);
 
+	const sortHienTai = sessionStorage.getItem('kachikun_sort') || 'newest';
+	params.append("sort", sortHienTai);
 
 	const categoryInput = document.getElementById("current-category-slug");
 	if (categoryInput && categoryInput.value) {
@@ -264,7 +235,6 @@ function filterProducts(index = 1) {
 	document.querySelectorAll('input[id^="filter-connection-"]:checked').forEach(chk => params.append("connection", chk.value));
 	document.querySelectorAll('input[id^="filter-material-"]:checked').forEach(chk => params.append("material", chk.value));
 	document.querySelectorAll('input[id^="filter-size-"]:checked').forEach(chk => params.append("size", chk.value));
-
 
 	fetch("ajaxFilter?" + params.toString())
 		.then(response => response.text())
@@ -282,7 +252,6 @@ function filterProducts(index = 1) {
 			const countDisplay = document.getElementById("count-display");
 
 			if (hiddenTotal && countDisplay) {
-
 				countDisplay.innerText = "Hiển thị " + hiddenTotal.value + " sản phẩm";
 			}
 		})
@@ -295,6 +264,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		chk.addEventListener("change", () => filterProducts(1));
 	});
 });
+
 
 // model đánh giá
 function openCancelModal(orderId) {
@@ -321,7 +291,6 @@ async function openReviewModal(orderId, contextPath) {
 		if (!res.ok) throw new Error(`Lỗi: ${res.status}`);
 
 		const html = await res.text();
-		// innerHTML không chạy <script> nên dùng onclick="setRating(...)" trong fragment
 		document.getElementById('reviewContent').innerHTML = html;
 	} catch (e) {
 		console.error(e);
@@ -334,14 +303,12 @@ function closeReviewModal() {
 }
 
 document.addEventListener('click', function (e) {
-	// Tìm phần tử star-btn gần nhất với vị trí click
 	const star = e.target.closest('.star-btn');
 	if (star) {
 		const container = star.closest('.star-container');
 		if (container) {
 			const productId = container.getAttribute('data-product-id');
 			const value = parseInt(star.getAttribute('data-value'));
-
 			if (productId && value) {
 				executeSetRating(productId, value);
 			}
@@ -349,10 +316,7 @@ document.addEventListener('click', function (e) {
 	}
 });
 
-// Hàm logic xử lý (không cần phơi ra global window nếu dùng cách trên)
 function executeSetRating(productId, value) {
-	console.log('Đang chọn ' + value + ' sao cho SP: ' + productId);
-
 	const input = document.getElementById('rating-' + productId);
 	if (input) input.value = value;
 
@@ -373,7 +337,7 @@ function executeSetRating(productId, value) {
 		});
 	}
 }
-// gộp đánh giá sp
+
 async function submitBulkReviews() {
 	const orderId = document.getElementById('bulkOrderId').value;
 	const items = document.querySelectorAll('.review-item');
