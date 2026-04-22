@@ -7,6 +7,9 @@ public class Product {
 	private double price;
 	private String image; // Đường dẫn ảnh sản phẩm
 	private int stock; // hết hàng
+	private int soldCount;
+	private double averageRating;
+	private int reviewCount;
 
 	// Quan hệ: Một sản phẩm thuộc về 1 Brand và 1 Category
 	private Brand brand;
@@ -118,6 +121,13 @@ public class Product {
 	public void setCategory(Category category) {
 		this.category = category;
 	}
+
+	public int getSoldCount() { return soldCount; }
+	public void setSoldCount(int soldCount) { this.soldCount = soldCount; }
+	public double getAverageRating() { return averageRating; }
+	public void setAverageRating(double averageRating) { this.averageRating = averageRating; }
+	public int getReviewCount() { return reviewCount; }
+	public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
 
 	@Override
 	public String toString() {
