@@ -19,7 +19,7 @@
 </head>
 <body class="bg-[#1a1a1a] text-white font-['Montserrat']">
 
-<jsp:include page="components/header.jsp" />
+<jsp:include page="components/header2.jsp" />
 
 <main class="container mx-auto px-4 py-8 mt-20">
 	<nav class="flex mb-5" aria-label="Breadcrumb">

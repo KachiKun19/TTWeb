@@ -42,7 +42,7 @@
 </head>
 <body class="bg-gray-100 font-['Montserrat'] flex flex-col min-h-screen">
 
-<jsp:include page="components/header.jsp"/>
+<jsp:include page="components/header2.jsp"/>
 
 <div class="flex-grow flex items-center justify-center py-16 px-4 relative overflow-hidden">
 

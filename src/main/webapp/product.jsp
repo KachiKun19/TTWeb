@@ -24,7 +24,7 @@
 </head>
 
 <body class="bg-white text-black">
-<jsp:include page="components/header.jsp"/>
+<jsp:include page="components/header2.jsp"/>
 <main class="flex-grow container mx-auto px-4 py-8">
 
     <nav class="flex mb-5" aria-label="Breadcrumb">

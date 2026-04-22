@@ -29,7 +29,7 @@
     </style>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
-<jsp:include page="components/header.jsp" />
+<jsp:include page="components/header2.jsp" />
 
 <main class="flex-grow container mx-auto px-4 py-8">
 
