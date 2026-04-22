@@ -1,67 +1,73 @@
 package com.kachikun.shop.dao;
 
+import com.kachikun.shop.model.Category;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kachikun.shop.model.Category;
-import com.kachikun.shop.utils.DBConnection;
+/**
+ * DAO xử lý tất cả thao tác với bảng Categories.
+ */
+public class CategoryDAO extends BaseDAO {
 
-public class CategoryDAO {
+    /**
+     * Chuyển đổi một hàng ResultSet thành đối tượng Category.
+     */
+    private Category mapCategory(ResultSet rs) throws SQLException {
+        Category category = new Category();
+        category.setId(rs.getInt("id"));
+        category.setName(rs.getString("name"));
+        category.setIcon(rs.getString("icon"));
+        return category;
+    }
 
-	public List<Category> getAllCategories() {
-		List<Category> list = new ArrayList<>();
-		String sql = "SELECT * FROM Categories";
+    /**
+     * Lấy toàn bộ danh sách danh mục sản phẩm.
+     */
+    public List<Category> getAllCategories() {
+        String sql = "SELECT * FROM Categories";
+        List<Category> categoryList = new ArrayList<>();
 
-		try {
-			Connection conn = DBConnection.getConnection();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-			PreparedStatement ps = conn.prepareStatement(sql);
+            while (rs.next()) {
+                categoryList.add(mapCategory(rs));
+            }
 
-			ResultSet rs = ps.executeQuery();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-			while (rs.next()) {
-				Category c = new Category();
-				c.setId(rs.getInt("id"));
-				c.setName(rs.getString("name"));
-				c.setIcon(rs.getString("icon"));
-				list.add(c);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
+        return categoryList;
+    }
 
-	public static void main(String[] args) {
-		CategoryDAO dao = new CategoryDAO();
-		List<Category> list = dao.getAllCategories();
+    /**
+     * Tìm danh mục theo ID.
+     */
+    public Category getCategoryById(int categoryId) {
+        String sql = "SELECT * FROM Categories WHERE id = ?";
 
-		System.out.println("--- DANH SÁCH CATEGORY TỪ SQL ---");
-		for (Category c : list) {
-			System.out.println("ID: " + c.getId() + " | Tên: " + c.getName());
-		}
-	}
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-	public Category getCategoryById(int id) {
-	    String sql = "SELECT * FROM Categories WHERE id = ?";
-	    try {
-	        Connection conn = DBConnection.getConnection();
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ps.setInt(1, id);
-	        ResultSet rs = ps.executeQuery();
-	        
-	        if (rs.next()) {
-	            Category c = new Category();
-	            c.setId(rs.getInt("id"));
-	            c.setName(rs.getString("name"));
-	            return c;
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return null;
-	}
+            ps.setInt(1, categoryId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapCategory(rs);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

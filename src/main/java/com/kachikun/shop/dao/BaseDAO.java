@@ -8,17 +8,19 @@ import java.sql.SQLException;
 import com.kachikun.shop.utils.DBConnection;
 
 public abstract class BaseDAO {
-	protected Connection getConnection() throws Exception{
-		return DBConnection.getConnection();
-	}
-	
-	protected void closeResources(Connection conn, PreparedStatement ps, ResultSet rs) {
-		try {
-			if(rs != null) rs.close();
-			if(ps != null) ps.close();
-			if(conn != null) conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
+    protected Connection getConnection() throws Exception {
+        return DBConnection.getConnection();
+    }
+
+    protected void closeQuietly(AutoCloseable... resources) {
+        for (AutoCloseable resource : resources) {
+            if (resource != null) {
+                try {
+                    resource.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

@@ -1,166 +1,239 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Lịch Sử Đơn Hàng - Kachi-Kun Shop</title>
-    <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
-    <link rel="stylesheet" href="style.css"/>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
-          rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .st-processing {
-            background-color: #fef3c7;
-            color: #d97706;
-        }
-
-        .st-shipping {
-            background-color: #dbeafe;
-            color: #2563eb;
-        }
-
-        .st-completed {
-            background-color: #d1fae5;
-            color: #059669;
-        }
-
-        .st-cancelled {
-            background-color: #fee2e2;
-            color: #dc2626;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<title>Lịch sử đơn hàng - KachiKun Shop</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
-<body class="bg-gray-50 font-['Montserrat'] flex flex-col min-h-screen">
-<jsp:include page="components/header.jsp"/>
+<body class="bg-gray-50 min-h-screen">
 
-
-<div class="container mx-auto px-4 py-10 flex-grow">
-    <div class="max-w-6xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Lịch sử đơn hàng</h1>
-        <p class="text-gray-500 mb-8">Theo dõi trạng thái các đơn hàng bạn đã đặt tại Kachi-Kun Shop.</p>
-
-        <c:if test="${not empty msg}">
-            <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
-                <span class="font-medium">Thành công!</span> ${msg}
-            </div>
-        </c:if>
-        <c:if test="${not empty error}">
-            <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                <span class="font-medium">Lỗi!</span> ${error}
-            </div>
-        </c:if>
-
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-            <c:choose>
-                <c:when test="${empty myOrders}">
-                    <div class="text-center py-16">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
-                             class="w-24 h-24 mx-auto opacity-20 mb-4">
-                        <p class="text-gray-500 text-lg">Bạn chưa có đơn hàng nào.</p>
-                        <a href="products"
-                           class="mt-4 inline-block bg-pink-600 text-white px-6 py-2 rounded-full hover:bg-pink-700 transition">Mua
-                            sắm ngay</a>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                            <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                                <th class="py-4 px-6">Mã đơn</th>
-                                <th class="py-4 px-6">Ngày đặt</th>
-                                <th class="py-4 px-6">Người nhận</th>
-                                <th class="py-4 px-6">Tổng tiền</th>
-                                <th class="py-4 px-6">Thanh toán</th>
-                                <th class="py-4 px-6 text-center">Trạng thái</th>
-                                <th class="py-4 px-6 text-center">Hành động</th>
-                            </tr>
-                            </thead>
-                            <tbody class="text-gray-700 text-sm">
-                            <c:forEach items="${myOrders}" var="o">
-                                <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                    <td class="py-4 px-6 font-bold text-pink-600">#${o.id}</td>
-                                    <td class="py-4 px-6"><fmt:formatDate value="${o.orderDate}"
-                                                                          pattern="dd/MM/yyyy"/></td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-semibold">${o.recipientName}</div>
-                                        <div class="text-xs text-gray-500">${o.recipientPhone}</div>
-                                    </td>
-                                    <td class="py-4 px-6 font-bold">
-                                        <fmt:formatNumber value="${o.totalPrice}" type="currency" currencySymbol="₫"/>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <c:choose>
-                                            <c:when test="${o.paymentMethod == 'BANKING'}">
-                                                <span class="text-blue-600 font-semibold"><i
-                                                        class="fas fa-university"></i> Chuyển khoản</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="text-green-600 font-semibold"><i
-                                                        class="fas fa-money-bill-wave"></i> Tiền mặt (COD)</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td class="py-4 px-6 text-center">
-                                        <c:choose>
-                                            <c:when test="${o.status == 'Đang xử lý'}">
-                                                <span class="status-badge st-processing">Đang xử lý</span>
-                                            </c:when>
-                                            <c:when test="${o.status == 'Đang giao hàng'}">
-                                                <span class="status-badge st-shipping">Đang giao</span>
-                                            </c:when>
-                                            <c:when test="${o.status == 'Đã giao' || o.status == 'Hoàn thành'}">
-                                                <span class="status-badge st-completed">Hoàn thành</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="status-badge st-cancelled">Đã hủy</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td class="py-4 px-6 text-center">
-                                        <c:if test="${o.status == 'Đang xử lý'}">
-                                            <a href="order-history?action=cancel&id=${o.id}"
-                                               onclick="return confirm('Bạn chắc chắn muốn hủy đơn hàng này?');"
-                                               class="text-red-500 hover:text-red-700 font-semibold transition bg-red-50 hover:bg-red-100 px-3 py-1 rounded border border-red-200">
-                                                <i class="fas fa-times"></i> Hủy đơn
-                                            </a>
-                                        </c:if>
-                                        <c:if test="${o.status != 'Đang xử lý'}">
-                                            <span class="text-gray-400 italic text-xs">Không thể hủy</span>
-                                        </c:if>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
+<!-- Modal hủy đơn -->
+<div id="cancelModal"
+	 class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+	<div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+		<h3 class="text-lg font-bold text-gray-800 mb-1">Xác nhận hủy đơn</h3>
+		<p class="text-sm text-gray-500 mb-4">
+			Đơn hàng sẽ bị hủy và không thể khôi phục. Hàng sẽ được hoàn lại kho.
+		</p>
+		<form method="get" action="order-history" id="cancelForm">
+			<input type="hidden" name="action" value="cancel"/>
+			<input type="hidden" name="id" id="cancelOrderId"/>
+			<div class="mb-4">
+				<label class="text-sm text-gray-600 mb-1 block">Lý do hủy (không bắt buộc)</label>
+				<textarea name="cancel_reason" rows="3"
+						  class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800
+                           focus:outline-none focus:ring-2 focus:ring-pink-300"
+						  placeholder="VD: Đặt nhầm sản phẩm, muốn đổi địa chỉ..."></textarea>
+			</div>
+			<div class="flex gap-3">
+				<button type="button" onclick="closeCancelModal()"
+						class="flex-1 border border-gray-200 rounded-xl py-2 text-sm text-gray-600
+                           hover:bg-gray-50 transition">
+					Giữ đơn
+				</button>
+				<button type="submit"
+						class="flex-1 bg-red-500 hover:bg-red-600 text-white rounded-xl py-2 text-sm
+                           font-semibold transition">
+					Xác nhận hủy
+				</button>
+			</div>
+		</form>
+	</div>
 </div>
 
-<jsp:include page="components/footer.jsp"/>
+<div class="max-w-4xl mx-auto p-6">
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script
-        src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="script.js"></script>
+	<!-- Header -->
+	<div class="flex items-center justify-between mb-6">
+		<div>
+			<h1 class="text-2xl font-bold text-gray-800">Lịch sử đơn hàng</h1>
+			<p class="text-sm text-gray-400 mt-1">Quản lý và theo dõi các đơn hàng của bạn</p>
+		</div>
+		<a href="home" class="text-pink-600 hover:text-pink-700 text-sm font-medium">
+			<i class="fa-solid fa-store mr-1"></i>Tiếp tục mua sắm
+		</a>
+	</div>
+
+	<!-- Thông báo -->
+	<c:if test="${not empty msg && not empty paymentMethod}">
+		<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+			<i class="fa-solid fa-circle-check text-green-500"></i>
+			<span class="text-green-700 text-sm">${msg}</span>
+		</div>
+	</c:if>
+	<c:if test="${not empty error}">
+		<div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+			<i class="fa-solid fa-circle-xmark text-red-500"></i>
+			<span class="text-red-700 text-sm">${error}</span>
+		</div>
+	</c:if>
+
+	<!-- Danh sách đơn hàng -->
+	<c:choose>
+		<c:when test="${empty myOrders}">
+			<div class="bg-white rounded-2xl shadow-sm p-16 text-center">
+				<i class="fa-regular fa-folder-open text-5xl text-gray-300 mb-4"></i>
+				<p class="text-gray-500">Bạn chưa có đơn hàng nào.</p>
+				<a href="home"
+				   class="inline-block mt-4 bg-pink-600 text-white px-6 py-2 rounded-xl text-sm
+                          font-semibold hover:bg-pink-700 transition">
+					Mua ngay
+				</a>
+			</div>
+		</c:when>
+		<c:otherwise>
+			<div class="space-y-4">
+				<c:forEach var="o" items="${myOrders}">
+					<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+
+						<!-- Header đơn -->
+						<div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+							<div class="flex items-center gap-3">
+								<span class="font-bold text-gray-700">#${o.id}</span>
+								<c:if test="${not empty o.orderDate}">
+                                    <span class="text-xs text-gray-400">
+                                        <fmt:formatDate value="${o.orderDate}" pattern="dd/MM/yyyy"/>
+                                    </span>
+								</c:if>
+							</div>
+							<span class="px-3 py-1 rounded-full text-xs font-bold ${o.statusColor}">
+									${o.status}
+							</span>
+						</div>
+
+						<!-- Thông tin giao hàng nhanh -->
+						<div class="px-5 py-3 bg-gray-50 text-xs text-gray-500 flex flex-wrap gap-4">
+							<span><i class="fa-solid fa-user mr-1"></i>${o.recipientName}</span>
+							<span><i class="fa-solid fa-phone mr-1"></i>${o.recipientPhone}</span>
+							<span><i class="fa-solid fa-location-dot mr-1"></i>${o.shippingAddress}</span>
+						</div>
+
+						<!-- Timeline mini -->
+						<c:if test="${o.status != 'Đã hủy'}">
+							<div class="px-5 py-3">
+								<div class="flex items-center gap-1">
+									<c:set var="s" value="${o.timelineStep}"/>
+
+									<div class="flex items-center gap-1">
+										<div class="w-6 h-6 rounded-full flex items-center justify-center text-xs
+                                            ${s >= 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}">
+											<i class="fa-solid fa-check text-xs"></i>
+										</div>
+										<span class="text-xs ${s >= 1 ? 'text-gray-700' : 'text-gray-400'}">Đặt hàng</span>
+									</div>
+									<div class="flex-1 h-0.5 ${s >= 2 ? 'bg-blue-400' : 'bg-gray-200'} mx-1"></div>
+
+									<div class="flex items-center gap-1">
+										<div class="w-6 h-6 rounded-full flex items-center justify-center
+                                            ${s >= 2 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}">
+											<i class="fa-solid fa-truck text-xs"></i>
+										</div>
+										<span class="text-xs ${s >= 2 ? 'text-gray-700' : 'text-gray-400'}">Đang giao</span>
+									</div>
+									<div class="flex-1 h-0.5 ${s >= 3 ? 'bg-green-400' : 'bg-gray-200'} mx-1"></div>
+
+
+									<div class="flex items-center gap-1">
+										<div class="w-6 h-6 rounded-full flex items-center justify-center
+                                            ${s >= 3 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}">
+											<i class="fa-solid fa-box text-xs"></i>
+										</div>
+										<span class="text-xs ${s >= 3 ? 'text-gray-700' : 'text-gray-400'}">Đã giao</span>
+									</div>
+									<div class="flex-1 h-0.5 ${s >= 4 ? 'bg-green-600' : 'bg-gray-200'} mx-1"></div>
+
+									<div class="flex items-center gap-1">
+										<div class="w-6 h-6 rounded-full flex items-center justify-center
+                                            ${s >= 4 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-400'}">
+											<i class="fa-solid fa-star text-xs"></i>
+										</div>
+										<span class="px-3 py-1 rounded-full text-xs font-bold
+    											${o.status == 'Hoàn thành' ? 'bg-yellow-100 text-yellow-600' : o.statusColor}">
+												${o.status}
+										</span>
+									</div>
+								</div>
+							</div>
+						</c:if>
+
+						<!-- Lý do hủy nếu có -->
+						<c:if test="${o.status == 'Đã hủy' && not empty o.cancelReason}">
+							<div class="px-5 py-3 bg-red-50">
+								<p class="text-xs text-red-500">
+									<i class="fa-solid fa-circle-info mr-1"></i>
+									Lý do hủy: ${o.cancelReason}
+								</p>
+							</div>
+						</c:if>
+
+						<div class="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+							<div>
+								<span class="text-xs text-gray-400">Tổng tiền</span>
+								<p class="font-bold text-pink-600 text-base">
+									<fmt:formatNumber value="${o.totalPrice}" type="number" groupingUsed="true"/>₫
+								</p>
+							</div>
+							<div class="flex gap-2">
+								<!-- Nút theo dõi -->
+								<c:if test="${o.status != 'Đã hủy'}">
+									<a href="order-tracking?id=${o.id}"
+									   class="px-4 py-2 rounded-xl text-sm bg-blue-50 text-blue-600
+                                              hover:bg-blue-100 transition font-medium">
+										<i class="fa-solid fa-location-dot mr-1"></i>Theo dõi
+									</a>
+								</c:if>
+
+								<!-- Nút Đánh giá  -->
+								<c:if test="${o.status == 'Đã giao'}">
+									<button onclick="openReviewModal('${o.id}', '${pageContext.request.contextPath}')"
+											class="px-4 py-2 rounded-xl text-sm bg-purple-600 text-white ...">
+										<i class="fa-solid fa-star mr-1"></i>Đánh giá
+									</button>
+								</c:if>
+
+								<!-- Nút hủy  -->
+								<c:if test="${o.cancellable}">
+									<button onclick="openCancelModal('${o.id}')"
+											class="px-4 py-2 rounded-xl text-sm bg-red-50 text-red-600
+                                               hover:bg-red-100 transition font-medium">
+										<i class="fa-solid fa-ban mr-1"></i>Hủy đơn
+									</button>
+								</c:if>
+							</div>
+						</div>
+					</div>
+				</c:forEach>
+			</div>
+		</c:otherwise>
+	</c:choose>
+</div>
+<!-- model đánh giá -->
+<div id="reviewModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 transition-all duration-300">
+	<div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl overflow-hidden transform transition-all scale-95 border border-gray-100">
+
+		<div class="px-8 py-6 border-b flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
+			<div>
+				<h3 class="text-2xl font-extrabold text-gray-800 tracking-tight">
+					Đánh giá đơn hàng <span class="text-pink-600">#<span id="modalOrderId"></span></span>
+				</h3>
+				<p class="text-sm text-gray-500 mt-1">Chia sẻ trải nghiệm của bạn để giúp chúng tôi tốt hơn</p>
+			</div>
+			<button onclick="closeReviewModal()"
+					class="w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all text-2xl">
+				<i class="fa-solid fa-xmark"></i>
+			</button>
+		</div>
+
+		<div id="reviewContent" class="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar bg-white">
+		</div>
+	</div>
+</div>
+
+
+<script src="${pageContext.request.contextPath}/script.js"></script>
 </body>
 </html>

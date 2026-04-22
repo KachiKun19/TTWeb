@@ -1,456 +1,664 @@
 package com.kachikun.shop.dao;
 
-import com.kachikun.shop.model.User;
-import com.kachikun.shop.model.DailyStat;
 import com.kachikun.shop.model.CartItem;
+import com.kachikun.shop.model.DailyStat;
 import com.kachikun.shop.model.Order;
 import com.kachikun.shop.model.OrderDetail;
 import com.kachikun.shop.model.Product;
-import com.kachikun.shop.utils.DBConnection;
+import com.kachikun.shop.model.User;
 
-import java.sql.Statement;
-import java.time.LocalDate;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OrderDAO {
-	public boolean createOrder(User user, List<CartItem> cart, double totalPrice, String fullname, String phone, String address, String paymentMethod) {
-        String sqlOrder = "INSERT INTO Orders (user_id, total_price, status, order_date, recipient_name, recipient_phone, shipping_address, payment_method) VALUES (?, ?, N'Đang xử lý', GETDATE(), ?, ?, ?, ?)";
-        String sqlDetail = "INSERT INTO OrderDetails (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
-        String sqlUpdateStock = "UPDATE Products SET stock_quantity = stock_quantity - ? WHERE id = ?";
+public class OrderDAO extends BaseDAO {
 
-        try (Connection conn = DBConnection.getConnection()) {
-            conn.setAutoCommit(false);
-            try (PreparedStatement psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
-                 PreparedStatement psDetail = conn.prepareStatement(sqlDetail);
-                 PreparedStatement psStock = conn.prepareStatement(sqlUpdateStock)) {
-                
-                psOrder.setInt(1, user.getId());
-                psOrder.setDouble(2, totalPrice);
-                psOrder.setString(3, fullname);
-                psOrder.setString(4, phone);
-                psOrder.setString(5, address);
-                psOrder.setString(6, paymentMethod);
-                psOrder.executeUpdate();
+    private Order mapOrder(ResultSet rs) throws SQLException {
+        Order order = new Order();
+        int id = rs.getInt("id");
+        if (rs.wasNull()) {
+            return null;
+        }
+        order.setId(id);
+        order.setTotalPrice(rs.getDouble("total_price"));
+        order.setStatus(rs.getString("status"));
+        order.setOrderDate(rs.getDate("order_date"));
+        order.setRecipientName(rs.getString("recipient_name"));
+        order.setRecipientPhone(rs.getString("recipient_phone"));
+        order.setShippingAddress(rs.getString("shipping_address"));
+        order.setPaymentMethod(rs.getString("payment_method"));
 
-                ResultSet rs = psOrder.getGeneratedKeys();
-                if (rs.next()) {
-                    int orderId = rs.getInt(1);
-                    for (CartItem item : cart) {
-                        psDetail.setInt(1, orderId);
-                        psDetail.setInt(2, item.getProduct().getId());
-                        psDetail.setDouble(3, item.getProduct().getPrice());
-                        psDetail.setInt(4, item.getQuantity());
-                        psDetail.addBatch();
 
-                        psStock.setInt(1, item.getQuantity());
-                        psStock.setInt(2, item.getProduct().getId());
-                        psStock.addBatch();
-                    }
-                    psDetail.executeBatch();
-                    psStock.executeBatch();
+        try {
+            order.setShippedAt(rs.getTimestamp("shipped_at"));
+        } catch (SQLException ignored) {
+        }
+        try {
+            order.setDeliveredAt(rs.getTimestamp("delivered_at"));
+        } catch (SQLException ignored) {
+        }
+        try {
+            order.setCancelReason(rs.getString("cancel_reason"));
+        } catch (SQLException ignored) {
+        }
+
+        User user = new User();
+        user.setId(rs.getInt("user_id"));
+        order.setUser(user);
+
+        return order;
+    }
+
+    /**
+     * Lấy trạng thái hiện tại của đơn hàng theo ID.
+     */
+    private String getOrderStatus(int orderId) {
+        String sql = "SELECT status FROM Orders WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getString("status");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private boolean isValidStatusTransition(String currentStatus, String nextStatus) {
+        switch (currentStatus) {
+            case "Đang xử lý":
+                return "Đang giao hàng".equals(nextStatus) || "Đã hủy".equals(nextStatus);
+            case "Đang giao hàng":
+                return "Đã giao".equals(nextStatus);
+            case "Đã giao":
+                return "Hoàn thành".equals(nextStatus);
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Lấy danh sách [productId, quantity] của tất cả sản phẩm trong đơn
+     */
+    private List<int[]> getOrderItemQuantities(Connection conn, int orderId) throws SQLException {
+        String sql = "SELECT product_id, quantity FROM OrderDetails WHERE order_id = ?";
+        List<int[]> items = new ArrayList<>();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    items.add(new int[]{rs.getInt("product_id"), rs.getInt("quantity")});
                 }
-                conn.commit();
-                return true;
-            } catch (Exception e) {
+            }
+        }
+        return items;
+    }
+
+    /**
+     * Hoàn trả tồn kho cho danh sách sản phẩm (batch update).
+     */
+    private void restoreStock(Connection conn, List<int[]> items) throws SQLException {
+        String sql = "UPDATE Products SET stock_quantity = stock_quantity + ? WHERE id = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (int[] item : items) {
+                ps.setInt(1, item[1]); // quantity
+                ps.setInt(2, item[0]); // productId
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+
+    public boolean createOrder(User user, List<CartItem> cart, double totalPrice,
+                               String recipientName, String recipientPhone,
+                               String shippingAddress, String paymentMethod) {
+
+        String insertOrderSql =
+                "INSERT INTO Orders (user_id, total_price, status, order_date, "
+                        + "  recipient_name, recipient_phone, shipping_address, payment_method) "
+                        + "VALUES (?, ?, N'Đang xử lý', GETDATE(), ?, ?, ?, ?)";
+
+        String insertDetailSql =
+                "INSERT INTO OrderDetails (order_id, product_id, price, quantity) "
+                        + "VALUES (?, ?, ?, ?)";
+
+        String deductStockSql =
+                "UPDATE Products SET stock_quantity = stock_quantity - ? WHERE id = ?";
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+
+            int orderId = -1;
+            try (PreparedStatement ps = conn.prepareStatement(insertOrderSql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, user.getId());
+                ps.setDouble(2, totalPrice);
+                ps.setString(3, recipientName);
+                ps.setString(4, recipientPhone);
+                ps.setString(5, shippingAddress);
+                ps.setString(6, paymentMethod);
+                ps.executeUpdate();
+
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        orderId = generatedKeys.getInt(1);
+                    }
+                }
+            }
+
+            if (orderId == -1) {
                 conn.rollback();
+                return false;
+            }
+
+            try (PreparedStatement psDetail = conn.prepareStatement(insertDetailSql);
+                 PreparedStatement psStock = conn.prepareStatement(deductStockSql)) {
+
+                for (CartItem item : cart) {
+                    int productId = item.getProduct().getId();
+
+                    psDetail.setInt(1, orderId);
+                    psDetail.setInt(2, productId);
+                    psDetail.setDouble(3, item.getProduct().getPrice());
+                    psDetail.setInt(4, item.getQuantity());
+                    psDetail.addBatch();
+
+                    psStock.setInt(1, item.getQuantity());
+                    psStock.setInt(2, productId);
+                    psStock.addBatch();
+                }
+
+                psDetail.executeBatch();
+                psStock.executeBatch();
+            }
+
+            conn.commit();
+            return true;
+
+        } catch (Exception e) {
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
+
+        } finally {
+            if (conn != null) try {
+                conn.close();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        }
+    }
+
+    public boolean adminUpdateStatus(int orderId, String newStatus) {
+        String currentStatus = getOrderStatus(orderId);
+        if (currentStatus == null) return false;
+        if (!isValidStatusTransition(currentStatus, newStatus)) return false;
+
+        StringBuilder sql = new StringBuilder("UPDATE Orders SET status = ?");
+        if (Order.STATUS_SHIPPING.equals(newStatus)) {
+            sql.append(", shipped_at = GETDATE()");
+        } else if (Order.STATUS_DELIVERED.equals(newStatus) || Order.STATUS_COMPLETED.equals(newStatus)) {
+            sql.append(", delivered_at = GETDATE()");
+        }
+        sql.append(" WHERE id = ?");
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            ps.setString(1, newStatus);
+            ps.setInt(2, orderId);
+            boolean ok = ps.executeUpdate() > 0;
+            if (ok && Order.STATUS_COMPLETED.equals(newStatus)) {
+                updateSoldCount(orderId);
+            }
+            return ok;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-	public boolean updateStatus(int orderId, String status) {
-		String sql = "UPDATE Orders SET status = ? WHERE id = ?";
+    // Alias giữ tương thích với code cũ đang gọi updateStatus()
+    public boolean updateStatus(int orderId, String status) {
+        return adminUpdateStatus(orderId, status);
+    }
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
 
-			ps.setString(1, status);
-			ps.setInt(2, orderId);
+    public boolean userCancelOrder(int orderId, int userId) {
+        return userCancelOrder(orderId, userId, null);
+    }
 
-			int rowsAffected = ps.executeUpdate();
-			return rowsAffected > 0;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+    public boolean userCancelOrder(int orderId, int userId, String reason) {
+        String updateSql =
+                "UPDATE Orders SET status = N'Đã hủy', cancel_reason = ? "
+                        + "WHERE id = ? AND user_id = ? AND status = N'Đang xử lý'";
 
-	public List<OrderDetail> getOrderDetail(int orderId) {
-		List<OrderDetail> list = new ArrayList<>();
+        return cancelOrderAndRestoreStock(
+                orderId, updateSql,
+                ps -> {
+                    ps.setString(1, reason != null ? reason : "Khách hủy đơn");
+                    ps.setInt(2, orderId);
+                    ps.setInt(3, userId);
+                }
+        );
+    }
 
-		String sql = "SELECT d.*, p.name, p.image " + "FROM OrderDetails d "
-				+ "INNER JOIN Products p ON d.product_id = p.id " + "WHERE d.order_id = ? ";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
 
-			ps.setInt(1, orderId);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				OrderDetail detail = new OrderDetail();
-				detail.setId(rs.getInt("id"));
-				detail.setPrice(rs.getDouble("price"));
-				detail.setQuantity(rs.getInt("quantity"));
+    public boolean adminCancelOrder(int orderId, String reason) {
+        String updateSql =
+                "UPDATE Orders SET status = N'Đã hủy', cancel_reason = ? "
+                        + "WHERE id = ? AND status NOT IN (N'Đã giao', N'Hoàn thành', N'Đã hủy')";
 
-				Product p = new Product();
-				p.setId(rs.getInt("product_id"));
-				p.setName(rs.getString("name"));
-				p.setImage(rs.getString("image"));
+        return cancelOrderAndRestoreStock(
+                orderId, updateSql,
+                ps -> {
+                    ps.setString(1, reason != null ? reason : "Admin hủy đơn");
+                    ps.setInt(2, orderId);
+                }
+        );
+    }
 
-				detail.setProduct(p);
-				list.add(detail);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
 
-	public List<Order> getAllOrders() {
-		List<Order> list = new ArrayList<>();
-		String sql = "SELECT * FROM Orders ORDER BY order_date DESC";
+    private boolean cancelOrderAndRestoreStock(int orderId, String updateSql, ParamSetter paramSetter) {
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
+            // Bước 1: Cập nhật trạng thái
+            try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+                paramSetter.set(ps);
+                if (ps.executeUpdate() == 0) {
+                    conn.rollback();
+                    return false; // WHERE không khớp → trạng thái không cho phép hủy
+                }
+            }
 
-			while (rs.next()) {
-				Order o = new Order();
-				o.setId(rs.getInt("id"));
-				o.setTotalPrice(rs.getDouble("total_price"));
-				o.setStatus(rs.getString("status"));
-				o.setOrderDate(rs.getDate("order_date"));
+            // Bước 2: Lấy sản phẩm cần hoàn kho
+            List<int[]> items = getOrderItemQuantities(conn, orderId);
 
-				o.setRecipientName(rs.getString("recipient_name"));
-				o.setRecipientPhone(rs.getString("recipient_phone"));
-				o.setShippingAddress(rs.getString("shipping_address"));
-				o.setPaymentMethod(rs.getString("payment_method"));
+            // Bước 3: Hoàn trả tồn kho
+            restoreStock(conn, items);
 
-				User u = new User();
-				u.setId(rs.getInt("user_id"));
-				o.setUser(u);
+            conn.commit();
+            return true;
 
-				list.add(o);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
+        } catch (Exception e) {
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
 
-	public Order getOrderById(int id) {
-		String sql = "SELECT * FROM Orders WHERE id = ?";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				Order o = new Order();
-				o.setId(rs.getInt("id"));
-				o.setTotalPrice(rs.getDouble("total_price"));
-				o.setStatus(rs.getString("status"));
-				o.setOrderDate(rs.getDate("order_date"));
-				o.setRecipientName(rs.getString("recipient_name"));
-				o.setRecipientPhone(rs.getString("recipient_phone"));
-				o.setShippingAddress(rs.getString("shipping_address"));
-				o.setPaymentMethod(rs.getString("payment_method"));
+        } finally {
+            if (conn != null) try {
+                conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-				User u = new User();
-				u.setId(rs.getInt("user_id"));
-				o.setUser(u);
-				return o;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Lỗi ở OrderDAO: " + e.getMessage());
-		}
-		return null;
-	}
+    @FunctionalInterface
+    private interface ParamSetter {
+        void set(PreparedStatement ps) throws SQLException;
+    }
 
-	public List<Order> getOrdersByUserId(int userId) {
-		List<Order> list = new ArrayList<>();
-		String sql = "SELECT * FROM Orders WHERE user_id = ? ORDER BY id DESC";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, userId);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				Order o = new Order();
-				o.setId(rs.getInt("id"));
-				o.setOrderDate(rs.getDate("order_date"));
-				o.setTotalPrice(rs.getDouble("total_price"));
-				o.setStatus(rs.getString("status"));
-				o.setRecipientName(rs.getString("recipient_name"));
-				o.setRecipientPhone(rs.getString("recipient_phone"));
-				o.setShippingAddress(rs.getString("shipping_address"));
-				o.setPaymentMethod(rs.getString("payment_method"));
-				list.add(o);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
+    /**
+     * Lấy tất cả đơn hàng
+     */
+    public List<Order> getAllOrders() {
+        String sql = "SELECT * FROM Orders ORDER BY order_date DESC";
+        List<Order> orderList = new ArrayList<>();
 
-	public boolean userCancelOrder(int orderId, int userId) {
-	    String sqlUpdateOrder = "UPDATE Orders SET status = N'Đã hủy' WHERE id = ? AND user_id = ? AND status = N'Đang xử lý'";
-	    String sqlGetItems = "SELECT product_id, quantity FROM OrderDetails WHERE order_id = ?";
-	    String sqlRestoreStock = "UPDATE Products SET stock_quantity = stock_quantity + ? WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-	    Connection conn = null;
-	    try {
-	        conn = DBConnection.getConnection();
-	        conn.setAutoCommit(false); // Bắt đầu Transaction
+            while (rs.next()) orderList.add(mapOrder(rs));
 
-	        // 1. Cập nhật trạng thái đơn hàng
-	        try (PreparedStatement psOrder = conn.prepareStatement(sqlUpdateOrder)) {
-	            psOrder.setInt(1, orderId);
-	            psOrder.setInt(2, userId);
-	            int rows = psOrder.executeUpdate();
-	            
-	            if (rows == 0) {
-	                conn.rollback(); // Đơn hàng không đủ điều kiện hủy (vĩ dụ: đã giao)
-	                return false;
-	            }
-	        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return orderList;
+    }
 
-	        // 2. Lấy danh sách sản phẩm để hoàn kho
-	        List<OrderDetail> items = new ArrayList<>();
-	        try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems)) {
-	            psItems.setInt(1, orderId);
-	            ResultSet rs = psItems.executeQuery();
-	            while (rs.next()) {
-	                OrderDetail d = new OrderDetail();
-	                Product p = new Product();
-	                p.setId(rs.getInt("product_id"));
-	                d.setProduct(p);
-	                d.setQuantity(rs.getInt("quantity"));
-	                items.add(d);
-	            }
-	        }
+    /**
+     * Tìm đơn hàng theo ID.
+     */
+    public Order getOrderById(int orderId) {
+        String sql = "SELECT * FROM Orders WHERE id = ?";
 
-	        // 3. Hoàn kho hàng loạt
-	        try (PreparedStatement psStock = conn.prepareStatement(sqlRestoreStock)) {
-	            for (OrderDetail item : items) {
-	                psStock.setInt(1, item.getQuantity());
-	                psStock.setInt(2, item.getProduct().getId());
-	                psStock.addBatch();
-	            }
-	            psStock.executeBatch();
-	        }
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-	        conn.commit(); // Hoàn tất mọi thay đổi
-	        return true;
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapOrder(rs);
+            }
 
-	    } catch (Exception e) {
-	        if (conn != null) {
-	            try { conn.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
-	        }
-	        e.printStackTrace();
-	        return false;
-	    } finally {
-	        if (conn != null) {
-	            try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
-	        }
-	    }
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	public Map<String, Double> getRevenueLast12Months() {
+    /**
+     * Lấy tất cả đơn hàng của một người dùng, mới nhất trước.
+     */
+    public List<Order> getOrdersByUserId(int userId) {
+        String sql = "SELECT * FROM Orders WHERE user_id = ? ORDER BY id DESC";
+        List<Order> orderList = new ArrayList<>();
 
-		Map<String, Double> map = new LinkedHashMap<>();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-		String sql = "SELECT FORMAT(order_date, 'MM/yyyy') as month_year, SUM(total_price) as total " + "FROM Orders "
-				+ "WHERE status IN (N'Đã giao', N'Hoàn thành') "
-				+ "GROUP BY FORMAT(order_date, 'MM/yyyy'), YEAR(order_date), MONTH(order_date) "
-				+ "ORDER BY YEAR(order_date) DESC, MONTH(order_date) DESC";
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) orderList.add(mapOrder(rs));
+            }
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return orderList;
+    }
 
-			while (rs.next()) {
-				map.put(rs.getString("month_year"), rs.getDouble("total"));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return map;
-	}
+    /**
+     * Lấy chi tiết sản phẩm bên trong một đơn hàng.
+     */
+    public List<OrderDetail> getOrderDetail(int orderId) {
+        String sql = "SELECT d.*, p.name, p.image "
+                + "FROM OrderDetails d "
+                + "INNER JOIN Products p ON d.product_id = p.id "
+                + "WHERE d.order_id = ?";
 
-	public int getTodayOrdersCount() {
-		int count = 0;
-		String sql = "SELECT COUNT(*) FROM Orders WHERE CAST(order_date AS DATE) = ? AND status IN (N'Đã giao', N'Hoàn thành')";
+        List<OrderDetail> detailList = new ArrayList<>();
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			LocalDate today = LocalDate.now();
-			ps.setDate(1, Date.valueOf(today));
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				count = rs.getInt(1);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return count;
-	}
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Product product = new Product();
+                    product.setId(rs.getInt("product_id"));
+                    product.setName(rs.getString("name"));
+                    product.setImage(rs.getString("image"));
 
-	public double getTodayRevenue() {
-		double revenue = 0.0;
-		String sql = "SELECT SUM(total_price) FROM Orders WHERE CAST(order_date AS DATE) = ? AND status IN (N'Đã giao', N'Hoàn thành')";
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			LocalDate today = LocalDate.now();
-			ps.setDate(1, Date.valueOf(today));
+                    OrderDetail detail = new OrderDetail();
+                    detail.setId(rs.getInt("id"));
+                    detail.setPrice(rs.getDouble("price"));
+                    detail.setQuantity(rs.getInt("quantity"));
+                    detail.setProduct(product);
 
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				revenue = rs.getDouble(1);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return revenue;
-	}
+                    detailList.add(detail);
+                }
+            }
 
-	public Map<String, Double> getMonthlyRevenue(int months) {
-		Map<String, Double> monthlyRevenue = new LinkedHashMap<>();
-		String sql = "SELECT FORMAT(order_date, 'yyyy-MM') as month, SUM(total_price) as revenue " + "FROM Orders "
-				+ "WHERE status IN (N'Đã giao', N'Hoàn thành') " + "AND order_date >= DATEADD(month, -?, GETDATE()) "
-				+ "GROUP BY FORMAT(order_date, 'yyyy-MM') " + "ORDER BY month DESC";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return detailList;
+    }
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, months);
+    /**
+     * Lấy đơn hàng theo tháng/năm — dùng cho xuất báo cáo Excel.
+     */
+    public List<Order> getOrdersByMonthYear(int month, int year) {
+        String sql = "SELECT * FROM Orders "
+                + "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? "
+                + "ORDER BY order_date DESC";
 
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				String month = rs.getString("month");
-				double revenue = rs.getDouble("revenue");
-				monthlyRevenue.put(month, revenue);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return monthlyRevenue;
-	}
+        List<Order> orderList = new ArrayList<>();
 
-	public int getLastMonthOrdersCount() {
-		int count = 0;
-		String sql = "SELECT COUNT(*) as count FROM Orders "
-				+ "WHERE MONTH(order_date) = MONTH(DATEADD(month, -1, GETDATE())) "
-				+ "AND YEAR(order_date) = YEAR(DATEADD(month, -1, GETDATE())) "
-				+ "AND status IN (N'Đã giao', N'Hoàn thành')";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				count = rs.getInt("count");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return count;
-	}
+            ps.setInt(1, month);
+            ps.setInt(2, year);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) orderList.add(mapOrder(rs));
+            }
 
-	public List<DailyStat> getDailyStatistics(int month, int year) {
-		List<DailyStat> list = new ArrayList<>();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return orderList;
+    }
 
-		String sql = "SELECT DAY(order_date) as day, COUNT(id) as count, SUM(total_price) as total " + "FROM Orders "
-				+ "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? " + "AND status IN (N'Đã giao', N'Hoàn thành') "
-				+ "GROUP BY DAY(order_date) " + "ORDER BY day ASC";
+    /**
+     * Doanh thu theo từng tháng trong 12 tháng gần nhất.
+     */
+    public Map<String, Double> getRevenueLast12Months() {
+        String sql = "SELECT FORMAT(order_date, 'MM/yyyy') AS month_year, SUM(total_price) AS total "
+                + "FROM Orders "
+                + "WHERE status IN (N'Đã giao', N'Hoàn thành') "
+                + "GROUP BY FORMAT(order_date, 'MM/yyyy'), YEAR(order_date), MONTH(order_date) "
+                + "ORDER BY YEAR(order_date) DESC, MONTH(order_date) DESC";
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, month);
-			ps.setInt(2, year);
-			ResultSet rs = ps.executeQuery();
+        Map<String, Double> revenueMap = new LinkedHashMap<>();
 
-			while (rs.next()) {
-				list.add(new DailyStat(rs.getInt("day"), rs.getInt("count"), rs.getDouble("total")));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-	public List<Order> getOrdersByMonthYear(int month, int year) {
-		List<Order> list = new ArrayList<>();
+            while (rs.next()) {
+                revenueMap.put(rs.getString("month_year"), rs.getDouble("total"));
+            }
 
-		String sql = "SELECT * FROM Orders " + "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? "
-				+ "ORDER BY order_date DESC";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return revenueMap;
+    }
 
-		try {
-			Connection conn = DBConnection.getConnection();
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, month);
-			ps.setInt(2, year);
+    /**
+     * Đếm số đơn hoàn thành trong ngày hôm nay.
+     */
+    public int getTodayOrdersCount() {
+        String sql = "SELECT COUNT(*) FROM Orders "
+                + "WHERE CAST(order_date AS DATE) = ? "
+                + "AND status IN (N'Đã giao', N'Hoàn thành')";
 
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				Order o = new Order();
-				o.setId(rs.getInt("id"));
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-				User u = new User();
-				if (hasColumn(rs, "user_id")) {
-					u.setId(rs.getInt("user_id"));
+            ps.setDate(1, Date.valueOf(LocalDate.now()));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
 
-				}
-				o.setUser(u);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
-				o.setOrderDate(rs.getDate("order_date"));
+    /**
+     * Tổng doanh thu từ đơn hoàn thành trong ngày hôm nay.
+     */
+    public double getTodayRevenue() {
+        String sql = "SELECT SUM(total_price) FROM Orders "
+                + "WHERE CAST(order_date AS DATE) = ? "
+                + "AND status IN (N'Đã giao', N'Hoàn thành')";
 
-				o.setTotalPrice(rs.getDouble("total_price"));
-				o.setStatus(rs.getString("status"));
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-				o.setRecipientName(rs.getString("recipient_name"));
-				o.setRecipientPhone(rs.getString("recipient_phone"));
+            ps.setDate(1, Date.valueOf(LocalDate.now()));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getDouble(1);
+            }
 
-				if (hasColumn(rs, "address")) {
-					o.setShippingAddress(rs.getString("address"));
-				} else if (hasColumn(rs, "shipping_address")) {
-					o.setShippingAddress(rs.getString("shipping_address"));
-				}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
-				if (hasColumn(rs, "payment_method")) {
-					o.setPaymentMethod(rs.getString("payment_method"));
-				}
+    /**
+     * Thống kê doanh thu theo từng ngày trong một tháng.
+     */
+    public List<DailyStat> getDailyStatistics(int month, int year) {
+        String sql = "SELECT DAY(order_date) AS day, COUNT(id) AS count, SUM(total_price) AS total "
+                + "FROM Orders "
+                + "WHERE MONTH(order_date) = ? AND YEAR(order_date) = ? "
+                + "AND status IN (N'Đã giao', N'Hoàn thành') "
+                + "GROUP BY DAY(order_date) "
+                + "ORDER BY day ASC";
 
-				list.add(o);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
+        List<DailyStat> statList = new ArrayList<>();
 
-	private boolean hasColumn(ResultSet rs, String columnName) {
-		try {
-			rs.findColumn(columnName);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, month);
+            ps.setInt(2, year);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    statList.add(new DailyStat(
+                            rs.getInt("day"),
+                            rs.getInt("count"),
+                            rs.getDouble("total")
+                    ));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statList;
+    }
+
+    /**
+     * Đếm số đơn hoàn thành của tháng trước.
+     */
+    public int getLastMonthOrdersCount() {
+        String sql = "SELECT COUNT(*) FROM Orders "
+                + "WHERE MONTH(order_date) = MONTH(DATEADD(month, -1, GETDATE())) "
+                + "AND YEAR(order_date)  = YEAR(DATEADD(month, -1, GETDATE())) "
+                + "AND status IN (N'Đã giao', N'Hoàn thành')";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) return rs.getInt(1);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Doanh thu theo tháng trong N tháng gần nhất.
+     */
+    public Map<String, Double> getMonthlyRevenue(int numberOfMonths) {
+        String sql = "SELECT FORMAT(order_date, 'yyyy-MM') AS month, SUM(total_price) AS revenue "
+                + "FROM Orders "
+                + "WHERE status IN (N'Đã giao', N'Hoàn thành') "
+                + "AND order_date >= DATEADD(month, -?, GETDATE()) "
+                + "GROUP BY FORMAT(order_date, 'yyyy-MM') "
+                + "ORDER BY month DESC";
+
+        Map<String, Double> revenueMap = new LinkedHashMap<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, numberOfMonths);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    revenueMap.put(rs.getString("month"), rs.getDouble("revenue"));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return revenueMap;
+    }
+
+    // cập nhật số lg sp bán
+    private void updateSoldCount(int orderId) {
+        String sql = "UPDATE Products SET sold_count = sold_count + od.quantity "
+                + "FROM Products p "
+                + "INNER JOIN OrderDetails od ON od.product_id = p.id "
+                + "WHERE od.order_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean completeOrderByUser(int orderId, int userId) {
+        String updateSql = "UPDATE Orders SET status = N'Hoàn thành', delivered_at = GETDATE() "
+                + "WHERE id = ? AND user_id = ? AND status = N'Đã giao'";
+
+        String soldSql = "UPDATE Products SET sold_count = sold_count + od.quantity "
+                + "FROM Products p "
+                + "INNER JOIN OrderDetails od ON od.product_id = p.id "
+                + "WHERE od.order_id = ?";
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+
+            // Chuyển trạng thái
+            try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+                ps.setInt(1, orderId);
+                ps.setInt(2, userId);
+                if (ps.executeUpdate() == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            //  Cập nhật sold_count
+            try (PreparedStatement ps = conn.prepareStatement(soldSql)) {
+                ps.setInt(1, orderId);
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+
+        } catch (Exception e) {
+            if (conn != null) try { conn.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
+        }
+    }
 }

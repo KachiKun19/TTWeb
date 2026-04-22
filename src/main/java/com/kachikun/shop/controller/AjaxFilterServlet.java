@@ -42,7 +42,7 @@ public class AjaxFilterServlet extends HttpServlet {
         } catch (Exception e) {
             index = 1;
         }
-
+        // xu ly logic
         ProductDAO dao = new ProductDAO();
 
         int total = dao.countFilteredProducts(brandIds, connections, materials, sizes, category);
@@ -52,51 +52,12 @@ public class AjaxFilterServlet extends HttpServlet {
 
         List<Product> list = dao.filterProducts(brandIds, connections, materials, sizes, category, index, sort);
 
-        PrintWriter out = response.getWriter();
-        out.println("<input type='hidden' id='ajax-total-res' value='" + total + "' />");
+        // dua du lieu qua jsp
+        request.setAttribute("products", list);
+        request.setAttribute("total", total);
+        request.setAttribute("endPage", endPage);
+        request.setAttribute("index", index);
 
-        NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
-
-        if (list.isEmpty()) {
-            out.println("<div class='col-span-3 text-center py-12'>Không tìm thấy sản phẩm nào phù hợp.</div>");
-        }
-
-        for (Product p : list) {
-            out.println(
-                    "<div class='product-card border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group product-item'>");
-
-            out.println("<div class='relative block'>");
-            out.println("<a href='product-detail?id=" + p.getId() + "'>"); // Mở thẻ link detail
-            out.println("<img src='images/" + p.getImage() + "' class='w-full h-56 object-contain p-4' />");
-            out.println("</a>");
-
-            // Nút chọn nhanh
-            out.println("<div class='absolute inset-x-4 bottom-4'>");
-            out.println("<a href='add-to-cart?id=" + p.getId()
-                    + "' class='block w-full bg-blue-600 text-white font-semibold py-2 rounded-lg text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300'>+ Chọn nhanh</a>");
-            out.println("</div>");
-            out.println("</div>");
-
-            out.println("<div class='p-4'>");
-            out.println("<h3 class='font-semibold text-base h-16 overflow-hidden line-clamp-2'>");
-            out.println("<a href='product-detail?id=" + p.getId() + "' class='hover:text-blue-600'>" + p.getName()
-                    + "</a>");
-            out.println("</h3>");
-            out.println("<p class='text-lg font-bold text-gray-800 mt-2'>" + nf.format(p.getPrice()) + "₫</p>");
-            out.println("</div>");
-
-            out.println("</div>");
-        }
-        if (endPage > 1) {
-            out.println("<div class='col-span-1 sm:col-span-2 lg:col-span-3 flex justify-center mt-8 space-x-2 py-4'>");
-            for (int i = 1; i <= endPage; i++) {
-                String activeClass = (index == i) ? "bg-pink-600 text-white font-bold"
-                        : "bg-white text-gray-700 hover:bg-pink-500 hover:text-white";
-                out.println("<button onclick='filterProducts(" + i
-                        + ")' class='px-4 py-2 border rounded-lg transition-colors duration-300 " + activeClass + "'>"
-                        + i + "</button>");
-            }
-            out.println("</div>");
-        }
+        request.getRequestDispatcher("ajaxFilterResult.jsp").forward(request, response);
     }
 }
