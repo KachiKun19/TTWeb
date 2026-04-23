@@ -554,94 +554,79 @@
 <script src="script.js"></script>
 <script>
 
-    // Lưu lựa chọn sắp xếp hiện tại của người dùng
-    let thuTuSapXep = 'newest';
+    const SORT_LABELS = {
+        'newest'    : 'Mới nhất',
+        'price_asc' : 'Giá thấp đến cao',
+        'price_desc': 'Giá cao đến thấp'
+    };
 
-    // Gọi khi người dùng chọn 1 option trong dropdown "Sắp xếp"
-    function chonSapXep(giaTriSort, tenHienThi) {
-        thuTuSapXep = giaTriSort;
-
-        // Cập nhật tên hiển thị trên nút
-        document.getElementById('sort-label').textContent = 'Sắp xếp: ' + tenHienThi;
-
-        // Đóng dropdown
-        document.getElementById('dropdownSort').classList.add('hidden');
-
-        // Tải lại từ trang 1 với thứ tự mới
-        taiSanPham(1);
+    function docSort() {
+        return sessionStorage.getItem('kachikun_sort') || 'newest';
     }
 
-    // Hàm chính — gọi AJAX để lấy danh sách sản phẩm theo bộ lọc + trang hiện tại
-    function taiSanPham(soTrang) {
+    function luuSort(giaTriSort) {
+        sessionStorage.setItem('kachikun_sort', giaTriSort);
+    }
 
-        // ── 1. Lấy danh mục đang xem (ví dụ: "Chuột Gaming") ──
+    function capNhatLabelSort(giaTriSort) {
+        const label = document.getElementById('sort-label');
+        if (label) {
+            label.textContent = 'Sắp xếp: ' + (SORT_LABELS[giaTriSort] || 'Mặc định');
+        }
+    }
+
+    function taiSanPham(soTrang) {
+        const sortHienTai = docSort();
         const danhMuc = document.getElementById('current-category-slug').value;
 
-        // ── 2. Thu thập các checkbox đang được tick ──
-        const loaiThuongHieu = layGiaTriCheckbox('input[id^="filter-brand-"]', 'brand');
-        const loaiKetNoi = layGiaTriCheckbox('input[id^="filter-connection-"]', 'connection');
-        const loaiChatLieu = layGiaTriCheckbox('input[id^="filter-material-"]', 'material');
-        const loaiKichThuoc = layGiaTriCheckbox('input[id^="filter-size-"]', 'size');
+        const params = new URLSearchParams();
+        document.querySelectorAll('input[id^="filter-brand-"]:checked').forEach(chk => params.append('brand', chk.value));
+        document.querySelectorAll('input[id^="filter-connection-"]:checked').forEach(chk => params.append('connection', chk.value));
+        document.querySelectorAll('input[id^="filter-material-"]:checked').forEach(chk => params.append('material', chk.value));
+        document.querySelectorAll('input[id^="filter-size-"]:checked').forEach(chk => params.append('size', chk.value));
 
-        // ── 3. Ghép tất cả thành query string gửi lên server ──
-        const danhSachParam = [
-            ...loaiThuongHieu,
-            ...loaiKetNoi,
-            ...loaiChatLieu,
-            ...loaiKichThuoc
-        ];
-        if (danhMuc) danhSachParam.push('category=' + encodeURIComponent(danhMuc));
-        danhSachParam.push('index=' + soTrang);
-        danhSachParam.push('sort=' + thuTuSapXep);
+        if (danhMuc) params.append('category', danhMuc);
+        params.append('index', soTrang);
+        params.append('sort', sortHienTai);
 
-        const duongDanAPI = 'ajaxFilter?' + danhSachParam.join('&');
-
-        // ── 4. Gọi server, hiện loading, rồi đổ kết quả vào lưới sản phẩm ──
         const luoiSanPham = document.getElementById('productGrid');
-        luoiSanPham.style.opacity = '0.5'; // hiệu ứng đang tải
+        luoiSanPham.style.opacity = '0.5';
 
-        fetch(duongDanAPI)
-            .then(function (response) {
-                return response.text();
-            })
-            .then(function (htmlTraVe) {
-
-                // Đổ HTML sản phẩm + phân trang vào lưới
-                luoiSanPham.innerHTML = htmlTraVe;
+        fetch('ajaxFilter?' + params.toString())
+            .then(res => res.text())
+            .then(html => {
+                luoiSanPham.innerHTML = html;
                 luoiSanPham.style.opacity = '1';
 
-                // Cập nhật dòng "Hiển thị X sản phẩm"
-                // (server nhúng <input id="ajax-total-res" value="..."> vào HTML trả về)
                 const oTongSoSP = document.getElementById('ajax-total-res');
                 if (oTongSoSP) {
                     document.getElementById('count-display').textContent =
                         'Hiển thị ' + oTongSoSP.value + ' sản phẩm';
                 }
             })
-            .catch(function (loi) {
-                console.error('Lỗi khi tải sản phẩm:', loi);
+            .catch(err => {
+                console.error('Lỗi khi tải sản phẩm:', err);
                 luoiSanPham.style.opacity = '1';
             });
     }
 
-    // Hàm phụ — lấy giá trị các checkbox đang được tick, trả về mảng "key=value"
-    function layGiaTriCheckbox(selector, tenParam) {
-        return [...document.querySelectorAll(selector + ':checked')]
-            .map(function (checkbox) {
-                return tenParam + '=' + checkbox.value;
-            });
+    function chonSapXep(giaTriSort, tenHienThi) {
+        luuSort(giaTriSort);
+        capNhatLabelSort(giaTriSort);
+        document.getElementById('dropdownSort').classList.add('hidden');
+        taiSanPham(1);
     }
 
-    // Mỗi khi tick/bỏ tick bất kỳ checkbox nào → tải lại từ trang 1
-    document.querySelectorAll('input[type="checkbox"]').forEach(function (checkbox) {
-        checkbox.addEventListener('change', function () {
+    document.querySelectorAll('input[type="checkbox"]').forEach(function (chk) {
+        chk.addEventListener('change', function () {
             taiSanPham(1);
         });
     });
 
-    // Tải sản phẩm ngay khi trang mở
-    taiSanPham(1);
-
+    (function init() {
+        capNhatLabelSort(docSort());
+        taiSanPham(1);
+    })();
 </script>
 </body>
 </html>
