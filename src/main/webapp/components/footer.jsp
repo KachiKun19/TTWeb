@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: Admin
-  Date: 4/6/2026
-  Time: 7:10 PM
-  To change this template use File | Settings | File Templates.
---%>
 <footer class="footer">
     <div class="container">
         <div>
