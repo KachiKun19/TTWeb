@@ -43,15 +43,16 @@ public class DetailServlet extends HttpServlet {
 
             // ds review
             List<Review> reviews = reviewDAO.getReviewsByProductId(id);
-            //sô sao
             int[] ratingDist = reviewDAO.getRatingDistribution(id);
-            //check user đã mua và có thể review không
             HttpSession session = request.getSession(false);
             boolean canReview = false;
             if (session != null && session.getAttribute("user") != null) {
                 User user = (User) session.getAttribute("user");
                 canReview = reviewDAO.getEligibleOrderId(id, user.getId()) != -1;
             }
+
+            List<Product> relatedProducts = dao.getRelatedProducts(p.getCategory().getId(), p.getId());
+            request.setAttribute("relatedProducts", relatedProducts);
 
             request.setAttribute("detail", p);
             request.setAttribute("reviews", reviews);
