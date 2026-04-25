@@ -101,7 +101,17 @@
                                             ${sessionScope.user.fullName}</p>
                                     <p class="text-xs text-gray-400 truncate mt-0.5">@${sessionScope.user.email}</p>
                                 </div>
-
+                                <div class="p-2 border-b border-gray-100">
+                                    <a href="profile"
+                                       class="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-pink-600 transition-colors">
+                                        <i class="fas fa-user-circle w-6 text-center mr-2 text-gray-400"></i> Tài khoản
+                                        của tôi
+                                    </a>
+                                    <a href="order-history"
+                                       class="flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-pink-600 transition-colors">
+                                        <i class="fas fa-receipt w-6 text-center mr-2 text-gray-400"></i> Đơn mua
+                                    </a>
+                                </div>
                                 <a href="logout"
                                    class="block px-6 py-3.5 text-sm text-red-500 hover:bg-red-50 hover:text-red-600 font-medium transition-colors duration-200 flex items-center">
                                     <i class="fas fa-sign-out-alt mr-3"></i> Đăng xuất
