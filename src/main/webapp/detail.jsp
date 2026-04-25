@@ -17,16 +17,13 @@
 	<link rel="stylesheet"
 		  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 	<style>
-		/* Hiệu ứng ẩn bớt mô tả */
 		.description-content {
-			max-height: 120px; /* Vừa đủ đọc khoảng 4-5 dòng */
+			max-height: 120px;
 			overflow: hidden;
 			position: relative;
 			transition: max-height 0.4s ease;
 		}
-		.description-content.expanded {
-			max-height: 2500px;
-		}
+		.description-content.expanded { max-height: 2500px; }
 		.description-gradient {
 			position: absolute;
 			bottom: 0;
@@ -36,18 +33,14 @@
 			background: linear-gradient(transparent, #252525);
 			pointer-events: none;
 		}
-		.description-content.expanded .description-gradient {
-			display: none;
-		}
+		.description-content.expanded .description-gradient { display: none; }
 	</style>
 </head>
 <body class="bg-[#1a1a1a] text-white font-['Montserrat']">
 
 <jsp:include page="components/header2.jsp" />
 
-<!-- Tối ưu margin top cho Header dính -->
 <main class="container mx-auto px-4 py-4 mt-[100px] mb-10">
-	<!-- Breadcrumb kích thước cân bằng -->
 	<nav class="flex mb-4" aria-label="Breadcrumb">
 		<ol class="inline-flex items-center space-x-1 md:space-x-2 text-xs">
 			<li class="inline-flex items-center"><a href="home"
@@ -70,7 +63,6 @@
 	</nav>
 
 	<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-[#252525] p-6 rounded-2xl shadow-xl">
-		<!-- Cột ảnh: Tối ưu Responsive, dùng Aspect-square và Max-width thay vì chiều cao cố định -->
 		<div class="lg:col-span-5 flex flex-col items-center justify-start lg:justify-center">
 			<div class="overflow-hidden rounded-xl bg-white p-4 lg:p-8 w-full max-w-[400px] aspect-square mx-auto flex items-center justify-center shadow-inner">
 				<img src="images/${detail.image}" alt="${detail.name}"
@@ -78,7 +70,6 @@
 			</div>
 		</div>
 
-		<!-- Cột thông tin -->
 		<div class="lg:col-span-7 flex flex-col space-y-4">
 			<div>
                 <span class="bg-pink-600 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider inline-block mb-2">
@@ -101,7 +92,6 @@
 				</c:if>
 			</div>
 
-			<!-- Thông số sp -->
 			<div class="grid grid-cols-3 gap-3 py-3 border-y border-gray-700">
 				<div class="flex flex-col items-center text-center p-2 bg-gray-800/40 rounded-lg">
 					<i class="fa-solid fa-plug text-pink-500 text-lg mb-1"></i>
@@ -120,7 +110,6 @@
 				</div>
 			</div>
 
-			<!-- Mô tả chữ dễ nhìn hơn -->
 			<div class="text-gray-300 text-sm leading-relaxed relative flex-grow">
 				<div class="flex justify-between items-end mb-2">
 					<h3 class="text-white font-bold text-base">Mô tả sản phẩm:</h3>
@@ -134,7 +123,6 @@
 				</div>
 			</div>
 
-			<!-- Nút mua hàng -->
 			<div class="pt-2 flex flex-col sm:flex-row gap-3 mt-auto">
 				<c:if test="${detail.stock > 0}">
 					<a href="add-to-cart?id=${detail.id}"
@@ -151,7 +139,38 @@
 		</div>
 	</div>
 
-	<section class="mt-8">
+	<c:if test="${not empty relatedProducts}">
+		<section class="mt-8">
+			<div class="bg-[#252525] p-5 rounded-2xl shadow-xl border border-gray-800/50">
+				<div class="flex justify-between items-center border-b border-pink-500 pb-2 mb-4">
+					<h3 class="text-white font-bold uppercase text-sm inline-flex items-center gap-2">
+						<i class="fa-solid fa-tags text-pink-500"></i> Sản phẩm tương tự
+					</h3>
+					<a href="products?category=${detail.category.name}" class="text-xs text-pink-500 hover:text-pink-400 font-semibold">Xem tất cả <i class="fa-solid fa-arrow-right ml-1"></i></a>
+				</div>
+
+				<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+					<c:forEach items="${relatedProducts}" var="item">
+						<div class="bg-[#1a1a1a] p-2 rounded-xl border border-gray-700 hover:border-pink-500 transition duration-300 shadow-lg group">
+							<a href="product-detail?id=${item.id}" class="block">
+								<div class="bg-white rounded-lg p-2 mb-2 w-full h-36 flex items-center justify-center overflow-hidden">
+									<img src="images/${item.image}" alt="${item.name}" loading="lazy" class="max-w-full max-h-full object-contain group-hover:scale-110 transition duration-300">
+								</div>
+								<div class="px-1 text-center">
+									<p class="text-xs font-semibold truncate text-gray-300 group-hover:text-white transition">${item.name}</p>
+									<p class="text-pink-500 font-bold text-[13px] mt-0.5">
+										<fmt:formatNumber value="${item.price}" type="number" />₫
+									</p>
+								</div>
+							</a>
+						</div>
+					</c:forEach>
+				</div>
+			</div>
+		</section>
+	</c:if>
+
+	<section class="mt-6">
 		<div id="recently-viewed-container" class="bg-[#252525] p-5 rounded-2xl shadow-xl border border-gray-800/50">
 		</div>
 	</section>
@@ -196,23 +215,26 @@
 
 		const list = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
 		if (list.length <= 1) {
-			container.style.display = 'none'; // Ẩn luôn box nếu không có gì
+			container.style.display = 'none';
 			return;
 		}
 
-		let html = '<h3 class="text-white font-bold mb-4 uppercase text-sm border-b border-pink-500 pb-2 inline-flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> Sản phẩm bạn đã xem</h3>';
-		html += '<div class="grid grid-cols-2 md:grid-cols-5 gap-4">';
+		let html = '<h3 class="text-white font-bold mb-4 uppercase text-sm border-b border-pink-500 pb-2 inline-flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-pink-500"></i> Sản phẩm bạn đã xem</h3>';
+		html += '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">';
 
 		list.forEach(item => {
 			if(item.id !== "${detail.id}") {
 				const formattedPrice = new Intl.NumberFormat('vi-VN').format(item.price);
-				html += '<div class="bg-[#252525] p-4 rounded-xl border border-gray-800 hover:border-pink-500 transition shadow-lg group">' +
-						'<a href="product-detail?id=' + item.id + '">' +
-						'<div class="bg-white rounded-lg p-2 mb-3 overflow-hidden">' +
-						'<img src="images/' + item.image + '" class="w-full h-32 object-contain group-hover:scale-110 transition duration-300">' +
+
+				html += '<div class="bg-[#1a1a1a] p-2 rounded-xl border border-gray-700 hover:border-pink-500 transition shadow-lg group">' +
+						'<a href="product-detail?id=' + item.id + '" class="block">' +
+						'<div class="bg-white rounded-lg p-2 mb-2 w-full h-36 flex items-center justify-center overflow-hidden">' +
+						'<img src="images/' + item.image + '" loading="lazy" class="max-w-full max-h-full object-contain group-hover:scale-110 transition duration-300">' +
 						'</div>' +
-						'<p class="text-sm font-semibold truncate text-gray-200">' + item.name + '</p>' +
-						'<p class="text-pink-500 font-bold mt-1">' + formattedPrice + '₫</p>' +
+						'<div class="px-1 text-center">' +
+						'<p class="text-xs font-semibold truncate text-gray-300 group-hover:text-white transition">' + item.name + '</p>' +
+						'<p class="text-pink-500 font-bold text-[13px] mt-0.5">' + formattedPrice + '₫</p>' +
+						'</div>' +
 						'</a>' +
 						'</div>';
 			}
@@ -225,7 +247,7 @@
 		let list = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
 		list = list.filter(item => item.id !== product.id);
 		list.unshift(product);
-		if (list.length > 6) list.pop(); <!-- giới hạn 5 sp sẽ load lại -->
+		if (list.length > 6) list.pop();
 		localStorage.setItem("recentlyViewed", JSON.stringify(list));
 	}
 </script>
