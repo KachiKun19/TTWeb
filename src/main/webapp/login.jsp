@@ -377,6 +377,41 @@
             box-shadow: none;
             transform: translateY(-50%);
         }
+
+        .btn-resend {
+            background: transparent;
+            border: 1px solid #2d7e7e;
+            color: #2d7e7e;
+            box-shadow: none;
+            margin-top: 8px;
+            font-size: 12px;
+            padding: 9px 30px;
+        }
+
+        .btn-resend:hover:not(:disabled) {
+            background: rgba(45, 126, 126, 0.08);
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-resend:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .otp-timer-wrap {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .alert-warning {
+            background-color: #fff7ed;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
     </style>
 </head>
 <body>
@@ -442,15 +477,33 @@
             <form action="register" method="post" id="otpForm">
                 <input type="hidden" name="step" value="verifyOtp"/>
                 <h1 class="mb-2" style="font-size:20px;">Xác nhận email</h1>
-                <p style="font-size:13px; color:#666; margin: 10px 0 20px;">
+                <p style="font-size:13px; color:#666; margin: 10px 0 12px;">
                     Mã OTP đã gửi đến<br/><strong>${reg_email_display}</strong>
                 </p>
 
+                    <%-- Thông báo gửi lại thành công --%>
+                <c:if test="${not empty resendSuccess}">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> ${resendSuccess}
+                    </div>
+                </c:if>
+
+                    <%-- Thông báo lỗi OTP sai / gửi lại thất bại --%>
                 <c:if test="${not empty registerError}">
                     <div class="alert alert-error">
                         <i class="fas fa-exclamation-circle"></i> ${registerError}
                     </div>
                 </c:if>
+
+                    <%-- Đồng hồ đếm ngược 5 phút --%>
+                <div class="otp-timer-wrap" id="otpTimerWrap">
+                    <i class="fas fa-clock" style="color:#2d7e7e;"></i>
+                    OTP hết hạn sau: <strong id="otpTimer" style="color:#2d7e7e;">5:00</strong>
+                </div>
+                <div class="alert alert-error" id="otpExpiredMsg" style="display:none;">
+                    <i class="fas fa-hourglass-end"></i>
+                    Mã OTP đã hết hạn! Vui lòng nhấn <strong>Gửi lại OTP</strong> để nhận mã mới.
+                </div>
 
                 <div style="display:flex; gap:8px; justify-content:center; margin-bottom:16px;">
                     <input type="text" name="otp1" class="otp-box" maxlength="1" required autocomplete="off"/>
@@ -461,8 +514,18 @@
                     <input type="text" name="otp6" class="otp-box" maxlength="1" required autocomplete="off"/>
                 </div>
 
-                <button type="submit">Hoàn tất đăng ký</button>
+                <button type="submit" id="submitOtpBtn">Hoàn tất đăng ký</button>
+
+                <button type="button" id="resendBtn" class="btn-resend" disabled onclick="doResendOtp()">
+                    Gửi lại (<span id="resendCountdown">60</span>s)
+                </button>
+
                 <a href="login.jsp" style="font-size:12px; margin-top:10px; display:block;">Nhập sai email? Quay lại</a>
+            </form>
+
+            <%-- Form ẩn để submit resend --%>
+            <form id="resendForm" action="register" method="post" style="display:none;">
+                <input type="hidden" name="step" value="resendOtp"/>
             </form>
         </c:if>
 
@@ -591,8 +654,88 @@
 
     if (msg) {
         container.classList.remove("right-panel-active");
+    }
 
+    // ── OTP countdown (đăng ký) ───────────────────────────────────────────────
+    (function () {
+        var timerWrap = document.getElementById('otpTimerWrap');
+        if (!timerWrap) return; // không ở bước OTP
 
+        var REG_SENT_AT = ${not empty reg_sentAt ? reg_sentAt : 0};
+        if (REG_SENT_AT === 0) return;
+
+        var now = Date.now();
+        var elapsed = Math.floor((now - REG_SENT_AT) / 1000);
+
+        var otpRemaining = Math.max(0, 300 - elapsed); // 5 phút
+        var resendRemaining = Math.max(0, 60 - elapsed); // 60 giây
+
+        var timerDisplay = document.getElementById('otpTimer');
+        var expiredMsg = document.getElementById('otpExpiredMsg');
+        var submitBtn = document.getElementById('submitOtpBtn');
+        var resendBtn = document.getElementById('resendBtn');
+        var resendCdEl = document.getElementById('resendCountdown');
+
+        function fmt(s) {
+            var m = Math.floor(s / 60), sec = s % 60;
+            return m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+
+        function applyOtpExpired() {
+            timerWrap.style.display = 'none';
+            expiredMsg.style.display = 'block';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.45';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+        }
+
+        function applyResendReady() {
+            resendBtn.disabled = false;
+            resendBtn.textContent = 'Gửi lại OTP';
+        }
+
+        // Trạng thái ban đầu
+        if (otpRemaining === 0) {
+            applyOtpExpired();
+        } else {
+            timerDisplay.textContent = fmt(otpRemaining);
+        }
+
+        if (resendRemaining === 0) {
+            applyResendReady();
+        } else {
+            resendCdEl.textContent = resendRemaining;
+        }
+
+        if (otpRemaining === 0 && resendRemaining === 0) return;
+
+        var interval = setInterval(function () {
+            if (otpRemaining > 0) otpRemaining--;
+            if (resendRemaining > 0) resendRemaining--;
+
+            // Cập nhật đồng hồ OTP
+            if (otpRemaining > 0) {
+                timerDisplay.textContent = fmt(otpRemaining);
+                if (otpRemaining <= 60) timerDisplay.style.color = '#dc2626';
+            } else {
+                applyOtpExpired();
+            }
+
+            // Cập nhật đếm ngược gửi lại
+            if (resendRemaining > 0) {
+                resendCdEl.textContent = resendRemaining;
+            } else {
+                applyResendReady();
+            }
+
+            if (otpRemaining === 0 && resendRemaining === 0) clearInterval(interval);
+        }, 1000);
+    })();
+
+    function doResendOtp() {
+        document.getElementById('resendForm').submit();
     }
 
     function showStrengthBar() {
