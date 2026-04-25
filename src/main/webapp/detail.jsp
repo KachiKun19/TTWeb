@@ -137,9 +137,77 @@
 			</div>
 		</div>
 	</div>
+
+	<section class="container mx-auto px-4 pb-12">
+		<div id="recently-viewed-container" class="mt-6 border-t border-gray-800 pt-6"></div>
+	</section>
 </main>
 
 <jsp:include page="components/footer.jsp" />
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		// 1. Lưu sản phẩm hiện tại vào localStorage
+		const currentProduct = {
+			id: "${detail.id}",
+			name: "${detail.name}",
+			price: ${detail.price},
+			image: "${detail.image}"
+		};
+		saveRecentlyViewed(currentProduct);
 
+		let recentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
+		recentlyViewed = recentlyViewed.filter(item => item.id !== currentProduct.id);
+		recentlyViewed.unshift(currentProduct);
+
+		if (recentlyViewed.length > 6) { recentlyViewed = recentlyViewed.slice(0, 6); }
+
+		localStorage.setItem("recentlyViewed", JSON.stringify(recentlyViewed));
+
+		// --- PHẦN 2: GỌI HÀM HIỂN THỊ (QUAN TRỌNG) ---
+		displayRecentlyViewed();
+	});
+
+	function displayRecentlyViewed() {
+		const container = document.getElementById("recently-viewed-container");
+		if (!container) return;
+
+		const list = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
+
+		// Chỉ hiển thị nếu có từ 2 sản phẩm trở lên (vì 1 cái là cái đang xem rồi)
+		if (list.length <= 1) return;
+
+		let html = '<h3 class="text-white font-bold mb-6 uppercase text-lg border-b border-pink-500 pb-2 inline-block">Sản phẩm bạn đã xem</h3>';
+		html += '<div class="grid grid-cols-2 md:grid-cols-5 gap-6">';
+
+		list.forEach(item => {
+			// Không hiện lại chính sản phẩm đang xem
+			if(item.id !== "${detail.id}") {
+				const formattedPrice = new Intl.NumberFormat('vi-VN').format(item.price);
+
+				// Sử dụng nối chuỗi truyền thống để tránh lỗi JSP parse nhầm dấu backtick
+				html += '<div class="bg-[#252525] p-4 rounded-xl border border-gray-800 hover:border-pink-500 transition shadow-lg group">' +
+						'<a href="product-detail?id=' + item.id + '">' +
+						'<div class="bg-white rounded-lg p-2 mb-3 overflow-hidden">' +
+						'<img src="images/' + item.image + '" class="w-full h-32 object-contain group-hover:scale-110 transition duration-300">' +
+						'</div>' +
+						'<p class="text-sm font-semibold truncate text-gray-200">' + item.name + '</p>' +
+						'<p class="text-pink-500 font-bold mt-1">' + formattedPrice + '₫</p>' +
+						'</a>' +
+						'</div>';
+			}
+		});
+		html += '</div>';
+		container.innerHTML = html;
+	}
+	function saveRecentlyViewed(product) {
+		let list = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
+		// Xóa nếu sản phẩm đã tồn tại để đưa lên đầu
+		list = list.filter(item => item.id !== product.id);
+		list.unshift(product);
+		// Giới hạn 5 sản phẩm
+		if (list.length > 6) list.pop();
+		localStorage.setItem("recentlyViewed", JSON.stringify(list));
+	}
+</script>
 </body>
 </html>
