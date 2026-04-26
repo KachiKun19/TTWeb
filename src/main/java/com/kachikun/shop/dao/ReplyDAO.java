@@ -62,4 +62,33 @@ public class ReplyDAO {
             e.printStackTrace();
         }
     }
+
+    public void insertReply(int contactId, String reply) {
+        String sql = "INSERT INTO AdminReplies (contact_id, reply_message, reply_date) VALUES (?, ?, GETDATE())";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, contactId);
+            ps.setString(2, reply);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateStatusReplied(int id) {
+        String sql = "UPDATE ContactMessages SET status = N'Đã trả lời' WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
