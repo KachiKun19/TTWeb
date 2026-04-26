@@ -31,7 +31,14 @@ public class ContactServlet extends HttpServlet {
         ContactDAO dao = new ContactDAO();
         
         boolean success = dao.insertMessage(msg);
-        
+
+        if (phone != null && !phone.isEmpty()) {
+            if (!phone.matches("^(0|\\+84)\\d{9,10}$")) {
+                request.setAttribute("errorMessage", "Số điện thoại không hợp lệ!");
+                request.getRequestDispatcher("contact.jsp").forward(request, response);
+                return;
+            }
+        }
         if (success) {
             request.setAttribute("successMessage", "Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất.");
         } else {

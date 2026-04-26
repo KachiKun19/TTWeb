@@ -1,6 +1,7 @@
 package com.kachikun.shop.controller;
 
 import com.kachikun.shop.dao.ContactDAO;
+import com.kachikun.shop.dao.ReplyDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -26,10 +27,10 @@ public class AdminReplyContactServlet extends HttpServlet {
 
         int id = Integer.parseInt(idStr);
 
-        ContactDAO dao = new ContactDAO();
-        dao.updateReply(id, reply);
+        ReplyDAO dao = new ReplyDAO();
+        dao.insertReply(id, reply);
+        dao.updateStatusReplied(id);
 
-        // 👉 quay lại trang admin
         response.sendRedirect("adminContacts");
     }
 }
