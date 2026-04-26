@@ -352,10 +352,8 @@
                         </td>
                         <td>
                             <c:choose>
-
                                 <c:when test="${msg.status == 'Chưa đọc'}">
                                     <span class="status-badge status-unread">Chưa đọc</span>
-
                                     <div style="margin-top: 5px;">
                                         <a href="adminContacts?action=markRead&id=${msg.id}" class="btn-action">
                                             <i class="fas fa-check"></i> Xử lý

@@ -181,11 +181,6 @@
                                     </div>
                                 </c:forEach>
                             </div>
-
-                            <a href="notifications"
-                               class="block text-center p-2 text-blue-600 hover:bg-gray-100">
-                                Xem tất cả
-                            </a>
                             <div class="max-h-60 overflow-y-auto">
 
                                 <c:if test="${empty list}">
@@ -193,13 +188,6 @@
                                         📭 Chưa có thông báo nào
                                     </div>
                                 </c:if>
-
-                                <c:forEach var="item" items="${list}">
-                                    <div class="p-3 border-b text-sm">
-                                        <p class="text-green-600">${item.replyMessage}</p>
-                                        <p class="text-xs text-gray-500">${item.replyDate}</p>
-                                    </div>
-                                </c:forEach>
 
                             </div>
                         </div>
