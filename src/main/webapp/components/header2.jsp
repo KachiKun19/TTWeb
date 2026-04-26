@@ -132,7 +132,58 @@
                     </c:choose>
                 </div>
             </div>
+            <c:if test="${not empty sessionScope.user}">
+                <div class="relative">
+                    <button id="notiBtn" onclick="toggleNoti()"
+                            class="text-xl relative pt-2 focus:outline-none">
+                        <i class="fas fa-bell"></i>
 
+                        <c:if test="${unreadCount > 0}">
+            <span class="absolute -top-1 -right-2 bg-red-600 text-white text-xs px-1 rounded-full">
+                    ${unreadCount}
+            </span>
+                        </c:if>
+                    </button>
+
+                    <!-- DROPDOWN -->
+                    <div id="notiDropdown"
+                         class="hidden absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-lg z-50 text-black">
+
+                        <div class="p-3 border-b font-bold">
+                            Thông báo
+                        </div>
+
+                        <div class="max-h-60 overflow-y-auto">
+                            <c:forEach var="item" items="${list}">
+                                <div class="p-3 border-b hover:bg-gray-100 text-sm">
+
+                                    <c:choose>
+                                        <c:when test="${item.replyMessage != null}">
+                                            <p class="font-semibold text-green-600">
+                                                    ${item.replyMessage}
+                                            </p>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <p class="text-yellow-500">
+                                                Đang chờ phản hồi...
+                                            </p>
+                                        </c:otherwise>
+                                    </c:choose>
+
+                                    <p class="text-xs text-gray-500">
+                                            ${item.replyDate}
+                                    </p>
+                                </div>
+                            </c:forEach>
+                        </div>
+
+                        <a href="notifications"
+                           class="block text-center p-2 text-blue-600 hover:bg-gray-100">
+                            Xem tất cả
+                        </a>
+                    </div>
+                </div>
+            </c:if>
             <div class="relative">
                 <button id="cartDropdownButton" data-dropdown-toggle="cartDropdown"
                         class="text-xl transition-opacity duration-200 hover:opacity-80 relative focus:outline-none pt-2">
