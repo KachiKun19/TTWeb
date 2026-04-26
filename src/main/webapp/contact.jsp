@@ -150,7 +150,7 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 group-focus-within:text-pink-500 transition">
                                 <i class="fas fa-phone"></i>
                             </span>
-                        <input type="tel" name="phone" placeholder="Số điện thoại"
+                        <input type="tel" name="phone" placeholder="Số điện thoại" pattern="^(0|\+84)\d{9,10}$"
                                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition bg-gray-50 focus:bg-white">
                     </div>
                     <div class="relative group">
