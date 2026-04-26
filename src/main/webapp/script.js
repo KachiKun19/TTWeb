@@ -376,13 +376,12 @@ async function submitBulkReviews() {
         console.error("Error:", error);
     }
 }
-
 function toggleNoti() {
     const box = document.getElementById("notiDropdown");
     box.classList.toggle("hidden");
 }
 
-    window.onclick = function (event) {
+window.onclick = function (event) {
     if (!event.target.closest('#notiBtn')) {
         document.getElementById("notiDropdown").classList.add("hidden");
     }
