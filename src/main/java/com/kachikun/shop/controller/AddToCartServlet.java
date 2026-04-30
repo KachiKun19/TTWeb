@@ -18,36 +18,69 @@ import com.kachikun.shop.model.Product;
 public class AddToCartServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String idStr = request.getParameter("id");
         String redirect = request.getParameter("redirect");
         boolean stayOnPage = "stay".equals(redirect);
+        boolean isAjax = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
 
         if (idStr != null) {
-            int productId = Integer.parseInt(idStr);
+            int productId;
+            try {
+                productId = Integer.parseInt(idStr);
+            } catch (NumberFormatException e) {
+                if (isAjax) {
+                    sendJson(response, false, "ID sản phẩm không hợp lệ!", 0);
+                } else {
+                    response.sendRedirect("products");
+                }
+                return;
+            }
 
             ProductDAO dao = new ProductDAO();
             Product dbProduct = dao.getProductById(productId);
 
-            HttpSession session = request.getSession();
-            List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+            if (dbProduct == null) {
+                if (isAjax) {
+                    sendJson(response, false, "Sản phẩm không tồn tại!", 0);
+                } else {
+                    response.sendRedirect("products");
+                }
+                return;
+            }
 
+            HttpSession session = request.getSession();
+
+            // Kiểm tra đăng nhập
+            if (session.getAttribute("user") == null) {
+                if (isAjax) {
+                    sendJson(response, false, "Vui lòng đăng nhập để thêm vào giỏ hàng!", 0);
+                } else {
+                    response.sendRedirect("login");
+                }
+                return;
+            }
+
+            List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
             if (cart == null) {
                 cart = new ArrayList<>();
             }
 
+            String message = "";
+            boolean success = true;
             boolean found = false;
 
             for (CartItem item : cart) {
                 if (item.getProduct().getId() == productId) {
-
                     if (item.getQuantity() < dbProduct.getStock()) {
-
                         item.setQuantity(item.getQuantity() + 1);
+                        message = "Đã thêm " + dbProduct.getName() + " vào giỏ hàng!";
                     } else {
-                        session.setAttribute("stockError", "Sản phẩm " + dbProduct.getName() + " đã đạt giới hạn số lượng tồn kho!");
+                        success = false;
+                        message = "Sản phẩm " + dbProduct.getName() + " đã đạt giới hạn tồn kho!";
                     }
-
                     found = true;
                     break;
                 }
@@ -55,24 +88,47 @@ public class AddToCartServlet extends HttpServlet {
 
             if (!found) {
                 if (dbProduct.getStock() > 0) {
-                    CartItem newItem = new CartItem(dbProduct, 1);
-                    cart.add(newItem);
+                    cart.add(new CartItem(dbProduct, 1));
+                    message = "Đã thêm " + dbProduct.getName() + " vào giỏ hàng!";
                 } else {
-                    session.setAttribute("stockError", "Sản phẩm này đã hết hàng!");
+                    success = false;
+                    message = "Sản phẩm " + dbProduct.getName() + " đã hết hàng!";
                 }
             }
 
             session.setAttribute("cart", cart);
+
+            int cartSize = 0;
+            for (CartItem item : cart) cartSize += item.getQuantity();
+
+            if (isAjax) {
+                sendJson(response, success, message, cartSize);
+                return;
+            }
+
+            if (!success) {
+                session.setAttribute("stockError", message);
+            }
         }
+
         if (stayOnPage) {
             String referer = request.getHeader("Referer");
-            if (referer != null && !referer.isEmpty()) {
-                response.sendRedirect(referer);
-            } else {
-                response.sendRedirect("products");
-            }
+            response.sendRedirect(referer != null && !referer.isEmpty() ? referer : "products");
         } else {
             response.sendRedirect("cart");
         }
+    }
+
+    private void sendJson(HttpServletResponse response, boolean success,
+                          String message, int cartSize) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        String json = String.format(
+                "{\"success\":%b, \"message\":\"%s\", \"cartSize\":%d}",
+                success,
+                message.replace("\"", "\\\""),
+                cartSize
+        );
+        response.getWriter().write(json);
     }
 }
