@@ -296,31 +296,58 @@ function showToast(message, type = 'success') {
     const existing = document.getElementById('cart-toast');
     if (existing) existing.remove();
 
-    const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+    const bgColor = type === 'success' ? '#22c55e' : '#ef4444';
     const icon    = type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark';
 
     const toast = document.createElement('div');
     toast.id = 'cart-toast';
-    toast.className = `fixed bottom-6 right-6 z-[9999] flex items-center gap-3 ${bgColor} text-white px-5 py-3 rounded-xl shadow-2xl translate-y-20 opacity-0 transition-all duration-300`;
-    toast.innerHTML = `<i class="fas ${icon} text-lg"></i><span class="text-sm font-medium">${message}</span>`;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: ${bgColor};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        font-family: Montserrat, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        transform: translateY(80px);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        max-width: 360px;
+    `;
+    toast.innerHTML = `
+        <i class="fas ${icon}" style="font-size:18px;flex-shrink:0;"></i>
+        <span>${message}</span>
+    `;
     document.body.appendChild(toast);
 
     requestAnimationFrame(() => {
-        toast.classList.remove('translate-y-20', 'opacity-0');
-        toast.classList.add('translate-y-0', 'opacity-100');
+        requestAnimationFrame(() => {
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+        });
     });
 
+    // ẩn sau 3 giây
     setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0');
-        toast.addEventListener('transitionend', () => toast.remove());
+        toast.style.transform = 'translateY(80px)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 350);
     }, 3000);
 }
 
 function updateCartBadge(cartSize) {
-    const badge = document.querySelector('.cart-count');
+    const badge = document.getElementById('cart-badge');
     if (badge) {
         badge.textContent = cartSize;
-        badge.style.display = cartSize > 0 ? 'flex' : 'none';
+        badge.style.display = cartSize > 0 ? 'inline-flex' : 'none';
     }
 }
 
