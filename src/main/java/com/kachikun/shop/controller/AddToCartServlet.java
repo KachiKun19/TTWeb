@@ -20,8 +20,10 @@ public class AddToCartServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String idStr = request.getParameter("id");
-        
-        if(idStr != null) {
+        String redirect = request.getParameter("redirect");
+        boolean stayOnPage = "stay".equals(redirect);
+
+        if (idStr != null) {
             int productId = Integer.parseInt(idStr);
 
             ProductDAO dao = new ProductDAO();
@@ -45,7 +47,7 @@ public class AddToCartServlet extends HttpServlet {
                     } else {
                         session.setAttribute("stockError", "Sản phẩm " + dbProduct.getName() + " đã đạt giới hạn số lượng tồn kho!");
                     }
-                    
+
                     found = true;
                     break;
                 }
@@ -56,13 +58,21 @@ public class AddToCartServlet extends HttpServlet {
                     CartItem newItem = new CartItem(dbProduct, 1);
                     cart.add(newItem);
                 } else {
-                     session.setAttribute("stockError", "Sản phẩm này đã hết hàng!");
+                    session.setAttribute("stockError", "Sản phẩm này đã hết hàng!");
                 }
             }
 
             session.setAttribute("cart", cart);
         }
-
-        response.sendRedirect("cart.jsp");
+        if (stayOnPage) {
+            String referer = request.getHeader("Referer");
+            if (referer != null && !referer.isEmpty()) {
+                response.sendRedirect(referer);
+            } else {
+                response.sendRedirect("products");
+            }
+        } else {
+            response.sendRedirect("cart");
+        }
     }
 }

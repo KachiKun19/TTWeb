@@ -181,18 +181,6 @@ function searchByName(param) {
         .catch(error => console.error('Lỗi:', error));
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    const buttons = document.querySelectorAll(".add-to-cart");
-
-    buttons.forEach(btn => {
-        btn.addEventListener("click", function (e) {
-            e.preventDefault();
-            const productId = this.getAttribute("data-id");
-            window.location.href = "add-to-cart?id=" + productId;
-        });
-    });
-});
-
 
 document.addEventListener("DOMContentLoaded", function () {
     const categoryList = document.getElementById('categoryList');
