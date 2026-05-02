@@ -19,12 +19,38 @@
                     <a href="product-detail?id=${p.id}">
                         <img src="images/${p.image}" class="w-full h-56 object-contain p-4" alt="${p.name}"/>
                     </a>
-                    <div class="absolute inset-x-4 bottom-4">
-                        <a href="add-to-cart?id=${p.id}"
-                           class="block w-full bg-blue-600 text-white font-semibold py-2 rounded-lg text-center
-                                  opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            + Chọn nhanh
-                        </a>
+                        <%-- chọn hàng--%>
+                    <div class="absolute inset-x-4 bottom-4 flex gap-2
+            opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+
+                            <%-- thêm vào giỏ--%>
+                        <button type="button"
+                                data-id="${p.id}"
+                                class="btn-add-to-cart flex-1 bg-white border border-blue-600 text-blue-600
+                   font-semibold py-2 rounded-lg text-center text-sm
+                   hover:bg-blue-50 transition-colors">
+                            <i class="fas fa-cart-plus mr-1"></i> Thêm vào giỏ
+                        </button>
+
+                            <%-- nút Mua ngay--%>
+                        <c:choose>
+                            <c:when test="${p.stock > 0}">
+                                <button type="button"
+                                        data-id="${p.id}"
+                                        class="btn-buy-now flex-1 bg-blue-600 text-white font-semibold
+                           py-2 rounded-lg text-center text-sm
+                           hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-bolt mr-1"></i> Mua ngay
+                                </button>
+                            </c:when>
+                            <c:otherwise>
+            <span class="flex-1 bg-gray-300 text-gray-500 font-semibold
+                         py-2 rounded-lg text-center text-sm cursor-not-allowed">
+                Hết hàng
+            </span>
+                            </c:otherwise>
+                        </c:choose>
+
                     </div>
                         <%-- Badge hết hàng --%>
                     <c:if test="${p.stock <= 0}">
