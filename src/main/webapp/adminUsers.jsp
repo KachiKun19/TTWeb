@@ -506,6 +506,7 @@
 			<li><a href="adminOrders"><i class="fas fa-shopping-cart"></i> Quản
 				lý đơn hàng</a></li>
 			<li><a href="adminContacts"><i class="fas fa-envelope"></i> Quản lý liên hệ</a></li>
+			<li><a href="adminDiscounts"><i class="fas fa-tag"></i> Mã giảm giá</a></li>
 			<li><a href="home"><i class="fas fa-store"></i> Về trang
 				cửa hàng</a></li>
 		</ul>
