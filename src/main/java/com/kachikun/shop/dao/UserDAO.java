@@ -246,6 +246,30 @@ public class UserDAO extends BaseDAO {
         return 0;
     }
 
+    public List<User> getUsersPaging(int page, int pageSize) {
+        List<User> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM Users ORDER BY id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, (page - 1) * pageSize);
+            ps.setInt(2, pageSize);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapUserWithoutPassword(rs));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
     /**
      * Có Password
      */
