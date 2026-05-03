@@ -28,12 +28,25 @@ public class AdminUserServlet extends HttpServlet {
             response.sendRedirect("home");
             return;
         }
+        // ===== PHÂN TRANG =====
+        int page = 1;
+        int pageSize = 10;
 
-        List<User> adminList = userDAO.getUsersByRole(1);
-        List<User> userList = userDAO.getUsersByRole(0);
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            page = Integer.parseInt(pageParam);
+        }
 
-        request.setAttribute("adminList", adminList);
+        // Tổng số user
+        int totalUsers = userDAO.getTotalUsers();
+        int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+        // Lấy user theo page
+        List<User> userList = userDAO.getUsersPaging(page, pageSize);
+
         request.setAttribute("userList", userList);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher("adminUsers.jsp").forward(request, response);
     }
