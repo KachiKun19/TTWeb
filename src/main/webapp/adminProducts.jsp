@@ -558,6 +558,13 @@ body {
 				</div>
 			</c:if>
 
+			<c:if test="${param.success eq 'edit_success'}">
+				<div class="alert alert-success">
+					<i class="fas fa-check-circle"></i> Sản phẩm đã được cập nhật
+					thành công!
+				</div>
+			</c:if>
+
 
 			<c:if test="${param.error eq 'delete_failed'}">
 				<div class="alert alert-error">
@@ -616,6 +623,11 @@ body {
 											</c:if></td>
 										<td>
 											<div class="action-buttons">
+												<a href="editProduct?id=${product.id}">
+													<button class="edit-btn">
+														<i class="fas fa-edit"></i> Sửa
+													</button>
+												</a>
 												<button class="delete-btn"
 													onclick="confirmDelete(${product.id})">
 													<i class="fas fa-trash"></i> Xóa
