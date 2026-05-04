@@ -701,6 +701,19 @@
                         </c:otherwise>
                     </c:choose>
                 </ul>
+                <div style="text-align:center; margin-top:10px;">
+                    <c:forEach begin="1" end="${totalAdminPages}" var="i">
+                        <a href="adminUsers?adminPage=${i}&userPage=${userPage}"
+                           style="margin:0 5px;
+                                   padding:6px 10px;
+                                   border-radius:5px;
+                                   background:${i == adminPage ? '#2d7e7e' : '#eee'};
+                                   color:${i == adminPage ? 'white' : 'black'};
+                                   text-decoration:none;">
+                                ${i}
+                        </a>
+                    </c:forEach>
+                </div>
             </div>
 
 
@@ -748,20 +761,20 @@
                         </c:otherwise>
                     </c:choose>
                 </ul>
+                <div style="text-align:center; margin-top:10px;">
+                    <c:forEach begin="1" end="${totalUserPages}" var="i">
+                        <a href="adminUsers?userPage=${i}&adminPage=${adminPage}"
+                           style="margin:0 5px;
+                                   padding:6px 10px;
+                                   border-radius:5px;
+                                   background:${i == userPage ? '#2d7e7e' : '#eee'};
+                                   color:${i == userPage ? 'white' : 'black'};
+                                   text-decoration:none;">
+                                ${i}
+                        </a>
+                    </c:forEach>
+                </div>
             </div>
-        </div>
-        <div style="margin-top:20px; text-align:center;">
-            <c:forEach begin="1" end="${totalPages}" var="i">
-                <a href="adminUsers?page=${i}"
-                   style="margin:0 5px;
-                           padding:8px 12px;
-                           border-radius:5px;
-                           background:${i == currentPage ? '#2d7e7e' : '#eee'};
-                           color:${i == currentPage ? 'white' : 'black'};
-                           text-decoration:none;">
-                        ${i}
-                </a>
-            </c:forEach>
         </div>
     </div>
 </div>

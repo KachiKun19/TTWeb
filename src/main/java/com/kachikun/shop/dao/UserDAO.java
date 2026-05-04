@@ -270,6 +270,20 @@ public class UserDAO extends BaseDAO {
 
         return list;
     }
+
+    public int countUsersByRole(int role) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE role = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, role);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     /**
      * Có Password
      */

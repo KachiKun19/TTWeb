@@ -3,6 +3,7 @@ package com.kachikun.shop.controller;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -28,24 +29,33 @@ public class AdminUserServlet extends HttpServlet {
             response.sendRedirect("home");
             return;
         }
-        int page = 1;
+        int adminPage = 1;
+        int userPage = 1;
         int pageSize = 5;
 
-        String pageParam = request.getParameter("page");
-        if (pageParam != null) {
-            page = Integer.parseInt(pageParam);
-        }
+        String adminPageParam = request.getParameter("adminPage");
+        String userPageParam = request.getParameter("userPage");
 
-        int totalUsers = userDAO.getTotalUsers();
-        int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+        if (adminPageParam != null) adminPage = Integer.parseInt(adminPageParam);
+        if (userPageParam != null) userPage = Integer.parseInt(userPageParam);
 
-        List<User> adminList = userDAO.getUsersByRolePaging(1, page, pageSize);
-        List<User> userList = userDAO.getUsersByRolePaging(0, page, pageSize);
+        int totalAdmins = userDAO.countUsersByRole(1);
+        int totalUsers = userDAO.countUsersByRole(0);
+
+        int totalAdminPages = (int) Math.ceil((double) totalAdmins / pageSize);
+        int totalUserPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+        List<User> adminList = userDAO.getUsersByRolePaging(1, adminPage, pageSize);
+        List<User> userList = userDAO.getUsersByRolePaging(0, userPage, pageSize);
 
         request.setAttribute("adminList", adminList);
-        request.setAttribute("userList", userList);;
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("userList", userList);
+
+        request.setAttribute("adminPage", adminPage);
+        request.setAttribute("userPage", userPage);
+
+        request.setAttribute("totalAdminPages", totalAdminPages);
+        request.setAttribute("totalUserPages", totalUserPages);
 
         request.getRequestDispatcher("adminUsers.jsp").forward(request, response);
     }
