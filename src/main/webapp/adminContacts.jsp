@@ -264,21 +264,52 @@
     </style>
 </head>
 <body>
-<c:if test="${empty user or user.role ne 1}">
-    <c:redirect url="login"/>
-</c:if>
+	<c:if test="${empty user or user.role ne 1}">
+		<c:redirect url="login" />
+	</c:if>
 
-<div class="admin-header">
-    <h1>
-        <i class="fas fa-crown"></i> Trang Quản Trị - Kachi-Kun Shop
-    </h1>
-    <div class="user-info">
-        <div class="user-avatar">
-            <i class="fas fa-user-shield"></i>
-        </div>
-        <div>
-            <div>
-                Xin chào, <strong>${user.fullName}</strong>
+	<div class="admin-header">
+		<h1>
+			<i class="fas fa-crown"></i> Trang Quản Trị - Kachi-Kun Shop
+		</h1>
+		<div class="user-info">
+			<div class="user-avatar">
+				<i class="fas fa-user-shield"></i>
+			</div>
+			<div>
+				<div>
+					Xin chào, <strong>${user.fullName}</strong>
+				</div>
+				<div style="font-size: 12px; opacity: 0.9;">Quản trị viên</div>
+			</div>
+			<a href="logout">
+				<button class="logout-btn">
+					<i class="fas fa-sign-out-alt"></i> Đăng xuất
+				</button>
+			</a>
+		</div>
+	</div>
+
+	<div class="admin-container">
+		<div class="sidebar">
+			<ul class="sidebar-menu">
+				<li><a href="adminHome"><i class="fas fa-tachometer-alt"></i> Tổng quan</a></li>
+				<li><a href="adminUsers"><i class="fas fa-users"></i> Quản lý người dùng</a></li>
+				<li><a href="adminProducts"><i class="fas fa-box"></i> Quản lý sản phẩm</a></li>
+				<li><a href="adminOrders"><i class="fas fa-shopping-cart"></i> Quản lý đơn hàng</a></li>
+                <li><a href="adminContacts" class="active"><i class="fas fa-envelope"></i> Quản lý liên hệ</a></li>
+				<li><a href="adminDiscounts"><i class="fas fa-tag"></i> Mã giảm giá</a></li>
+				<li><a href="home"><i class="fas fa-store"></i> Về trang cửa hàng</a></li>
+			</ul>
+		</div>
+
+		<div class="main-content">
+
+            <div class="page-header">
+                <h2><i class="fas fa-envelope"></i> Hộp thư góp ý & Liên hệ</h2>
+                <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">
+                    Danh sách tin nhắn từ khách hàng gửi qua form liên hệ.
+                </p>
             </div>
             <div style="font-size: 12px; opacity: 0.9;">Quản trị viên</div>
         </div>

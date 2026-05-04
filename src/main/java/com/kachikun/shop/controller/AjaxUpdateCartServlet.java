@@ -63,8 +63,8 @@ public class AjaxUpdateCartServlet extends HttpServlet {
                             cart.remove(i);
                             session.setAttribute("cart", cart);
                             double newTotal = calculateTotal(cart);
-                            out.print(String.format("{\"status\":\"removed\", \"cartTotal\":\"%s\", \"cartSize\":%d}", 
-                                    formatMoney(newTotal), cart.size()));
+                            out.print(String.format("{\"status\":\"removed\", \"cartTotal\":\"%s\", \"cartTotalRaw\":%.2f, \"cartSize\":%d}",
+                                    formatMoney(newTotal), newTotal, cart.size()));
                             return;
                         }
                         break;
@@ -85,10 +85,11 @@ public class AjaxUpdateCartServlet extends HttpServlet {
             }
 
             String jsonResponse = String.format(
-                "{\"status\":\"ok\", \"newQty\":%d, \"itemTotal\":\"%s\", \"cartTotal\":\"%s\", \"cartSize\":%d}",
-                currentQty, 
-                formatMoney(itemTotal), 
+                "{\"status\":\"ok\", \"newQty\":%d, \"itemTotal\":\"%s\", \"cartTotal\":\"%s\", \"cartTotalRaw\":%.2f, \"cartSize\":%d}",
+                currentQty,
+                formatMoney(itemTotal),
                 formatMoney(newTotal),
+                newTotal,
                 cart.size()
             );
             

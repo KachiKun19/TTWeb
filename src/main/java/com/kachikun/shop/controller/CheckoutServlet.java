@@ -9,10 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import com.kachikun.shop.dao.DiscountDAO;
 import com.kachikun.shop.dao.OrderDAO;
-import com.kachikun.shop.dao.ProductDAO; // Nhớ import cái này
+import com.kachikun.shop.dao.ProductDAO;
 import com.kachikun.shop.model.CartItem;
-import com.kachikun.shop.model.Product; // Nhớ import cái này
+import com.kachikun.shop.model.Discount;
+import com.kachikun.shop.model.Product;
 import com.kachikun.shop.model.User;
 
 @WebServlet("/checkout")
@@ -26,6 +28,7 @@ public class CheckoutServlet extends HttpServlet {
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
         String paymentMethod = request.getParameter("payment_method");
+        String discountCode = request.getParameter("discountCode");
 
         HttpSession session = request.getSession();
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
@@ -56,16 +59,29 @@ public class CheckoutServlet extends HttpServlet {
             }
         }
         double totalMoney = calculateTotal(cart);
+        double discountAmount = 0;
+
+        if (discountCode != null && !discountCode.trim().isEmpty()) {
+            DiscountDAO discountDAO = new DiscountDAO();
+            Discount discount = discountDAO.findByCode(discountCode.trim());
+            if (discount != null && discount.isValid() && totalMoney >= discount.getMinOrderValue()) {
+                discountAmount = discount.calculateDiscount(totalMoney);
+            }
+        }
+        double finalTotal = totalMoney - discountAmount;
 
         OrderDAO dao = new OrderDAO();
-        boolean check = dao.createOrder(user, cart, totalMoney, fullname, phone, address, paymentMethod);
+        boolean check = dao.createOrder(user, cart, finalTotal, fullname, phone, address, paymentMethod);
 
         if (check) {
+            if (discountCode != null && !discountCode.trim().isEmpty() && discountAmount > 0) {
+                new DiscountDAO().incrementUsed(discountCode.trim());
+            }
             session.removeAttribute("cart");
 
             request.setAttribute("msg", "Đặt hàng thành công!");
-            request.setAttribute("paymentMethod", paymentMethod); 
-            request.setAttribute("finalTotal", totalMoney);
+            request.setAttribute("paymentMethod", paymentMethod);
+            request.setAttribute("finalTotal", finalTotal);
             request.setAttribute("orderId", System.currentTimeMillis());
             
             request.getRequestDispatcher("cart.jsp").forward(request, response);

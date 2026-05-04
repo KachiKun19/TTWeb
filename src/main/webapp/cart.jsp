@@ -29,7 +29,7 @@
     </style>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
-<jsp:include page="components/header2.jsp" />
+<jsp:include page="components/header2.jsp"/>
 
 <main class="flex-grow container mx-auto px-4 py-8">
 
@@ -177,8 +177,50 @@
                             class="text-lg font-bold mb-4 uppercase border-b pb-2 text-black">Thông
                         tin thanh toán</h2>
 
-                    <form action="checkout" method="post" class="space-y-4">
+                        <%-- Tính tạm tính từ session cart --%>
+                    <c:set var="cartSubtotal" value="0"/>
+                    <c:forEach items="${sessionScope.cart}" var="item">
+                        <c:set var="cartSubtotal" value="${cartSubtotal + item.totalPrice}"/>
+                    </c:forEach>
 
+                        <%-- Tóm tắt đơn hàng --%>
+                    <div class="mb-4 space-y-2 text-sm">
+                        <div class="flex justify-between text-gray-600">
+                            <span>Tạm tính:</span>
+                            <span id="cart-total-display">
+                                <fmt:formatNumber value="${cartSubtotal}" type="currency" currencySymbol="₫"/>
+                            </span>
+                        </div>
+                        <div id="discount-row" class="flex justify-between text-green-600 hidden">
+                            <span>Giảm giá (<span id="discount-label"></span>):</span>
+                            <span id="discount-amount-display"></span>
+                        </div>
+                        <div class="flex justify-between font-bold border-t pt-2">
+                            <span class="text-gray-800">Tổng cộng:</span>
+                            <span id="final-total-display" class="text-red-600 text-base">
+                                <fmt:formatNumber value="${cartSubtotal}" type="currency" currencySymbol="₫"/>
+                            </span>
+                        </div>
+                    </div>
+
+                        <%-- Nhập mã giảm giá --%>
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Mã giảm giá</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="discount-input"
+                                   placeholder="Nhập mã..."
+                                   class="flex-1 text-sm p-2 border border-gray-300 rounded focus:ring-black focus:border-black"
+                                   oninput="this.value = this.value.toUpperCase()">
+                            <button type="button" onclick="applyDiscount()"
+                                    class="bg-black text-white px-3 py-2 rounded text-sm font-bold hover:bg-gray-800 transition whitespace-nowrap">
+                                Áp dụng
+                            </button>
+                        </div>
+                        <p id="discount-msg" class="text-xs mt-1 hidden"></p>
+                    </div>
+
+                    <form action="checkout" method="post" class="space-y-4">
+                        <input type="hidden" name="discountCode" id="discount-code-hidden" value="">
 
                         <hr class="border-dashed">
 
@@ -186,7 +228,8 @@
                             <label
                                     class="block text-xs font-bold text-gray-700 uppercase mb-1">Họ tên người nhận
                                 *</label>
-                            <input type="text" name="fullname" pattern="^[A-Za-zÀ-ỹ\s]+$"    oninvalid="this.setCustomValidity('Chỉ được nhập chữ cái, không có số!')"
+                            <input type="text" name="fullname" pattern="^[A-Za-zÀ-ỹ\s]+$"
+                                   oninvalid="this.setCustomValidity('Chỉ được nhập chữ cái, không có số!')"
                                    oninput="this.setCustomValidity('')"
                                    placeholder="Nguyễn Văn A" required
                                    class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black">
@@ -372,6 +415,56 @@
 
 <script>
 
+    var subtotalRaw = ${cartSubtotal};
+    var discountAmountRaw = 0;
+
+    function formatVND(amount) {
+        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
+    }
+
+    function applyDiscount() {
+        var code = document.getElementById('discount-input').value.trim();
+        if (!code) {
+            showDiscountMsg('Vui lòng nhập mã giảm giá!', 'error');
+            return;
+        }
+        fetch('apply-discount?code=' + encodeURIComponent(code))
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    discountAmountRaw = data.discountAmount;
+                    subtotalRaw = data.subtotal;
+                    document.getElementById('discount-code-hidden').value = data.code;
+                    document.getElementById('discount-label').innerText = data.code;
+                    document.getElementById('discount-amount-display').innerText = '-' + formatVND(data.discountAmount);
+                    document.getElementById('final-total-display').innerText = formatVND(data.finalTotal);
+                    document.getElementById('discount-row').classList.remove('hidden');
+                    showDiscountMsg('Áp dụng mã giảm giá thành công!', 'success');
+                } else {
+                    clearDiscount();
+                    showDiscountMsg(data.message, 'error');
+                }
+            })
+            .catch(() => showDiscountMsg('Có lỗi xảy ra, vui lòng thử lại!', 'error'));
+    }
+
+    function clearDiscount() {
+        discountAmountRaw = 0;
+        document.getElementById('discount-code-hidden').value = '';
+        document.getElementById('discount-row').classList.add('hidden');
+        document.getElementById('final-total-display').innerText = formatVND(subtotalRaw);
+        var msgEl = document.getElementById('discount-msg');
+        if (msgEl) msgEl.classList.add('hidden');
+    }
+
+    function showDiscountMsg(msg, type) {
+        var el = document.getElementById('discount-msg');
+        el.innerText = msg;
+        el.className = 'text-xs mt-1 ' + (type === 'error' ? 'text-red-600' : 'text-green-600');
+        el.classList.remove('hidden');
+        setTimeout(() => el.classList.add('hidden'), 4000);
+    }
+
     function updateQuantityAjax(productId, mod) {
         callAjax('ajaxUpdateCart?id=' + productId + '&mod=' + mod, productId);
     }
@@ -417,6 +510,10 @@
                     if (errorAlert) errorAlert.classList.add("hidden");
                     if (rowDiv) rowDiv.remove();
                     if (cartTotalSpan) cartTotalSpan.innerText = data.cartTotal;
+                    if (data.cartTotalRaw !== undefined) {
+                        subtotalRaw = data.cartTotalRaw;
+                        clearDiscount();
+                    }
                     updateCartCount(data.cartSize);
 
                 } else {
@@ -425,6 +522,10 @@
                     if (qtyInput) qtyInput.value = data.newQty;
                     if (itemTotalSpan) itemTotalSpan.innerText = data.itemTotal;
                     if (cartTotalSpan) cartTotalSpan.innerText = data.cartTotal;
+                    if (data.cartTotalRaw !== undefined) {
+                        subtotalRaw = data.cartTotalRaw;
+                        clearDiscount();
+                    }
                     updateCartCount(data.cartSize);
                 }
             })

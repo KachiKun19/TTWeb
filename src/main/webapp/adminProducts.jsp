@@ -525,6 +525,7 @@ body {
 						Quản lý đơn hàng</a></li>
 				<li><a href="adminContacts"><i class="fas fa-envelope"></i>
 						Quản lý liên hệ</a></li>
+				<li><a href="adminDiscounts"><i class="fas fa-tag"></i> Mã giảm giá</a></li>
 				<li><a href="home"><i class="fas fa-store"></i> Về trang
 						cửa hàng</a></li>
 			</ul>
@@ -554,6 +555,13 @@ body {
 				<div class="alert alert-success">
 					<i class="fas fa-check-circle"></i> Sản phẩm đã được xóa thành
 					công!
+				</div>
+			</c:if>
+
+			<c:if test="${param.success eq 'edit_success'}">
+				<div class="alert alert-success">
+					<i class="fas fa-check-circle"></i> Sản phẩm đã được cập nhật
+					thành công!
 				</div>
 			</c:if>
 
@@ -615,6 +623,11 @@ body {
 											</c:if></td>
 										<td>
 											<div class="action-buttons">
+												<a href="editProduct?id=${product.id}">
+													<button class="edit-btn">
+														<i class="fas fa-edit"></i> Sửa
+													</button>
+												</a>
 												<button class="delete-btn"
 													onclick="confirmDelete(${product.id})">
 													<i class="fas fa-trash"></i> Xóa

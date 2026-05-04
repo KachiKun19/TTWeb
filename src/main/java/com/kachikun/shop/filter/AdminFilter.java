@@ -9,8 +9,8 @@ import java.io.IOException;
 import com.kachikun.shop.model.User;
 
 @WebFilter(urlPatterns = {
-    "/adminHome", "/adminProducts", "/addProduct", "/deleteProduct", 
-    "/adminUsers", "/adminOrders", "/adminContacts", 
+    "/adminHome", "/adminProducts", "/addProduct", "/editProduct", "/deleteProduct",
+    "/adminUsers", "/adminOrders", "/adminContacts", "/adminDiscounts",
     "/loadDailyStats", "/exportRevenueStats"
 })
 public class AdminFilter implements Filter {

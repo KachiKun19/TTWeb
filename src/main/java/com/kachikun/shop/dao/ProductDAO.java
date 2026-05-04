@@ -417,6 +417,32 @@ public class ProductDAO extends BaseDAO {
         }
     }
 
+    // cap nhat sp
+    public boolean updateProduct(Product product) {
+        String sql = "UPDATE Products SET name=?, description=?, price=?, image=?, stock_quantity=?, "
+                + "category_id=?, brand_id=?, connection_type=?, material=?, product_size=? "
+                + "WHERE id=?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, product.getName());
+            ps.setString(2, product.getDescription());
+            ps.setDouble(3, product.getPrice());
+            ps.setString(4, product.getImage());
+            ps.setInt(5, product.getStock());
+            ps.setInt(6, product.getCategory() != null ? product.getCategory().getId() : 0);
+            ps.setInt(7, product.getBrand() != null ? product.getBrand().getId() : 0);
+            ps.setString(8, product.getConnectionType());
+            ps.setString(9, product.getMaterial());
+            ps.setString(10, product.getSize());
+            ps.setInt(11, product.getId());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Lỗi khi cập nhật sản phẩm: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // xóa sp
     public boolean deleteProduct(int productId) {
         String sql = "DELETE FROM Products WHERE id = ?";
