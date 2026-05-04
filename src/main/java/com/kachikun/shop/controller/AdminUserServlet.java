@@ -28,23 +28,22 @@ public class AdminUserServlet extends HttpServlet {
             response.sendRedirect("home");
             return;
         }
-        // ===== PHÂN TRANG =====
         int page = 1;
-        int pageSize = 10;
+        int pageSize = 5;
 
         String pageParam = request.getParameter("page");
         if (pageParam != null) {
             page = Integer.parseInt(pageParam);
         }
 
-        // Tổng số user
         int totalUsers = userDAO.getTotalUsers();
         int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
 
-        // Lấy user theo page
-        List<User> userList = userDAO.getUsersPaging(page, pageSize);
+        List<User> adminList = userDAO.getUsersByRolePaging(1, page, pageSize);
+        List<User> userList = userDAO.getUsersByRolePaging(0, page, pageSize);
 
-        request.setAttribute("userList", userList);
+        request.setAttribute("adminList", adminList);
+        request.setAttribute("userList", userList);;
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
 

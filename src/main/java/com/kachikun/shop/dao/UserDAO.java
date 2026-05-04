@@ -246,16 +246,17 @@ public class UserDAO extends BaseDAO {
         return 0;
     }
 
-    public List<User> getUsersPaging(int page, int pageSize) {
+    public List<User> getUsersByRolePaging(int role, int page, int pageSize) {
         List<User> list = new ArrayList<>();
 
-        String sql = "SELECT * FROM Users ORDER BY id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        String sql = "SELECT * FROM Users WHERE role = ? ORDER BY id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, (page - 1) * pageSize);
-            ps.setInt(2, pageSize);
+            ps.setInt(1, role);
+            ps.setInt(2, (page - 1) * pageSize);
+            ps.setInt(3, pageSize);
 
             ResultSet rs = ps.executeQuery();
 
@@ -269,7 +270,6 @@ public class UserDAO extends BaseDAO {
 
         return list;
     }
-
     /**
      * Có Password
      */

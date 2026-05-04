@@ -83,8 +83,8 @@ public class UserService {
         return userDAO.updatePassword(email, hashedPassword);
     }
 
-    public List<User> getUsersPaging(int page, int pageSize) {
-        return userDAO.getUsersPaging(page, pageSize);
+    public List<User> getUsersByRolePaging(int role, int page, int pageSize) {
+        return userDAO.getUsersByRolePaging(role, page, pageSize);
     }
 
     public int getTotalUsers() {
