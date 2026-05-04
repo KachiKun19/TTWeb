@@ -3,6 +3,7 @@ package com.kachikun.shop.dao;
 import com.kachikun.shop.model.Brand;
 import com.kachikun.shop.model.Category;
 import com.kachikun.shop.model.Product;
+import com.kachikun.shop.utils.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -456,5 +457,34 @@ public class ProductDAO extends BaseDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public List<Product> getRelatedProducts(int categoryId, int excludeProductId) {
+        List<Product> list = new ArrayList<>();
+        String sql = "SELECT TOP 5 * FROM Products WHERE category_id = ? AND id != ? AND stock_quantity > 0 ORDER BY NEWID()";
+
+        // lấy dao
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, categoryId);
+            ps.setInt(2, excludeProductId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Product p = new Product();
+                    p.setId(rs.getInt("id"));
+                    p.setName(rs.getString("name"));
+                    p.setImage(rs.getString("image"));
+                    p.setPrice(rs.getDouble("price"));
+
+                    list.add(p);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi lấy sản phẩm liên quan: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
     }
 }

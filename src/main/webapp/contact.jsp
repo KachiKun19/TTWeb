@@ -150,15 +150,21 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 group-focus-within:text-pink-500 transition">
                                 <i class="fas fa-phone"></i>
                             </span>
-                        <input type="tel" name="phone" placeholder="Số điện thoại"
+                        <input type="tel" name="phone" placeholder="Số điện thoại" pattern="^(0|\+84)\d{9,10}$"
                                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition bg-gray-50 focus:bg-white">
                     </div>
                     <div class="relative group">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 group-focus-within:text-pink-500 transition">
                                 <i class="fas fa-tag"></i>
                             </span>
-                        <input type="text" name="subject" required placeholder="Chủ đề cần hỗ trợ"
-                               class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition bg-gray-50 focus:bg-white">
+                        <select name="subject" required
+                                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition bg-gray-50 focus:bg-white">
+                            <option value="">-- Chọn chủ đề --</option>
+                            <option value="product_error">Lỗi sản phẩm</option>
+                            <option value="return">Đổi / Trả</option>
+                            <option value="consult">Tư vấn</option>
+                            <option value="other">Khác</option>
+                        </select>
                     </div>
                 </div>
 

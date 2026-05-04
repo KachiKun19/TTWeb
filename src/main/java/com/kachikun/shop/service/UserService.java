@@ -1,6 +1,7 @@
 package com.kachikun.shop.service;
 
 import java.util.List;
+
 import com.kachikun.shop.model.User;
 import com.kachikun.shop.dao.UserDAO;
 import com.kachikun.shop.utils.BCryptUtils;
@@ -82,8 +83,27 @@ public class UserService {
         return userDAO.updatePassword(email, hashedPassword);
     }
 
-    public List<User> getAllUsers() { return userDAO.getAllUsers(); }
-    public List<User> getAdmins() { return userDAO.getUsersByRole(1); }
-    public List<User> getRegularUsers() { return userDAO.getUsersByRole(0); }
-    public boolean deleteUser(int userId) { return userDAO.deleteUser(userId); }
+    public List<User> getUsersByRolePaging(int role, int page, int pageSize) {
+        return userDAO.getUsersByRolePaging(role, page, pageSize);
+    }
+
+    public int getTotalUsers() {
+        return userDAO.getTotalUsers();
+    }
+
+    public List<User> getAllUsers() {
+        return userDAO.getAllUsers();
+    }
+
+    public List<User> getAdmins() {
+        return userDAO.getUsersByRole(1);
+    }
+
+    public List<User> getRegularUsers() {
+        return userDAO.getUsersByRole(0);
+    }
+
+    public boolean deleteUser(int userId) {
+        return userDAO.deleteUser(userId);
+    }
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kachikun.shop.model.ContactMessage;
+import com.kachikun.shop.model.Reply;
 
 public class ContactDAO extends BaseDAO {
 
@@ -115,4 +116,5 @@ public class ContactDAO extends BaseDAO {
 
         return c;
     }
+
 }

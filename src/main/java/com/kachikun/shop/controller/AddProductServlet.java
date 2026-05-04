@@ -22,7 +22,6 @@ public class AddProductServlet extends HttpServlet {
     private BrandDAO brandDAO = new BrandDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Kiểm tra đăng nhập và quyền admin
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login");
@@ -34,8 +33,7 @@ public class AddProductServlet extends HttpServlet {
             response.sendRedirect("home");
             return;
         }
-        
-        // Lấy danh sách category và brand để hiển thị trong form
+
         List<Category> categories = categoryDAO.getAllCategories();
         List<Brand> brands = brandDAO.getAllBrands();
         

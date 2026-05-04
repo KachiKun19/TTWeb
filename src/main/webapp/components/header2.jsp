@@ -132,17 +132,78 @@
                     </c:choose>
                 </div>
             </div>
+            <c:if test="${not empty sessionScope.user}">
+                <div class="relative">
+                    <button id="notiBtn" onclick="toggleNoti()"
+                            class="text-xl relative pt-2 focus:outline-none">
+                        <i class="fas fa-bell"></i>
 
+                        <c:if test="${unreadCount > 0}">
+            <span class="absolute -top-1 -right-2 bg-red-600 text-white text-xs px-1 rounded-full">
+                    ${unreadCount}
+            </span>
+                        </c:if>
+                    </button>
+
+                    <!-- DROPDOWN -->
+                    <div id="notiDropdown"
+                         class="hidden absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-lg z-50 text-black">
+
+                        <div class="p-3 border-b font-bold">
+                            Thông báo
+                        </div>
+
+                        <div class="max-h-60 overflow-y-auto">
+                            <c:forEach var="item" items="${list}">
+                                <div class="p-3 border-b hover:bg-gray-100 text-sm">
+
+                                    <c:choose>
+                                        <c:when test="${item.replyMessage != null}">
+                                            <p class="font-semibold text-green-600">
+                                                    ${item.replyMessage}
+                                            </p>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <p class="text-yellow-500">
+                                                Đang chờ phản hồi...
+                                            </p>
+                                        </c:otherwise>
+                                    </c:choose>
+
+                                    <p class="text-xs text-gray-500">
+                                            ${item.replyDate}
+                                    </p>
+                                </div>
+                            </c:forEach>
+                        </div>
+
+                        <div class="max-h-60 overflow-y-auto">
+
+                            <c:if test="${empty list}">
+                                <div class="p-4 text-center text-gray-500 text-sm">
+                                    📭 Chưa có thông báo nào
+                                </div>
+                            </c:if>
+
+                        </div>
+                    </div>
+                </div>
+            </c:if>
             <div class="relative">
                 <button id="cartDropdownButton" data-dropdown-toggle="cartDropdown"
                         class="text-xl transition-opacity duration-200 hover:opacity-80 relative focus:outline-none pt-2">
                     <i class="fas fa-shopping-basket"></i>
 
-                    <c:if test="${not empty sessionScope.cart}">
-            <span class="absolute -top-1 -right-2 bg-pink-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-[#1a1a1a]">
-                    ${sessionScope.cart.size()}
-            </span>
-                    </c:if>
+                    <c:set var="totalCartQty" value="0"/>
+                    <c:forEach var="item" items="${sessionScope.cart}">
+                        <c:set var="totalCartQty" value="${totalCartQty + item.quantity}"/>
+                    </c:forEach>
+
+                    <span id="cart-badge"
+                          class="absolute -top-1 -right-2 bg-pink-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-[#1a1a1a]"
+                          style="${empty sessionScope.cart ? 'display:none;' : ''}">
+                        ${totalCartQty}
+                    </span>
                 </button>
 
                 <div id="cartDropdown"
