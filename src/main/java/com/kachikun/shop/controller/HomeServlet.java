@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.kachikun.shop.dao.CategoryDAO;
 import com.kachikun.shop.model.Category;
 import com.kachikun.shop.dao.ProductDAO;
+import com.kachikun.shop.dao.FeaturedProductDAO;
 import com.kachikun.shop.model.Product;
 
 @WebServlet("/home")
@@ -18,14 +19,15 @@ public class HomeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	CategoryDAO cateDAO = new CategoryDAO();
-
 	private ProductDAO productDAO = new ProductDAO();
+	private FeaturedProductDAO featuredDAO = new FeaturedProductDAO();
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		List<Product> list = productDAO.getAllProducts();
 		List<Category> listC = cateDAO.getAllCategories();
+		List<Product> featuredProducts = featuredDAO.getFeaturedProducts();
 
 		System.out.println("====================================");
 		System.out.println("DEBUG: Đang chạy HomeServlet");
@@ -36,8 +38,8 @@ public class HomeServlet extends HttpServlet {
 		System.out.println("====================================");
 
 		request.setAttribute("products", list);
-
 		request.setAttribute("listCategories", listC);
+		request.setAttribute("featuredProducts", featuredProducts);
 
 		request.getRequestDispatcher("home.jsp").forward(request, response);
 	}

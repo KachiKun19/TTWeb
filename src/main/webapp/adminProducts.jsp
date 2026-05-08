@@ -526,6 +526,7 @@ body {
 				<li><a href="adminContacts"><i class="fas fa-envelope"></i>
 						Quản lý liên hệ</a></li>
 				<li><a href="adminDiscounts"><i class="fas fa-tag"></i> Mã giảm giá</a></li>
+				<li><a href="adminFeaturedProducts"><i class="fas fa-star"></i> Sản phẩm nổi bật</a></li>
 				<li><a href="home"><i class="fas fa-store"></i> Về trang
 						cửa hàng</a></li>
 			</ul>
