@@ -32,6 +32,7 @@ public class ProductDAO extends BaseDAO {
         Category category = new Category();
         category.setId(rs.getInt("category_id"));
         category.setName(rs.getString("cat_name"));
+        try { category.setIcon(rs.getString("cat_icon")); } catch (Exception ignored) {}
         product.setCategory(category);
 
         Brand brand = new Brand();
@@ -50,7 +51,7 @@ public class ProductDAO extends BaseDAO {
 
     // lấy toàn bộ sản phẩm để panging cho adminProduct
     public List<Product> getAllProducts() {
-        String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name "
                 + "FROM Products p "
                 + "INNER JOIN Categories c ON p.category_id = c.id "
                 + "INNER JOIN Brands b ON p.brand_id = b.id";
@@ -72,7 +73,7 @@ public class ProductDAO extends BaseDAO {
 
     //tìm bằng id
     public Product getProductById(int productId) {
-        String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name "
                 + "FROM Products p "
                 + "INNER JOIN Categories c ON p.category_id = c.id "
                 + "INNER JOIN Brands b ON p.brand_id = b.id "
@@ -94,7 +95,7 @@ public class ProductDAO extends BaseDAO {
 
     // search tên sp - loại sp
     public List<Product> findByName(String keyword) {
-        String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name "
                 + "FROM Products p "
                 + "INNER JOIN Categories c ON p.category_id = c.id "
                 + "INNER JOIN Brands b ON p.brand_id = b.id "
@@ -121,7 +122,7 @@ public class ProductDAO extends BaseDAO {
 
     // search sp theo danh mục
     public List<Product> findByCategoryName(String categoryName) {
-        String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name "
                 + "FROM Products p "
                 + "INNER JOIN Categories c ON p.category_id = c.id "
                 + "INNER JOIN Brands b ON p.brand_id = b.id "
@@ -145,7 +146,7 @@ public class ProductDAO extends BaseDAO {
 
     // chỉ lấy ra sản phẩm , ko lọc
     public List<Product> pagingProduct(int pageIndex) {
-        String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name, b.logo AS brand_logo "
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name, b.logo AS brand_logo "
                 + "FROM Products p "
                 + "LEFT JOIN Categories c ON p.category_id = c.id "
                 + "LEFT JOIN Brands b ON p.brand_id = b.id "
@@ -170,7 +171,7 @@ public class ProductDAO extends BaseDAO {
 
     // lấy sp theo trang trong danh mục
     public List<Product> pagingProductByCategory(String categoryName, int pageIndex) {
-        String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name, b.logo AS brand_logo "
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name, b.logo AS brand_logo "
                 + "FROM Products p "
                 + "LEFT JOIN Categories c ON p.category_id = c.id "
                 + "LEFT JOIN Brands b ON p.brand_id = b.id "
@@ -197,7 +198,7 @@ public class ProductDAO extends BaseDAO {
 
     // lấy sp theo trang
     public List<Product> getProductsByPage(int pageIndex, int pageSize) {
-        String sql = "SELECT p.*, c.name AS cat_name, b.name AS brand_name "
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name "
                 + "FROM Products p "
                 + "INNER JOIN Categories c ON p.category_id = c.id "
                 + "INNER JOIN Brands b ON p.brand_id = b.id "
@@ -273,7 +274,7 @@ public class ProductDAO extends BaseDAO {
         if (isCount) {
             sql.append("SELECT COUNT(*) FROM Products p ");
         } else {
-            sql.append("SELECT p.*, c.name AS cat_name, b.name AS brand_name, b.logo AS brand_logo ");
+            sql.append("SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name, b.logo AS brand_logo ");
             sql.append("FROM Products p ");
         }
 

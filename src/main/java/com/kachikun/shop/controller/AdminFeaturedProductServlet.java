@@ -12,7 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/adminFeaturedProducts")
 public class AdminFeaturedProductServlet extends HttpServlet {
@@ -34,7 +37,13 @@ public class AdminFeaturedProductServlet extends HttpServlet {
         List<Product> allProducts = productDAO.getAllProducts();
         List<Integer> featuredIds = featuredDAO.getFeaturedProductIds();
 
-        request.setAttribute("allProducts", allProducts);
+        Map<String, List<Product>> productsByCategory = new LinkedHashMap<>();
+        for (Product p : allProducts) {
+            String catName = p.getCategory() != null ? p.getCategory().getName() : "Khác";
+            productsByCategory.computeIfAbsent(catName, k -> new ArrayList<>()).add(p);
+        }
+
+        request.setAttribute("productsByCategory", productsByCategory);
         request.setAttribute("featuredIds", featuredIds);
         request.getRequestDispatcher("adminFeaturedProducts.jsp").forward(request, response);
     }
