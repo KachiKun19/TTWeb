@@ -224,6 +224,50 @@ public class ProductDAO extends BaseDAO {
     }
 
 
+    // lấy sp theo trang + danh mục (dùng cho admin filter theo tab)
+    public List<Product> getProductsByPageAndCategory(String category, int pageIndex, int pageSize) {
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name "
+                + "FROM Products p "
+                + "INNER JOIN Categories c ON p.category_id = c.id "
+                + "INNER JOIN Brands b ON p.brand_id = b.id "
+                + "WHERE c.name = ? "
+                + "ORDER BY p.id DESC "
+                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        List<Product> productList = new ArrayList<>();
+        int offset = (pageIndex - 1) * pageSize;
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, category);
+            ps.setInt(2, offset);
+            ps.setInt(3, pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) productList.add(mapProduct(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return productList;
+    }
+
+    // đếm sp theo danh mục (exact match)
+    public int countProductsByCategoryExact(String category) {
+        String sql = "SELECT COUNT(*) FROM Products p "
+                + "INNER JOIN Categories c ON p.category_id = c.id "
+                + "WHERE c.name = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, category);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public List<Product> filterProducts(String[] brandIds, String[] connections,
                                         String[] materials, String[] sizes,
                                         String category, int pageIndex, String sort) {

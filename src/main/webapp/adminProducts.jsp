@@ -452,6 +452,62 @@ body {
 	}
 }
 
+/* ── Tab bar danh mục ─────────────────────────────── */
+.tab-wrapper {
+    background: #fafafa;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+.tab-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.tab-btn {
+    flex: 1;
+    min-width: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px 12px;
+    background: white;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+    text-align: center;
+    line-height: 1.3;
+    transition: .2s;
+}
+.tab-btn i { font-size: 1.8rem; color: #001f3f; transition: .2s; }
+.tab-btn:hover { border-color: #2d7e7e; color: #2d7e7e; }
+.tab-btn:hover i { color: #2d7e7e; transform: scale(1.1); }
+.tab-btn.active { background: #2d7e7e; border-color: #2d7e7e; color: white; }
+.tab-btn.active i { color: white; }
+
+/* Toast */
+.toast {
+    position: fixed; top: 24px; right: 24px;
+    padding: 13px 18px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 9px;
+    z-index: 9999; opacity: 0; transform: translateY(-8px);
+    transition: opacity .25s, transform .25s;
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast-success { background: #d4edda; color: #155724; }
+.toast-error   { background: #f8d7da; color: #721c24; }
+
 @media ( max-width : 768px) {
 	.page-header {
 		flex-direction: column;
@@ -574,6 +630,30 @@ body {
 				</div>
 			</c:if>
 
+			<%-- Tab bar danh mục --%>
+			<c:if test="${not empty categories}">
+				<div class="tab-wrapper">
+					<div class="tab-bar">
+						<%-- Tab Tất cả --%>
+						<a href="adminProducts?page=1${not empty encodedCategory ? '&amp;category='.concat(encodedCategory) : ''}" class="tab-btn ${empty currentCategory ? 'active' : ''}">
+							<i class="fas fa-th-large"></i>
+							<span>Tất cả</span>
+						</a>
+						<%-- Tab từng danh mục --%>
+						<c:forEach var="cat" items="${categories}">
+							<c:url value="adminProducts" var="catUrl">
+								<c:param name="category" value="${cat.name}" />
+								<c:param name="page" value="1" />
+							</c:url>
+							<a href="${catUrl}" class="tab-btn ${currentCategory eq cat.name ? 'active' : ''}">
+								<i class="${cat.icon}"></i>
+								<span>${cat.name}</span>
+							</a>
+						</c:forEach>
+					</div>
+				</div>
+			</c:if>
+
 			<div class="products-table">
 				<c:choose>
 					<c:when test="${empty productList}">
@@ -659,7 +739,7 @@ body {
 
 							<c:choose>
 								<c:when test="${currentPage > 1}">
-									<a href="adminProducts?page=1" class="page-btn"
+									<a href="adminProducts?page=1${not empty encodedCategory ? '&amp;category='.concat(encodedCategory) : ''}" class="page-btn"
 										title="Trang đầu"> <i class="fas fa-angle-double-left"></i>
 									</a>
 								</c:when>
@@ -673,7 +753,7 @@ body {
 
 							<c:choose>
 								<c:when test="${currentPage > 1}">
-									<a href="adminProducts?page=${currentPage - 1}"
+									<a href="adminProducts?page=${currentPage - 1}${not empty encodedCategory ? '&amp;category='.concat(encodedCategory) : ''}"
 										class="page-btn" title="Trang trước"> <i
 										class="fas fa-chevron-left"></i>
 									</a>
@@ -710,7 +790,7 @@ body {
 
 
 								<c:if test="${startPage > 1}">
-									<a href="adminProducts?page=1" class="page-number">1</a>
+									<a href="adminProducts?page=1${not empty encodedCategory ? '&amp;category='.concat(encodedCategory) : ''}" class="page-number">1</a>
 									<c:if test="${startPage > 2}">
 										<span class="ellipsis">...</span>
 									</c:if>
@@ -723,7 +803,7 @@ body {
 											<span class="current-page">${i}</span>
 										</c:when>
 										<c:otherwise>
-											<a href="adminProducts?page=${i}" class="page-number">${i}</a>
+											<a href="adminProducts?page=${i}${not empty encodedCategory ? '&amp;category='.concat(encodedCategory) : ''}" class="page-number">${i}</a>
 										</c:otherwise>
 									</c:choose>
 								</c:forEach>
@@ -732,14 +812,14 @@ body {
 									<c:if test="${endPage < totalPages - 1}">
 										<span class="ellipsis">...</span>
 									</c:if>
-									<a href="adminProducts?page=${totalPages}" class="page-number">${totalPages}</a>
+									<a href="adminProducts?page=${totalPages}${not empty encodedCategory ? '&amp;category='.concat(encodedCategory) : ''}" class="page-number">${totalPages}</a>
 								</c:if>
 							</div>
 
 
 							<c:choose>
 								<c:when test="${currentPage < totalPages}">
-									<a href="adminProducts?page=${currentPage + 1}"
+									<a href="adminProducts?page=${currentPage + 1}${not empty encodedCategory ? '&amp;category='.concat(encodedCategory) : ''}"
 										class="page-btn" title="Trang sau"> <i
 										class="fas fa-chevron-right"></i>
 									</a>
@@ -754,7 +834,7 @@ body {
 
 							<c:choose>
 								<c:when test="${currentPage < totalPages}">
-									<a href="adminProducts?page=${totalPages}" class="page-btn"
+									<a href="adminProducts?page=${totalPages}${not empty encodedCategory ? '&amp;category='.concat(encodedCategory) : ''}" class="page-btn"
 										title="Trang cuối"> <i class="fas fa-angle-double-right"></i>
 									</a>
 								</c:when>
@@ -772,18 +852,48 @@ body {
 	</div>
 
 	<script>
-		
 		function confirmDelete(productId) {
-			if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
-				window.location.href = "deleteProduct?id=" + productId + "&page=${currentPage}";
-			}
+			if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) return;
+
+			fetch("deleteProduct?id=" + productId + "&page=${currentPage}", {
+				headers: { "X-Requested-With": "XMLHttpRequest" }
+			})
+			.then(r => r.json())
+			.then(data => {
+				if (data.success) {
+					// Xóa hàng khỏi bảng không reload
+					const row = document.querySelector('button.delete-btn[onclick="confirmDelete(' + productId + ')"]')
+					                    .closest('tr');
+					row.style.transition = 'opacity .3s';
+					row.style.opacity = '0';
+					setTimeout(() => {
+						row.remove();
+						// Nếu hết sản phẩm trên trang này thì reload
+						const remaining = document.querySelectorAll('tbody tr').length;
+						if (remaining === 0) window.location.reload();
+					}, 300);
+					showToast('Đã xóa sản phẩm thành công!', 'success');
+				} else {
+					showToast('Không thể xóa sản phẩm!', 'error');
+				}
+			})
+			.catch(() => showToast('Lỗi kết nối!', 'error'));
+		}
+
+		function showToast(msg, type) {
+			const t = document.createElement('div');
+			t.className = 'toast toast-' + type;
+			t.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + msg;
+			document.body.appendChild(t);
+			requestAnimationFrame(() => t.classList.add('show'));
+			setTimeout(() => {
+				t.classList.remove('show');
+				setTimeout(() => t.remove(), 300);
+			}, 2800);
 		}
 
 		setTimeout(function() {
-			var alerts = document.querySelectorAll('.alert');
-			alerts.forEach(function(alert) {
-				alert.style.display = 'none';
-			});
+			document.querySelectorAll('.alert').forEach(a => a.style.display = 'none');
 		}, 5000);
 	</script>
 </body>
