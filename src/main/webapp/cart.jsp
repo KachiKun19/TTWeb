@@ -219,6 +219,16 @@
                         <p id="discount-msg" class="text-xs mt-1 hidden"></p>
                     </div>
 
+                    <%-- Gợi ý mã đã lưu --%>
+                    <c:if test="${not empty savedDiscounts}">
+                        <div class="mb-4">
+                            <button type="button" onclick="openDiscountModal()"
+                                    class="w-full flex items-center justify-center gap-2 border border-dashed border-pink-400 rounded-lg px-3 py-2 text-pink-600 font-semibold text-sm hover:bg-pink-50 transition">
+                                <i class="fas fa-bookmark"></i> Chọn mã đã lưu của tôi
+                            </button>
+                        </div>
+                    </c:if>
+
                     <form action="checkout" method="post" class="space-y-4">
                         <input type="hidden" name="discountCode" id="discount-code-hidden" value="">
 
@@ -408,6 +418,56 @@
     </script>
 </c:if>
 
+<c:if test="${not empty savedDiscounts}">
+<!-- Modal chọn mã giảm giá -->
+<div id="discount-modal" onclick="if(event.target===this)closeDiscountModal()"
+     class="fixed inset-0 z-50 flex items-center justify-center hidden"
+     style="background:rgba(0,0,0,0.5);">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-bookmark text-pink-500"></i> Mã giảm giá của bạn
+            </h3>
+            <button type="button" onclick="closeDiscountModal()"
+                    class="text-gray-400 hover:text-gray-600 text-xl leading-none">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex flex-col gap-3 max-h-80 overflow-y-auto pr-1">
+            <c:forEach var="sd" items="${savedDiscounts}">
+                <button type="button" onclick="selectSavedCode('${sd.code}')"
+                        class="flex items-center justify-between w-full border border-dashed border-pink-400 rounded-xl px-4 py-3 hover:bg-pink-50 transition text-left group">
+                    <div>
+                        <div class="font-bold text-pink-600 text-sm tracking-wider">${sd.code}</div>
+                        <div class="text-xs text-gray-500 mt-0.5">
+                            <c:choose>
+                                <c:when test="${sd.discountType eq 'PERCENT'}">Giảm ${sd.discountValue}%</c:when>
+                                <c:otherwise>Giảm <fmt:formatNumber value="${sd.discountValue}" type="number" maxFractionDigits="0" groupingUsed="true"/>₫</c:otherwise>
+                            </c:choose>
+                            &nbsp;·&nbsp; Đơn từ <fmt:formatNumber value="${sd.minOrderValue}" type="number" maxFractionDigits="0" groupingUsed="true"/>₫
+                            <c:if test="${sd.expiresAt != null}">
+                                &nbsp;·&nbsp; HSD: <fmt:formatDate value="${sd.expiresAt}" pattern="dd/MM/yyyy"/>
+                            </c:if>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400 group-hover:text-pink-500 transition whitespace-nowrap ml-3">
+                        Chọn <i class="fas fa-arrow-right"></i>
+                    </span>
+                </button>
+            </c:forEach>
+        </div>
+    </div>
+</div>
+<script>
+function openDiscountModal() { document.getElementById('discount-modal').classList.remove('hidden'); }
+function closeDiscountModal() { document.getElementById('discount-modal').classList.add('hidden'); }
+function selectSavedCode(code) {
+    closeDiscountModal();
+    applySavedCode(code);
+}
+</script>
+</c:if>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script
         src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
@@ -420,6 +480,11 @@
 
     function formatVND(amount) {
         return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
+    }
+
+    function applySavedCode(code) {
+        document.getElementById('discount-input').value = code;
+        applyDiscount();
     }
 
     function applyDiscount() {

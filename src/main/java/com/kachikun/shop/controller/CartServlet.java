@@ -3,6 +3,8 @@ package com.kachikun.shop.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.kachikun.shop.dao.DiscountDAO;
+import com.kachikun.shop.model.Discount;
 import com.kachikun.shop.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,6 +18,7 @@ import com.kachikun.shop.model.CartItem;
 @WebServlet("/cart")
 public class CartServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private final DiscountDAO discountDAO = new DiscountDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,11 +32,12 @@ public class CartServlet extends HttpServlet {
         double totalMoney = 0;
         if (cart != null) {
             for (CartItem item : cart) {
-
                 totalMoney += item.getTotalPrice();
             }
         }
+        List<Discount> savedDiscounts = discountDAO.getSavedDiscountsByUser(user.getId());
         request.setAttribute("totalMoney", totalMoney);
+        request.setAttribute("savedDiscounts", savedDiscounts);
         request.getRequestDispatcher("cart.jsp").forward(request, response);
     }
 }

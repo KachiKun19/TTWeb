@@ -4,7 +4,9 @@ import com.kachikun.shop.model.Discount;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DiscountDAO extends BaseDAO {
 
@@ -102,6 +104,75 @@ public class DiscountDAO extends BaseDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<Discount> getActiveDiscounts() {
+        List<Discount> list = new ArrayList<>();
+        String sql = "SELECT * FROM Discounts WHERE is_active = 1 " +
+                     "AND (expires_at IS NULL OR expires_at >= CAST(GETDATE() AS DATE)) " +
+                     "AND (max_uses IS NULL OR used_count < max_uses) ORDER BY id DESC";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) list.add(mapDiscount(rs));
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public boolean saveForUser(int userId, int discountId) {
+        if (isAlreadySaved(userId, discountId)) return false;
+        String sql = "INSERT INTO UserSavedDiscounts (user_id, discount_id) VALUES (?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, discountId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
+    }
+
+    public boolean isAlreadySaved(int userId, int discountId) {
+        String sql = "SELECT COUNT(*) FROM UserSavedDiscounts WHERE user_id = ? AND discount_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, discountId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
+    }
+
+    public Set<Integer> getSavedDiscountIdsByUser(int userId) {
+        Set<Integer> ids = new HashSet<>();
+        String sql = "SELECT discount_id FROM UserSavedDiscounts WHERE user_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) ids.add(rs.getInt("discount_id"));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return ids;
+    }
+
+    public List<Discount> getSavedDiscountsByUser(int userId) {
+        List<Discount> list = new ArrayList<>();
+        String sql = "SELECT d.* FROM Discounts d " +
+                     "JOIN UserSavedDiscounts usd ON d.id = usd.discount_id " +
+                     "WHERE usd.user_id = ? AND d.is_active = 1 " +
+                     "AND (d.expires_at IS NULL OR d.expires_at >= CAST(GETDATE() AS DATE)) " +
+                     "AND (d.max_uses IS NULL OR d.used_count < d.max_uses) " +
+                     "ORDER BY usd.saved_at DESC";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapDiscount(rs));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
     }
 
     private Discount mapDiscount(ResultSet rs) throws SQLException {

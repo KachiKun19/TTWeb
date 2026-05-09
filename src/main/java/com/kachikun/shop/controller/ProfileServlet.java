@@ -1,6 +1,8 @@
 package com.kachikun.shop.controller;
 
+import com.kachikun.shop.dao.DiscountDAO;
 import com.kachikun.shop.dao.UserDAO;
+import com.kachikun.shop.model.Discount;
 import com.kachikun.shop.model.User;
 import com.kachikun.shop.service.OtpService;
 import com.kachikun.shop.service.UserService;
@@ -13,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/profile")
 public class ProfileServlet extends HttpServlet {
@@ -21,6 +24,7 @@ public class ProfileServlet extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
     private final UserService userService = new UserService();
+    private final DiscountDAO discountDAO = new DiscountDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -30,6 +34,9 @@ public class ProfileServlet extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+        User profileUser = (User) session.getAttribute("user");
+        List<Discount> savedDiscounts = discountDAO.getSavedDiscountsByUser(profileUser.getId());
+        request.setAttribute("savedDiscounts", savedDiscounts);
         request.getRequestDispatcher("profile.jsp").forward(request, response);
     }
 
