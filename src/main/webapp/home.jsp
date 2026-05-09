@@ -339,7 +339,6 @@
             </div>
         </div>
     </section>
-
     <!-- Sản phẩm nổi bật -->
     <c:if test="${not empty featuredProducts}">
         <section class="featured-section">
@@ -373,7 +372,7 @@
                                         <span class="fp-btn-disabled">Hết hàng</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <a href="add-to-cart?productId=${p.id}" class="fp-btn-cart">
+                                        <a href="add-to-cart?id=${p.id}" class="fp-btn-cart">
                                             <i class="fas fa-cart-plus"></i> Thêm giỏ
                                         </a>
                                     </c:otherwise>
