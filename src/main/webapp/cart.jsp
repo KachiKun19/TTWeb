@@ -10,14 +10,30 @@
     <title>Giỏ hàng - Kachi-Kun Shop</title>
     <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
     <link rel="stylesheet" href="style.css"/>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+          rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
     <style>
+        select {
+            background-color: white !important;
+            color: black !important;
+        }
+
+        option {
+            background-color: white !important;
+            color: black !important;
+        }
+
         .qty-input::-webkit-outer-spin-button,
-        .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
         .cart-checkbox {
-            width: 18px; height: 18px;
+            width: 18px;
+            height: 18px;
             accent-color: #e11d48;
             cursor: pointer;
             flex-shrink: 0;
@@ -53,7 +69,8 @@
         <div class="text-center py-16 bg-white rounded shadow-sm">
             <div class="text-6xl text-gray-300 mb-4"><i class="fas fa-shopping-basket"></i></div>
             <p class="text-xl text-gray-500 mb-6">Giỏ hàng của bạn đang trống trơn!</p>
-            <a href="home" class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 transition uppercase font-bold">
+            <a href="home"
+               class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 transition uppercase font-bold">
                 Tiếp tục mua sắm
             </a>
         </div>
@@ -74,7 +91,8 @@
                 <c:set var="serverError"
                        value="${requestScope.stockError != null ? requestScope.stockError : sessionScope.stockError}"/>
                 <div id="error-alert" class="col-span-1 md:col-span-3 ${not empty serverError ? '' : 'hidden'}">
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-md flex items-center animate-pulse" role="alert">
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-md flex items-center animate-pulse"
+                         role="alert">
                         <i class="fas fa-exclamation-triangle text-2xl mr-3"></i>
                         <div>
                             <strong class="font-bold">Thông báo:</strong>
@@ -121,7 +139,8 @@
                                 <div class="col-span-5 flex gap-4 items-center">
                                     <a href="product-detail?id=${item.product.id}"
                                        class="w-20 h-20 flex-shrink-0 border rounded overflow-hidden hover:opacity-80 transition">
-                                        <img src="images/${item.product.image}" alt="${item.product.name}" class="w-full h-full object-cover">
+                                        <img src="images/${item.product.image}" alt="${item.product.name}"
+                                             class="w-full h-full object-cover">
                                     </a>
                                     <div>
                                         <h3 class="font-bold text-gray-800 hover:text-blue-600 transition">
@@ -149,20 +168,25 @@
                                     <div class="flex items-center border rounded border-gray-300">
                                         <button type="button"
                                                 onclick="updateQuantityAjax(${item.product.id}, -1)"
-                                                class="px-3 py-1 text-gray-600 hover:bg-gray-100 font-bold border-r border-gray-200 focus:outline-none transition h-full">-</button>
+                                                class="px-3 py-1 text-gray-600 hover:bg-gray-100 font-bold border-r border-gray-200 focus:outline-none transition h-full">
+                                            -
+                                        </button>
                                         <input type="number" id="qty-${item.product.id}"
                                                value="${item.quantity}"
                                                onchange="updateQuantityDirectly(${item.product.id}, this)"
                                                class="w-16 text-center border-0 text-sm font-bold text-gray-900 focus:ring-0 bg-transparent p-0 qty-input"/>
                                         <button type="button"
                                                 onclick="updateQuantityAjax(${item.product.id}, 1)"
-                                                class="px-3 py-1 text-gray-600 hover:bg-gray-100 font-bold border-l border-gray-200 focus:outline-none transition h-full">+</button>
+                                                class="px-3 py-1 text-gray-600 hover:bg-gray-100 font-bold border-l border-gray-200 focus:outline-none transition h-full">
+                                            +
+                                        </button>
                                     </div>
                                 </div>
 
                                 <div class="col-span-2 text-right font-bold text-red-600">
                                     <span id="item-total-${item.product.id}">
-                                        <fmt:formatNumber value="${item.totalPrice}" type="currency" currencySymbol="₫"/>
+                                        <fmt:formatNumber value="${item.totalPrice}" type="currency"
+                                                          currencySymbol="₫"/>
                                     </span>
                                 </div>
                             </div>
@@ -191,6 +215,10 @@
                                 <span>Giảm giá (<span id="discount-label"></span>):</span>
                                 <span id="discount-amount-display"></span>
                             </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Phí vận chuyển:</span>
+                                <span id="shipping-fee">0₫</span>
+                            </div>
                             <div class="flex justify-between font-bold border-t pt-2">
                                 <span class="text-gray-800">Tổng cộng:</span>
                                 <span id="final-total-display" class="text-red-600 text-base">
@@ -218,7 +246,8 @@
 
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Họ tên người nhận *</label>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Họ tên người nhận
+                                    *</label>
                                 <input type="text" name="fullname"
                                        pattern="^[A-Za-zÀ-ỹ\s]+$"
                                        oninvalid="this.setCustomValidity('Chỉ được nhập chữ cái, không có số!')"
@@ -227,28 +256,81 @@
                                        class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Số điện thoại *</label>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Số điện thoại
+                                    *</label>
                                 <input type="number" name="phone" pattern="0[0-9]{9}"
                                        placeholder="09xxxxxxx" required
                                        class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ giao hàng *</label>
-                                <textarea name="address" rows="3"
-                                          placeholder="Số nhà, đường, phường/xã..." required
-                                          class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black text-black"></textarea>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ giao hàng
+                                    *</label>
+                                <div class="space-y-3">
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">
+                                            Tỉnh / Thành phố
+                                        </label>
+
+                                        <select id="province"
+                                                class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
+                                            <option value="">-- Chọn tỉnh --</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">
+                                            Quận / Huyện
+                                        </label>
+
+                                        <select id="districtSelect"
+                                                onchange="loadWards()"
+                                                class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
+                                            <option value="">-- Chọn quận --</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">
+                                            Phường / Xã
+                                        </label>
+
+                                        <select id="wardSelect"
+                                                onchange="calculateShipping()"
+                                                class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
+                                            <option value="">-- Chọn phường --</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">
+                                            Địa chỉ chi tiết
+                                        </label>
+
+                                        <textarea name="address"
+                                                  rows="3"
+                                                  placeholder="Số nhà, tên đường..."
+                                                  required
+                                                  class="w-full text-sm p-2.5 border border-gray-300 rounded">
+                                                    </textarea>
+                                    </div>
+
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Phương thức thanh toán</label>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Phương thức thanh
+                                    toán</label>
                                 <div class="flex items-center mb-2">
                                     <input id="payment-cod" type="radio" value="COD" name="payment_method" checked
                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
-                                    <label for="payment-cod" class="ml-2 text-sm font-medium text-gray-900">Thanh toán khi nhận hàng (COD)</label>
+                                    <label for="payment-cod" class="ml-2 text-sm font-medium text-gray-900">Thanh toán
+                                        khi nhận hàng (COD)</label>
                                 </div>
                                 <div class="flex items-center">
                                     <input id="payment-bank" type="radio" value="BANKING" name="payment_method"
                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
-                                    <label for="payment-bank" class="ml-2 text-sm font-medium text-gray-900">Chuyển khoản ngân hàng</label>
+                                    <label for="payment-bank" class="ml-2 text-sm font-medium text-gray-900">Chuyển
+                                        khoản ngân hàng</label>
                                 </div>
                             </div>
 
@@ -283,7 +365,8 @@
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-2">Đặt hàng thành công!</h3>
                     <div class="mt-2 px-2 py-3">
-                        <p class="text-gray-500">Cảm ơn bạn đã mua sắm tại Kachi-Kun Shop.<br>Đơn hàng của bạn đã được ghi nhận.</p>
+                        <p class="text-gray-500">Cảm ơn bạn đã mua sắm tại Kachi-Kun Shop.<br>Đơn hàng của bạn đã được
+                            ghi nhận.</p>
                     </div>
                     <div class="mt-4">
                         <button type="button" onclick="window.location.href='home'"
@@ -296,18 +379,24 @@
 
             <c:if test="${paymentMethod == 'BANKING'}">
                 <div class="mt-2">
-                    <img src="https://cdn.tgdd.vn/2020/04/GameApp/icon-200x200.jpg" alt="VCB Logo" class="h-10 mx-auto mb-4">
+                    <img src="https://cdn.tgdd.vn/2020/04/GameApp/icon-200x200.jpg" alt="VCB Logo"
+                         class="h-10 mx-auto mb-4">
                     <h3 class="text-xl font-bold text-gray-800 mb-4 uppercase border-b pb-2">Thông tin chuyển khoản</h3>
                     <div class="mt-4 mb-6 text-center">
-                        <img src="images/qr.jpg" alt="QR Code Thanh Toán" class="mx-auto w-48 h-48 border border-gray-200 rounded-lg shadow-md">
+                        <img src="images/qr.jpg" alt="QR Code Thanh Toán"
+                             class="mx-auto w-48 h-48 border border-gray-200 rounded-lg shadow-md">
                         <p class="text-sm text-gray-600 mt-2">Quét mã QR để chuyển khoản nhanh</p>
                     </div>
                     <div class="text-left bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-inner mx-1">
                         <div class="mb-4 text-center">
-                            <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-1">Số tài khoản</p>
+                            <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-1">Số tài
+                                khoản</p>
                             <div class="flex items-center justify-center gap-2">
-                                <p id="bank-acc-num" class="text-blue-700 font-extrabold text-3xl tracking-widest font-mono">9355 849 425</p>
-                                <button type="button" onclick="copyToClipboard()" class="text-gray-400 hover:text-blue-600" title="Sao chép">
+                                <p id="bank-acc-num"
+                                   class="text-blue-700 font-extrabold text-3xl tracking-widest font-mono">9355 849
+                                    425</p>
+                                <button type="button" onclick="copyToClipboard()"
+                                        class="text-gray-400 hover:text-blue-600" title="Sao chép">
                                     <i class="far fa-copy"></i>
                                 </button>
                             </div>
@@ -342,7 +431,9 @@
                             Đã chuyển khoản xong
                         </button>
                         <button type="button" onclick="window.location.href='home'"
-                                class="px-4 py-2 text-gray-500 text-sm hover:text-gray-800 underline">Để sau, về trang chủ</button>
+                                class="px-4 py-2 text-gray-500 text-sm hover:text-gray-800 underline">Để sau, về trang
+                            chủ
+                        </button>
                     </div>
                 </div>
             </c:if>
@@ -360,30 +451,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
 <script>
-    var subtotalRaw       = ${not empty cartSubtotal ? cartSubtotal : 0};
+    var subtotalRaw = ${not empty cartSubtotal ? cartSubtotal : 0};
     var discountAmountRaw = 0;
 
     function formatVND(amount) {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
     }
 
     //Tính tổng từ các item đang được tích chọn
     function recalcSelected() {
         var checkboxes = document.querySelectorAll('.item-checkbox');
         var total = 0, count = 0;
-        checkboxes.forEach(function(chk) {
+        checkboxes.forEach(function (chk) {
             if (chk.checked) {
                 total += parseFloat(chk.getAttribute('data-price')) || 0;
                 count++;
             }
         });
 
-        subtotalRaw       = total;
+        subtotalRaw = total;
         discountAmountRaw = 0;
 
-        document.getElementById('cart-total-display').innerText  = formatVND(total);
+        document.getElementById('cart-total-display').innerText = formatVND(total);
         document.getElementById('final-total-display').innerText = formatVND(total);
-        document.getElementById('selected-count').innerText      = count;
+        document.getElementById('selected-count').innerText = count;
 
         // Reset discount vì subtotal đã thay đổi
         document.getElementById('discount-row').classList.add('hidden');
@@ -394,13 +485,13 @@
         var selectAll = document.getElementById('select-all');
         if (selectAll) {
             var total_boxes = checkboxes.length;
-            selectAll.checked       = (count === total_boxes && total_boxes > 0);
+            selectAll.checked = (count === total_boxes && total_boxes > 0);
             selectAll.indeterminate = (count > 0 && count < total_boxes);
         }
     }
 
     function toggleSelectAll(masterChk) {
-        document.querySelectorAll('.item-checkbox').forEach(function(chk) {
+        document.querySelectorAll('.item-checkbox').forEach(function (chk) {
             chk.checked = masterChk.checked;
         });
         recalcSelected();
@@ -419,18 +510,24 @@
     //  Mã giảm giá
     function applyDiscount() {
         var code = document.getElementById('discount-input').value.trim();
-        if (!code)            { showDiscountMsg('Vui lòng nhập mã giảm giá!', 'error'); return; }
-        if (subtotalRaw <= 0) { showDiscountMsg('Vui lòng chọn sản phẩm trước!', 'error'); return; }
+        if (!code) {
+            showDiscountMsg('Vui lòng nhập mã giảm giá!', 'error');
+            return;
+        }
+        if (subtotalRaw <= 0) {
+            showDiscountMsg('Vui lòng chọn sản phẩm trước!', 'error');
+            return;
+        }
 
         fetch('apply-discount?code=' + encodeURIComponent(code))
             .then(r => r.json())
             .then(data => {
                 if (data.status === 'ok') {
                     discountAmountRaw = data.discountAmount;
-                    document.getElementById('discount-code-hidden').value        = data.code;
-                    document.getElementById('discount-label').innerText          = data.code;
+                    document.getElementById('discount-code-hidden').value = data.code;
+                    document.getElementById('discount-label').innerText = data.code;
                     document.getElementById('discount-amount-display').innerText = '-' + formatVND(data.discountAmount);
-                    document.getElementById('final-total-display').innerText     = formatVND(subtotalRaw - data.discountAmount);
+                    document.getElementById('final-total-display').innerText = formatVND(subtotalRaw - data.discountAmount);
                     document.getElementById('discount-row').classList.remove('hidden');
                     showDiscountMsg('Áp dụng mã giảm giá thành công!', 'success');
                 } else {
@@ -452,8 +549,8 @@
 
     function showDiscountMsg(msg, type) {
         var el = document.getElementById('discount-msg');
-        el.innerText  = msg;
-        el.className  = 'text-xs mt-1 ' + (type === 'error' ? 'text-red-600' : 'text-green-600');
+        el.innerText = msg;
+        el.className = 'text-xs mt-1 ' + (type === 'error' ? 'text-red-600' : 'text-green-600');
         el.classList.remove('hidden');
         setTimeout(() => el.classList.add('hidden'), 4000);
     }
@@ -473,20 +570,22 @@
     }
 
     function callAjax(url, productId) {
-        var qtyInput      = document.getElementById("qty-" + productId);
+        var qtyInput = document.getElementById("qty-" + productId);
         var itemTotalSpan = document.getElementById("item-total-" + productId);
-        var rowDiv        = document.getElementById("row-" + productId);
-        var errorAlert    = document.getElementById("error-alert");
-        var errorMsg      = document.getElementById("error-msg");
+        var rowDiv = document.getElementById("row-" + productId);
+        var errorAlert = document.getElementById("error-alert");
+        var errorMsg = document.getElementById("error-msg");
 
         fetch(url)
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
+            .then(function (r) {
+                return r.json();
+            })
+            .then(function (data) {
                 if (data.status === 'error') {
-                    if (errorMsg)   errorMsg.innerText = data.message;
+                    if (errorMsg) errorMsg.innerText = data.message;
                     if (errorAlert) {
                         errorAlert.classList.remove("hidden");
-                        errorAlert.scrollIntoView({ behavior: "smooth", block: "center" });
+                        errorAlert.scrollIntoView({behavior: "smooth", block: "center"});
                     }
                     if (data.currentQty != null && qtyInput) qtyInput.value = data.currentQty;
 
@@ -498,8 +597,8 @@
 
                 } else {
                     if (errorAlert) errorAlert.classList.add("hidden");
-                    if (qtyInput)      qtyInput.value          = data.newQty;
-                    if (itemTotalSpan) itemTotalSpan.innerText  = formatVND(data.itemTotalRaw);
+                    if (qtyInput) qtyInput.value = data.newQty;
+                    if (itemTotalSpan) itemTotalSpan.innerText = formatVND(data.itemTotalRaw);
 
                     var chk = document.querySelector('.item-checkbox[value="' + productId + '"]');
                     if (chk) chk.setAttribute('data-price', data.itemTotalRaw);
@@ -508,16 +607,168 @@
                     updateCartCount(data.cartSize);
                 }
             })
-            .catch(function(e) { console.error('Lỗi:', e); });
+            .catch(function (e) {
+                console.error('Lỗi:', e);
+            });
     }
 
     function updateCartCount(count) {
-        document.querySelectorAll(".absolute.-top-1.-right-2").forEach(function(b) { b.innerText = count; });
+        document.querySelectorAll(".absolute.-top-1.-right-2").forEach(function (b) {
+            b.innerText = count;
+        });
         if (count === 0) location.reload();
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        recalcSelected();
+    let shippingFeeRaw = 0;
+
+    const districtSelect =
+        document.getElementById("districtSelect");
+
+    const wardSelect =
+        document.getElementById("wardSelect");
+
+    function loadProvinces() {
+
+        fetch('ghn-provinces')
+            .then(res => res.json())
+            .then(data => {
+
+                console.log("PROVINCES:", data);
+
+                const provinceSelect =
+                    document.getElementById('province');
+
+                provinceSelect.innerHTML =
+                    '<option value="">-- Chọn tỉnh --</option>';
+
+                data.data.forEach(p => {
+
+                    const option = document.createElement("option");
+
+                    option.value = p.ProvinceID;
+                    option.textContent = p.ProvinceName;
+
+                    provinceSelect.appendChild(option);
+                });
+            });
+    }
+
+    function loadDistricts() {
+
+        const provinceId =
+            document.getElementById('province').value;
+
+        if (!provinceId) return;
+
+        fetch('ghn-districts?provinceId=' + provinceId)
+            .then(res => res.json())
+            .then(data => {
+
+                console.log("DISTRICTS:", data);
+
+                const district =
+                    document.getElementById('districtSelect');
+
+                district.innerHTML =
+                    '<option value="">-- Chọn quận --</option>';
+
+                data.data.forEach(d => {
+
+                    const option = document.createElement("option");
+
+                    option.value = d.DistrictID;
+                    option.textContent = d.DistrictName;
+
+                    district.appendChild(option);
+                });
+            })
+            .catch(err => console.log(err));
+    }
+
+    function loadWards() {
+
+        const districtId =
+            document.getElementById("districtSelect").value;
+
+        if (!districtId) return;
+
+        fetch('ghn/wards?district_id=' + districtId)
+            .then(res => res.json())
+            .then(data => {
+
+                console.log("WARDS:", data);
+
+                const wardSelect =
+                    document.getElementById("wardSelect");
+
+                wardSelect.innerHTML =
+                    '<option value="">-- Chọn phường --</option>';
+
+                data.data.forEach(ward => {
+
+                    const option = document.createElement("option");
+
+                    option.value = ward.WardCode;
+                    option.textContent = ward.WardName;
+
+                    wardSelect.appendChild(option);
+                });
+            })
+            .catch(err => console.log(err));
+    }
+
+    function calculateShipping() {
+
+        const districtId =
+            document.getElementById('districtSelect').value;
+
+        const wardCode =
+            document.getElementById('wardSelect').value;
+
+        if (!districtId || !wardCode) return;
+
+        fetch('ghn/shipping-fee', {
+
+            method: 'POST',
+
+            headers: {
+                'Content-Type':
+                    'application/x-www-form-urlencoded'
+            },
+
+            body:
+                'district_id=' + districtId +
+                '&ward_code=' + wardCode
+        })
+            .then(res => res.json())
+
+            .then(data => {
+
+                console.log(data);
+
+                shippingFeeRaw = data.data.total;
+
+                document.getElementById("shipping-fee")
+                    .innerText =
+                    formatVND(shippingFeeRaw);
+
+                updateFinalTotal(); // QUAN TRỌNG
+            });
+    }
+
+    function updateFinalTotal() {
+        const finalTotal =
+            subtotalRaw - discountAmountRaw + shippingFeeRaw;
+        document.getElementById('final-total-display')
+            .innerText = formatVND(finalTotal);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        loadProvinces();
+
+        document.getElementById('province')
+            .addEventListener('change', loadDistricts);
     });
 </script>
 </body>
