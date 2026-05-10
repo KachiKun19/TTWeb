@@ -251,7 +251,7 @@
                                     class="block text-xs font-bold text-gray-700 uppercase mb-1">Số
                                 điện thoại *</label> <input type="number" name="phone" pattern="0[0-9]{9}"
                                                             placeholder="09xxxxxxx" required
-                                                            class="w-full text-sm p-2.5 border b	order-gray-300 rounded focus:ring-black focus:border-black">
+                                                            class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black">
                         </div>
 
                         <div>
@@ -418,8 +418,8 @@
     </script>
 </c:if>
 
+<%-- Modal chọn mã giảm giá đã lưu --%>
 <c:if test="${not empty savedDiscounts}">
-<!-- Modal chọn mã giảm giá -->
 <div id="discount-modal" onclick="if(event.target===this)closeDiscountModal()"
      class="fixed inset-0 z-50 flex items-center justify-center hidden"
      style="background:rgba(0,0,0,0.5);">
