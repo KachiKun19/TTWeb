@@ -1,6 +1,7 @@
 package com.kachikun.shop.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,9 @@ import com.kachikun.shop.model.User;
 @WebServlet("/order-history")
 public class OrderHistoryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
+	private static final int PAGE_SIZE = 5;
+
 	private OrderDAO  orderDAO  = new OrderDAO();
 	private ReviewDAO reviewDAO = new ReviewDAO();
 	private ProductDAO productDAO = new ProductDAO();
@@ -57,21 +61,71 @@ public class OrderHistoryServlet extends HttpServlet {
 		// Lấy danh sách đơn hàng
 		List<Order> myOrders = orderDAO.getOrdersByUserId(user.getId());
 
-		Map<Integer, List<Product>> unreviewedMap = new HashMap<>();
-		for (Order o : myOrders) {
-			if ("Đã giao".equals(o.getStatus())) {
-				List<Integer> unreviewedIds = reviewDAO.getUnreviewedProductIds(o.getId(), user.getId());
-				List<Product> unreviewedProducts = new java.util.ArrayList<>();
-				for (int pid : unreviewedIds) {
-					Product p = productDAO.getProductById(pid);
-					if (p != null) unreviewedProducts.add(p);
+		// filter theo status
+		String statusFilter = request.getParameter("status");
+		if (statusFilter == null) statusFilter = "ALL";
+
+		List<Order> filteredOrders;
+		if ("ALL".equals(statusFilter)) {
+			filteredOrders = myOrders;
+		} else {
+			filteredOrders = new ArrayList<>();
+			for (Order o : myOrders) {
+				if (statusFilter.equals(o.getStatus())) {
+					filteredOrders.add(o);
 				}
-				unreviewedMap.put(o.getId(), unreviewedProducts);
 			}
 		}
 
-		request.setAttribute("myOrders", myOrders);
+		Map<String, Integer> statusCount = new HashMap<>();
+		statusCount.put("ALL", myOrders.size());
+		for (Order o : myOrders) {
+			statusCount.merge(o.getStatus(), 1, Integer::sum);
+		}
+
+		// phân trang
+		int totalOrders = filteredOrders.size();
+		int totalPages  = (int) Math.ceil((double) totalOrders / PAGE_SIZE);
+		if (totalPages == 0) totalPages = 1;
+
+		int currentPage = 1;
+		String pageParam = request.getParameter("page");
+		if (pageParam != null) {
+			try {
+				currentPage = Integer.parseInt(pageParam);
+			} catch (NumberFormatException ignored) {}
+		}
+		if (currentPage < 1)           currentPage = 1;
+		if (currentPage > totalPages)  currentPage = totalPages;
+
+		int fromIndex = (currentPage - 1) * PAGE_SIZE;
+		int toIndex   = Math.min(fromIndex + PAGE_SIZE, totalOrders);
+		List<Order> pagedOrders = (totalOrders > 0)
+				? filteredOrders.subList(fromIndex, toIndex)
+				: new ArrayList<>();
+
+		//
+
+		Map<Integer, List<Product>> unreviewedMap = new HashMap<>();
+		for (Order o : pagedOrders) {
+			if ("Đã giao".equals(o.getStatus())) {
+				List<Integer> unreviewedIds = reviewDAO.getUnreviewedProductIds(o.getId(), user.getId());
+				List<Product> prods = new ArrayList<>();
+				for (int pid : unreviewedIds) {
+					Product p = productDAO.getProductById(pid);
+					if (p != null) prods.add(p);
+				}
+				unreviewedMap.put(o.getId(), prods);
+			}
+		}
+
+		request.setAttribute("myOrders", pagedOrders);
 		request.setAttribute("unreviewedMap", unreviewedMap);
+		request.setAttribute("statusFilter",  statusFilter);
+		request.setAttribute("statusCount",   statusCount);
+		request.setAttribute("currentPage",   currentPage);
+		request.setAttribute("totalPages",    totalPages);
+		request.setAttribute("totalOrders",   totalOrders);
 		request.getRequestDispatcher("orderHistory.jsp").forward(request, response);
 	}
 
