@@ -4,13 +4,27 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-	<meta charset="UTF-8">
-	<title>Lịch sử đơn hàng - KachiKun Shop</title>
-	<script src="https://cdn.tailwindcss.com"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Giỏ hàng - Kachi-Kun Shop</title>
+		<link rel="icon" type="image/png" href="images/LogoRemake.png"/>
+		<link rel="stylesheet" href="style.css"/>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+		<style>
+			.qty-input::-webkit-outer-spin-button,
+			.qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+			.cart-checkbox {
+				width: 18px; height: 18px;
+				accent-color: #e11d48;
+				cursor: pointer;
+				flex-shrink: 0;
+			}
+		</style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-
+<jsp:include page="components/header2.jsp"/>
 <%-- hủy đơn --%>
 <div id="cancelModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
 	<div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
@@ -302,6 +316,7 @@
 		</c:otherwise>
 	</c:choose>
 </div>
+<jsp:include page="components/footer.jsp"/>
 
 <script src="${pageContext.request.contextPath}/script.js"></script>
 </body>
