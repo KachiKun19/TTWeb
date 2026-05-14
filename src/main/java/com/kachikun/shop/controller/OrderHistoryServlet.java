@@ -118,6 +118,25 @@ public class OrderHistoryServlet extends HttpServlet {
 				unreviewedMap.put(o.getId(), prods);
 			}
 		}
+		 // xóa msg từ sesion của ReviewBulkServlet
+		String sessionMsg = (String) session.getAttribute("msg");
+		if (sessionMsg != null) {
+			session.removeAttribute("msg");
+
+			boolean hasUnreviewed = false;
+			for (Order o : myOrders) {
+				if ("Đã giao".equals(o.getStatus())) {
+					List<Integer> unreviewed = reviewDAO.getUnreviewedProductIds(o.getId(), user.getId());
+					if (!unreviewed.isEmpty()) {
+						hasUnreviewed = true;
+						break;
+					}
+				}
+			}
+			if (!hasUnreviewed) {
+				request.setAttribute("msg", sessionMsg);
+			}
+		}
 
 		request.setAttribute("myOrders", pagedOrders);
 		request.setAttribute("unreviewedMap", unreviewedMap);
