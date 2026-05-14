@@ -4,24 +4,24 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Giỏ hàng - Kachi-Kun Shop</title>
-		<link rel="icon" type="image/png" href="images/LogoRemake.png"/>
-		<link rel="stylesheet" href="style.css"/>
-		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-		<style>
-			.qty-input::-webkit-outer-spin-button,
-			.qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-			.cart-checkbox {
-				width: 18px; height: 18px;
-				accent-color: #e11d48;
-				cursor: pointer;
-				flex-shrink: 0;
-			}
-		</style>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>Giỏ hàng - Kachi-Kun Shop</title>
+	<link rel="icon" type="image/png" href="images/LogoRemake.png"/>
+	<link rel="stylesheet" href="style.css"/>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+	<style>
+		.qty-input::-webkit-outer-spin-button,
+		.qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+		.cart-checkbox {
+			width: 18px; height: 18px;
+			accent-color: #e11d48;
+			cursor: pointer;
+			flex-shrink: 0;
+		}
+	</style>
 </head>
 <body class="bg-gray-50 min-h-screen">
 <jsp:include page="components/header2.jsp"/>
@@ -84,7 +84,8 @@
 	</div>
 
 	<c:if test="${not empty msg}">
-		<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+		<div id="review-success-banner"
+			 class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
 			<i class="fa-solid fa-circle-check text-green-500"></i>
 			<span class="text-green-700 text-sm">${msg}</span>
 		</div>
