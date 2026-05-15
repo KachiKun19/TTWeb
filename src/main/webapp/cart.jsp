@@ -10,7 +10,8 @@
     <title>Giỏ hàng - Kachi-Kun Shop</title>
     <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
     <link rel="stylesheet" href="style.css"/>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+          rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
     <style>
@@ -68,7 +69,8 @@
         <div class="text-center py-16 bg-white rounded shadow-sm">
             <div class="text-6xl text-gray-300 mb-4"><i class="fas fa-shopping-basket"></i></div>
             <p class="text-xl text-gray-500 mb-6">Giỏ hàng của bạn đang trống trơn!</p>
-            <a href="home" class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 transition uppercase font-bold">
+            <a href="home"
+               class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 transition uppercase font-bold">
                 Tiếp tục mua sắm
             </a>
         </div>
@@ -96,7 +98,7 @@
                 <c:remove var="stockError" scope="session"/>
             </div>
 
-            <%-- Danh sách sản phẩm --%>
+                <%-- Danh sách sản phẩm --%>
             <div class="md:col-span-2 space-y-4">
                 <div class="bg-white rounded shadow overflow-hidden">
                     <div class="hidden md:grid grid-cols-12 gap-4 p-4 bg-gray-100 font-bold text-gray-700 text-sm uppercase">
@@ -187,7 +189,7 @@
                 </div>
             </div>
 
-            <%-- Sidebar thanh toán --%>
+                <%-- Sidebar thanh toán --%>
             <div class="md:col-span-1">
                 <div class="bg-white p-6 rounded shadow sticky top-24">
                     <h2 class="text-lg font-bold mb-4 uppercase border-b pb-2 text-black">Thông tin thanh toán</h2>
@@ -197,7 +199,7 @@
                         <c:set var="cartSubtotal" value="${cartSubtotal + item.totalPrice}"/>
                     </c:forEach>
 
-                    <%-- Tóm tắt đơn hàng --%>
+                        <%-- Tóm tắt đơn hàng --%>
                     <div class="mb-4 space-y-2 text-sm">
                         <div class="flex justify-between text-gray-600">
                             <span>Tạm tính (<span id="selected-count">0</span> SP):</span>
@@ -221,7 +223,7 @@
                         </div>
                     </div>
 
-                    <%-- Nhập mã giảm giá --%>
+                        <%-- Nhập mã giảm giá --%>
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Mã giảm giá</label>
                         <div class="flex gap-2">
@@ -237,7 +239,7 @@
                         <p id="discount-msg" class="text-xs mt-1 hidden"></p>
                     </div>
 
-                    <%-- Gợi ý mã đã lưu --%>
+                        <%-- Gợi ý mã đã lưu --%>
                     <c:if test="${not empty savedDiscounts}">
                         <div class="mb-4">
                             <button type="button" onclick="openDiscountModal()"
@@ -253,7 +255,8 @@
                         <hr class="border-dashed">
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Họ tên người nhận *</label>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Họ tên người nhận
+                                *</label>
                             <input type="text" name="fullname"
                                    pattern="^[A-Za-zÀ-ỹ\s]+$"
                                    oninvalid="this.setCustomValidity('Chỉ được nhập chữ cái, không có số!')"
@@ -270,31 +273,36 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ giao hàng *</label>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ giao hàng
+                                *</label>
                             <div class="space-y-3">
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Tỉnh / Thành phố</label>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Tỉnh / Thành
+                                        phố</label>
                                     <select id="province"
                                             class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
                                         <option value="">-- Chọn tỉnh --</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Quận / Huyện</label>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Quận /
+                                        Huyện</label>
                                     <select id="districtSelect" onchange="loadWards()"
                                             class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
                                         <option value="">-- Chọn quận --</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Phường / Xã</label>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Phường /
+                                        Xã</label>
                                     <select id="wardSelect" onchange="calculateShipping()"
                                             class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
                                         <option value="">-- Chọn phường --</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ chi tiết</label>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ chi
+                                        tiết</label>
                                     <textarea name="address" rows="3"
                                               placeholder="Số nhà, tên đường..." required
                                               class="w-full text-sm p-2.5 border border-gray-300 rounded text-black"></textarea>
@@ -303,7 +311,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Phương thức thanh toán</label>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Phương thức thanh
+                                toán</label>
                             <div class="flex items-center mb-2">
                                 <input id="payment-cod" type="radio" value="COD" name="payment_method" checked
                                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
@@ -350,7 +359,8 @@
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-2">Đặt hàng thành công!</h3>
                     <div class="mt-2 px-2 py-3">
-                        <p class="text-gray-500">Cảm ơn bạn đã mua sắm tại Kachi-Kun Shop.<br>Đơn hàng của bạn đã được ghi nhận.</p>
+                        <p class="text-gray-500">Cảm ơn bạn đã mua sắm tại Kachi-Kun Shop.<br>Đơn hàng của bạn đã được
+                            ghi nhận.</p>
                     </div>
                     <div class="mt-4">
                         <button onclick="window.location.href='home'"
@@ -373,9 +383,11 @@
                     </div>
                     <div class="text-left bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-inner mx-1">
                         <div class="mb-4 text-center">
-                            <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-1">Số tài khoản</p>
+                            <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-1">Số tài
+                                khoản</p>
                             <div class="flex items-center justify-center gap-2">
-                                <p id="bank-acc-num" class="text-blue-700 font-extrabold text-3xl tracking-widest font-mono">
+                                <p id="bank-acc-num"
+                                   class="text-blue-700 font-extrabold text-3xl tracking-widest font-mono">
                                     9355 849 425
                                 </p>
                                 <button type="button" onclick="copyToClipboard()"
@@ -458,9 +470,12 @@
                             <div class="text-xs text-gray-500 mt-0.5">
                                 <c:choose>
                                     <c:when test="${sd.discountType eq 'PERCENT'}">Giảm ${sd.discountValue}%</c:when>
-                                    <c:otherwise>Giảm <fmt:formatNumber value="${sd.discountValue}" type="number" maxFractionDigits="0" groupingUsed="true"/>₫</c:otherwise>
+                                    <c:otherwise>Giảm <fmt:formatNumber value="${sd.discountValue}" type="number"
+                                                                        maxFractionDigits="0"
+                                                                        groupingUsed="true"/>₫</c:otherwise>
                                 </c:choose>
-                                &nbsp;·&nbsp; Đơn từ <fmt:formatNumber value="${sd.minOrderValue}" type="number" maxFractionDigits="0" groupingUsed="true"/>₫
+                                &nbsp;·&nbsp; Đơn từ <fmt:formatNumber value="${sd.minOrderValue}" type="number"
+                                                                       maxFractionDigits="0" groupingUsed="true"/>₫
                                 <c:if test="${sd.expiresAt != null}">
                                     &nbsp;·&nbsp; HSD: <fmt:formatDate value="${sd.expiresAt}" pattern="dd/MM/yyyy"/>
                                 </c:if>
@@ -475,8 +490,14 @@
         </div>
     </div>
     <script>
-        function openDiscountModal() { document.getElementById('discount-modal').classList.remove('hidden'); }
-        function closeDiscountModal() { document.getElementById('discount-modal').classList.add('hidden'); }
+        function openDiscountModal() {
+            document.getElementById('discount-modal').classList.remove('hidden');
+        }
+
+        function closeDiscountModal() {
+            document.getElementById('discount-modal').classList.add('hidden');
+        }
+
         function selectSavedCode(code) {
             closeDiscountModal();
             applySavedCode(code);
@@ -561,7 +582,9 @@
         }
 
         fetch('apply-discount?code=' + encodeURIComponent(code) + '&subtotal=' + subtotalRaw)
-            .then(function (r) { return r.json(); })
+            .then(function (r) {
+                return r.json();
+            })
             .then(function (data) {
                 if (data.status === 'ok') {
                     discountAmountRaw = data.discountAmount;
@@ -576,7 +599,9 @@
                     showDiscountMsg(data.message, 'error');
                 }
             })
-            .catch(function () { showDiscountMsg('Có lỗi xảy ra, vui lòng thử lại!', 'error'); });
+            .catch(function () {
+                showDiscountMsg('Có lỗi xảy ra, vui lòng thử lại!', 'error');
+            });
     }
 
     function clearDiscount() {
@@ -593,7 +618,9 @@
         el.innerText = msg;
         el.className = 'text-xs mt-1 ' + (type === 'error' ? 'text-red-600' : 'text-green-600');
         el.classList.remove('hidden');
-        setTimeout(function () { el.classList.add('hidden'); }, 4000);
+        setTimeout(function () {
+            el.classList.add('hidden');
+        }, 4000);
     }
 
     // ─── Cập nhật số lượng ──────────────────────────────────────────────────
@@ -619,7 +646,9 @@
         var errorMsg = document.getElementById("error-msg");
 
         fetch(url)
-            .then(function (r) { return r.json(); })
+            .then(function (r) {
+                return r.json();
+            })
             .then(function (data) {
                 if (data.status === 'error') {
                     if (errorMsg) errorMsg.innerText = data.message;
@@ -648,7 +677,9 @@
                     updateCartCount(data.cartSize);
                 }
             })
-            .catch(function (e) { console.error('Lỗi:', e); });
+            .catch(function (e) {
+                console.error('Lỗi:', e);
+            });
     }
 
     function updateCartCount(count) {
@@ -661,7 +692,9 @@
     // ─── GHN Shipping ────────────────────────────────────────────────────────
     function loadProvinces() {
         fetch('ghn-provinces')
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 var provinceSelect = document.getElementById('province');
                 provinceSelect.innerHTML = '<option value="">-- Chọn tỉnh --</option>';
@@ -678,7 +711,9 @@
         var provinceId = document.getElementById('province').value;
         if (!provinceId) return;
         fetch('ghn-districts?provinceId=' + provinceId)
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 var district = document.getElementById('districtSelect');
                 district.innerHTML = '<option value="">-- Chọn quận --</option>';
@@ -689,14 +724,18 @@
                     district.appendChild(option);
                 });
             })
-            .catch(function (err) { console.log(err); });
+            .catch(function (err) {
+                console.log(err);
+            });
     }
 
     function loadWards() {
         var districtId = document.getElementById("districtSelect").value;
         if (!districtId) return;
         fetch('ghn/wards?district_id=' + districtId)
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 var wardSelect = document.getElementById("wardSelect");
                 wardSelect.innerHTML = '<option value="">-- Chọn phường --</option>';
@@ -707,7 +746,9 @@
                     wardSelect.appendChild(option);
                 });
             })
-            .catch(function (err) { console.log(err); });
+            .catch(function (err) {
+                console.log(err);
+            });
     }
 
     function calculateShipping() {
@@ -719,7 +760,9 @@
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'district_id=' + districtId + '&ward_code=' + wardCode
         })
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 shippingFeeRaw = data.data.total;
                 document.getElementById("shipping-fee").innerText = formatVND(shippingFeeRaw);
@@ -732,6 +775,27 @@
         recalcSelected();
         loadProvinces();
         document.getElementById('province').addEventListener('change', loadDistricts);
+
+        document.querySelector('form[action="checkout"]').addEventListener('submit', function (e) {
+            var form = this;
+            form.querySelectorAll('input[name="selectedIds"]').forEach(function (el) {
+                el.remove();
+            });
+
+            var checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+            if (checkedBoxes.length === 0) {
+                e.preventDefault();
+                alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán!');
+                return;
+            }
+            checkedBoxes.forEach(function (chk) {
+                var hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'selectedIds';
+                hidden.value = chk.value;
+                form.appendChild(hidden);
+            });
+        });
     });
 </script>
 </body>
