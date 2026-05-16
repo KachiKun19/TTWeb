@@ -402,3 +402,16 @@ document.addEventListener('click', function (e) {
         window.location.href = `add-to-cart?id=${buyBtn.getAttribute('data-id')}`;
     }
 });
+
+// banner thông báo của orderHistory
+document.addEventListener('DOMContentLoaded', function () {
+    var banner = document.getElementById('review-success-banner');
+    if (banner) {
+        setTimeout(function () {
+            banner.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            banner.style.opacity = '0';
+            banner.style.transform = 'translateY(-8px)';
+            setTimeout(function () { banner.remove(); }, 500);
+        }, 4000);
+    }
+});
