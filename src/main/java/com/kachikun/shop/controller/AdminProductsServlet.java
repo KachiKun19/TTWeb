@@ -4,71 +4,81 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 
+import com.kachikun.shop.dao.CategoryDAO;
+import com.kachikun.shop.dao.ProductDAO;
+import com.kachikun.shop.model.Category;
 import com.kachikun.shop.model.Product;
 import com.kachikun.shop.model.User;
-import com.kachikun.shop.dao.ProductDAO;
 
 @WebServlet("/adminProducts")
 public class AdminProductsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private ProductDAO productDAO = new ProductDAO();
+    private final ProductDAO productDAO = new ProductDAO();
+    private final CategoryDAO categoryDAO = new CategoryDAO();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login");
             return;
         }
-        
         User user = (User) session.getAttribute("user");
         if (user.getRole() != 1) {
             response.sendRedirect("home");
             return;
         }
-        
-        String pageParam = request.getParameter("page");
+
+        // -- Tham số trang
         int currentPage = 1;
+        String pageParam = request.getParameter("page");
         if (pageParam != null && !pageParam.isEmpty()) {
-            try {
-                currentPage = Integer.parseInt(pageParam);
-                if (currentPage < 1) currentPage = 1;
-            } catch (NumberFormatException e) {
-                currentPage = 1;
-            }
+            try { currentPage = Math.max(1, Integer.parseInt(pageParam)); }
+            catch (NumberFormatException ignored) {}
         }
-        
+
+        // -- Tham số danh mục (rỗng = tất cả)
+        String category = request.getParameter("category");
+        if (category == null) category = "";
+
         int pageSize = 10;
-        
-        int totalProducts = productDAO.getTotalProducts();
-        
-        int totalPages = 0;
-        if (totalProducts > 0) {
-            totalPages = (int) Math.ceil((double) totalProducts / pageSize);
+        int totalProducts;
+        List<Product> productList;
+
+        if (!category.isEmpty()) {
+            totalProducts = productDAO.countProductsByCategoryExact(category);
+            productList   = productDAO.getProductsByPageAndCategory(category, currentPage, pageSize);
+        } else {
+            totalProducts = productDAO.getTotalProducts();
+            productList   = productDAO.getProductsByPage(currentPage, pageSize);
         }
-        
-        if (totalPages > 0 && currentPage > totalPages) {
-            currentPage = totalPages;
-        }
-        
-        List<Product> productList = productDAO.getProductsByPage(currentPage, pageSize);
-        
-        System.out.println("Current Page: " + currentPage);
-        System.out.println("Total Pages: " + totalPages);
-        System.out.println("Total Products: " + totalProducts);
-        System.out.println("Product List Size: " + (productList != null ? productList.size() : 0));
-        System.out.println("================================");
-        
-        request.setAttribute("productList", productList);
-        request.setAttribute("currentPage", currentPage);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("totalProducts", totalProducts);
-        
+
+        int totalPages = (totalProducts > 0) ? (int) Math.ceil((double) totalProducts / pageSize) : 0;
+        if (totalPages > 0 && currentPage > totalPages) currentPage = totalPages;
+
+        // -- Danh sách danh mục cho tab bar
+        List<Category> categories = categoryDAO.getAllCategories();
+
+        // -- Encode category cho URL (tránh lỗi ký tự tiếng Việt)
+        String encodedCategory = URLEncoder.encode(category, "UTF-8");
+
+        request.setAttribute("productList",      productList);
+        request.setAttribute("currentPage",      currentPage);
+        request.setAttribute("totalPages",       totalPages);
+        request.setAttribute("totalProducts",    totalProducts);
+        request.setAttribute("categories",       categories);
+        request.setAttribute("currentCategory",  category);
+        request.setAttribute("encodedCategory",  encodedCategory);
+
         request.getRequestDispatcher("adminProducts.jsp").forward(request, response);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         doGet(request, response);
     }
 }

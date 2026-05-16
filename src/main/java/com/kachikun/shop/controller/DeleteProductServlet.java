@@ -36,30 +36,39 @@ public class DeleteProductServlet extends HttpServlet {
 			return;
 		}
 
+		boolean isAjax = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+
 		try {
 			int productId = Integer.parseInt(productIdStr);
-
 			boolean success = productDAO.deleteProduct(productId);
 
+			if (isAjax) {
+				response.setContentType("application/json;charset=UTF-8");
+				response.getWriter().write("{\"success\":" + success + "}");
+				return;
+			}
+
 			if (pageParam != null && !pageParam.isEmpty()) {
-				if (success) {
-					response.sendRedirect("adminProducts?page=" + pageParam + "&success=delete_success");
-				} else {
-					response.sendRedirect("adminProducts?page=" + pageParam + "&error=delete_failed");
-				}
+				response.sendRedirect("adminProducts?page=" + pageParam + (success ? "&success=delete_success" : "&error=delete_failed"));
 			} else {
-				if (success) {
-					response.sendRedirect("adminProducts?success=delete_success");
-				} else {
-					response.sendRedirect("adminProducts?error=delete_failed");
-				}
+				response.sendRedirect("adminProducts?" + (success ? "success=delete_success" : "error=delete_failed"));
 			}
 
 		} catch (NumberFormatException e) {
-			response.sendRedirect("adminProducts?error=invalid_id_format");
+			if (isAjax) {
+				response.setContentType("application/json;charset=UTF-8");
+				response.getWriter().write("{\"success\":false}");
+			} else {
+				response.sendRedirect("adminProducts?error=invalid_id_format");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.sendRedirect("adminProducts?error=server_error");
+			if (isAjax) {
+				response.setContentType("application/json;charset=UTF-8");
+				response.getWriter().write("{\"success\":false}");
+			} else {
+				response.sendRedirect("adminProducts?error=server_error");
+			}
 		}
 	}
 }
