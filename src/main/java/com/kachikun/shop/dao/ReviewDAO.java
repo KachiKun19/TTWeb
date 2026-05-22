@@ -109,19 +109,37 @@ public class ReviewDAO extends BaseDAO {
         return list;
     }
 
-    // Thêm review mới
+    // cập nhật review
     public boolean insertReview(Review review) {
-        String sql = "INSERT INTO ProductReviews (product_id, user_id, order_id, rating, comment) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO ProductReviews (product_id, user_id, order_id, rating, comment) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        String updateSql = "UPDATE Products SET " +
+                "average_rating = (SELECT AVG(CAST(rating AS FLOAT)) FROM ProductReviews WHERE product_id = ?), " +
+                "review_count    = (SELECT COUNT(*) FROM ProductReviews WHERE product_id = ?) " +
+                "WHERE id = ?";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, review.getProductId());
-            ps.setInt(2, review.getUserId());
-            ps.setInt(3, review.getOrderId());
-            ps.setInt(4, review.getRating());
-            ps.setString(5, review.getComment());
-            return ps.executeUpdate() > 0;
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement psInsert = conn.prepareStatement(insertSql)) {
+                psInsert.setInt(1, review.getProductId());
+                psInsert.setInt(2, review.getUserId());
+                psInsert.setInt(3, review.getOrderId());
+                psInsert.setInt(4, review.getRating());
+                psInsert.setString(5, review.getComment());
+                if (psInsert.executeUpdate() == 0) { conn.rollback(); return false; }
+            }
+
+            try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+                psUpdate.setInt(1, review.getProductId());
+                psUpdate.setInt(2, review.getProductId());
+                psUpdate.setInt(3, review.getProductId());
+                psUpdate.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
