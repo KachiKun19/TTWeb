@@ -8,134 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sản Phẩm Nổi Bật - Kachi-Kun Shop</title>
     <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
+    <link rel="stylesheet" href="css/Admin.css"/>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
     <link
             href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap"
             rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .admin-header {
-            background: linear-gradient(135deg, #2d7e7e 0%, #1a5c5c 100%);
-            color: white;
-            padding: 20px 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .admin-header h1 {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, .2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .logout-btn {
-            background: rgba(255, 255, 255, .2);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
-            transition: .3s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, .3);
-        }
-
-        .admin-container {
-            display: flex;
-            min-height: calc(100vh - 80px);
-        }
-
-        .sidebar {
-            width: 250px;
-            background: white;
-            padding: 20px 0;
-            box-shadow: 2px 0 8px rgba(0, 0, 0, .05);
-        }
-
-        .sidebar-menu {
-            list-style: none;
-        }
-
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 15px 25px;
-            color: #555;
-            text-decoration: none;
-            transition: .3s;
-            border-left: 4px solid transparent;
-        }
-
-        .sidebar-menu a:hover {
-            background: #f0f7f7;
-            color: #2d7e7e;
-            border-left-color: #2d7e7e;
-        }
-
-        .sidebar-menu a.active {
-            background: #e8f4f4;
-            color: #2d7e7e;
-            border-left-color: #2d7e7e;
-            font-weight: 600;
-        }
-
-        .sidebar-menu i {
-            width: 24px;
-            margin-right: 12px;
-            text-align: center;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .page-header h2 {
-            font-size: 24px;
-            color: #2d7e7e;
-        }
 
         .alert {
             padding: 15px;
