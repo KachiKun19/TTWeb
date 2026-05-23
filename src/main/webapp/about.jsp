@@ -12,7 +12,7 @@
     <meta charset="UTF-8">
     <title>About Us</title>
     <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
     <link
             href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
             rel="stylesheet"/>
