@@ -7,8 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Đơn Hàng - Kachi-Kun Shop</title>
-    <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
     <link rel="stylesheet" href="css/Admin.css"/>
+    <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -176,14 +176,13 @@
             margin-bottom: 15px;
             color: #ccc;
         }
-
     </style>
 </head>
 <body>
 <c:if test="${empty user or user.role ne 1}">
     <c:redirect url="login"/>
 </c:if>
-<c:set var="activePage" value="orders" scope="request" />
+<c:set var="activePage" value="orders" scope="request"/>
 <jsp:include page="componentsAdmin/headerAdmin.jsp"/>
 
 <div class="admin-container">
@@ -228,9 +227,9 @@
                                     <fmt:formatNumber value="${o.totalPrice}" type="currency" currencySymbol="₫"/>
                                 </td>
                                 <td>
-                                            <span class="status-badge 
-                                                ${o.status == 'Đang xử lý' ? 'status-pending' : 
-                                                  (o.status == 'Đang giao hàng' ? 'status-shipping' : 
+                                            <span class="status-badge
+                                                ${o.status == 'Đang xử lý' ? 'status-pending' :
+                                                  (o.status == 'Đang giao hàng' ? 'status-shipping' :
                                                   (o.status == 'Đã giao' || o.status == 'Hoàn thành' ? 'status-done' : 'status-cancel'))}">
                                                     ${o.status}
                                             </span>
@@ -261,6 +260,51 @@
                         </c:forEach>
                         </tbody>
                     </table>
+
+                    <%-- UI phân trang --%>
+                    <c:if test="${totalPages > 1}">
+                        <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:24px; flex-wrap:wrap;">
+                            <c:choose>
+                                <c:when test="${currentPage > 1}">
+                                    <a href="adminOrders?page=${currentPage - 1}"
+                                       style="padding:8px 14px; border:1px solid #ddd; border-radius:6px; background:white; color:#2d7e7e; text-decoration:none; font-weight:600;">
+                                        &laquo; Trước
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <span style="padding:8px 14px; border:1px solid #eee; border-radius:6px; background:#f5f5f5; color:#bbb;">&laquo; Trước</span>
+                                </c:otherwise>
+                            </c:choose>
+
+                            <c:forEach begin="1" end="${totalPages}" var="p">
+                                <c:choose>
+                                    <c:when test="${p == currentPage}">
+                                        <span style="padding:8px 14px; border-radius:6px; background:#2d7e7e; color:white; font-weight:700;">${p}</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a href="adminOrders?page=${p}"
+                                           style="padding:8px 14px; border:1px solid #ddd; border-radius:6px; background:white; color:#555; text-decoration:none;">${p}</a>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+
+                            <c:choose>
+                                <c:when test="${currentPage < totalPages}">
+                                    <a href="adminOrders?page=${currentPage + 1}"
+                                       style="padding:8px 14px; border:1px solid #ddd; border-radius:6px; background:white; color:#2d7e7e; text-decoration:none; font-weight:600;">
+                                        Sau &raquo;
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <span style="padding:8px 14px; border:1px solid #eee; border-radius:6px; background:#f5f5f5; color:#bbb;">Sau &raquo;</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                        <p style="text-align:center; color:#888; font-size:13px; margin-top:8px;">
+                            Trang ${currentPage} / ${totalPages} &nbsp;•&nbsp; ${totalOrders} đơn hàng
+                        </p>
+                    </c:if>
+                    <%-- phân trang --%>
                 </c:otherwise>
             </c:choose>
         </div>
