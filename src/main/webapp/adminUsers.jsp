@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Người Dùng - Kachi-Kun Shop</title>
     <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
+    <link rel="stylesheet" href="css/Admin.css"/>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
     <link
@@ -14,132 +15,7 @@
             rel="stylesheet">
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
 
-        body {
-            font-family: 'Montserrat', 'Arial', sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .admin-header {
-            background: linear-gradient(135deg, #2d7e7e 0%, #1a5c5c 100%);
-            color: white;
-            padding: 20px 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .admin-header h1 {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .logout-btn {
-            background-color: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
-            transition: background-color 0.3s;
-        }
-
-        .logout-btn:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .admin-container {
-            display: flex;
-            min-height: calc(100vh - 80px);
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: white;
-            padding: 20px 0;
-            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .sidebar-menu {
-            list-style: none;
-        }
-
-        .sidebar-menu li {
-            padding: 0;
-        }
-
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 15px 25px;
-            color: #555;
-            text-decoration: none;
-            transition: all 0.3s;
-            border-left: 4px solid transparent;
-        }
-
-        .sidebar-menu a:hover {
-            background-color: #f0f7f7;
-            color: #2d7e7e;
-            border-left-color: #2d7e7e;
-        }
-
-        .sidebar-menu a.active {
-            background-color: #e8f4f4;
-            color: #2d7e7e;
-            border-left-color: #2d7e7e;
-            font-weight: 600;
-        }
-
-        .sidebar-menu i {
-            width: 24px;
-            margin-right: 12px;
-            text-align: center;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .page-header h2 {
-            font-size: 24px;
-            color: #2d7e7e;
-        }
 
         .add-user-btn {
             background: linear-gradient(135deg, #2d7e7e 0%, #1a5c5c 100%);
@@ -477,47 +353,11 @@
 <c:if test="${empty user or user.role ne 1}">
     <c:redirect url="login"/>
 </c:if>
-
-<div class="admin-header">
-    <h1>
-        <i class="fas fa-crown"></i> Trang Quản Trị - Kachi-Kun Shop
-    </h1>
-    <div class="user-info">
-        <div class="user-avatar">
-            <i class="fas fa-user-shield"></i>
-        </div>
-        <div>
-            <div>
-                Xin chào, <strong>${user.fullName}</strong>
-            </div>
-            <div style="font-size: 12px; opacity: 0.9;">Quản trị viên</div>
-        </div>
-        <a href="logout">
-            <button class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Đăng xuất
-            </button>
-        </a>
-    </div>
-</div>
-
+<c:set var="activePage" value="users" scope="request"/>
+<jsp:include page="componentsAdmin/headerAdmin.jsp"/>
 <div class="admin-container">
-    <div class="sidebar">
-        <ul class="sidebar-menu">
-            <li><a href="adminHome"><i class="fas fa-tachometer-alt"></i>
-                Tổng quan</a></li>
-            <li><a href="adminUsers" class="active"><i class="fas fa-users"></i> Quản lý người
-                dùng</a></li>
-            <li><a href="adminProducts"><i class="fas fa-box"></i> Quản lý sản phẩm</a></li>
-            <li><a href="adminOrders"><i class="fas fa-shopping-cart"></i> Quản
-                lý đơn hàng</a></li>
-            <li><a href="adminContacts"><i class="fas fa-envelope"></i> Quản lý liên hệ</a></li>
-            <li><a href="adminDiscounts"><i class="fas fa-tag"></i> Mã giảm giá</a></li>
-            <li><a href="adminFeaturedProducts"><i class="fas fa-star"></i> Sản phẩm nổi bật</a></li>
-            <li><a href="home"><i class="fas fa-store"></i> Về trang
-                cửa hàng</a></li>
-        </ul>
-    </div>
 
+    <jsp:include page="componentsAdmin/sidebarAdmin.jsp"/>
     <div class="main-content">
         <div class="page-header">
             <h2>

@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Liên Hệ - Kachi-Kun Shop</title>
     <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>

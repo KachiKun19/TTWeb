@@ -9,7 +9,7 @@
     <title>Tài khoản của tôi - Kachi-Kun Shop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
     <style>
         .tab-btn { transition: all .2s; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: #f82c97; border-bottom-color: #f82c97; }
