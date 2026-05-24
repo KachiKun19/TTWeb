@@ -116,7 +116,11 @@ public class CheckoutServlet extends HttpServlet {
 
         if (check) {
             if (discountCode != null && !discountCode.trim().isEmpty() && discountAmount > 0) {
-                new DiscountDAO().incrementUsed(discountCode.trim());
+                boolean usedOk = new DiscountDAO().incrementUsedSafe(discountCode.trim());
+                if (!usedOk) {
+                    System.out.println("[WARN] Discount quota race condition: code=" + discountCode
+                            + ", userId=" + user.getId());
+                }
             }
 
             // Xóa khỏi session chỉ những item đã mua, giữ lại item chưa chọn

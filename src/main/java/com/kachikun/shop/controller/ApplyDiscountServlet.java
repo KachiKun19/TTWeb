@@ -47,7 +47,13 @@ public class ApplyDiscountServlet extends HttpServlet {
             return;
         }
 
-        double subtotal = cart.stream().mapToDouble(CartItem::getTotalPrice).sum();
+        String subtotalParam = request.getParameter("subtotal");
+        double subtotal = 0;
+        try {
+            subtotal = Double.parseDouble(subtotalParam);
+        } catch (Exception e) {
+            subtotal = cart.stream().mapToDouble(CartItem::getTotalPrice).sum();
+        }
 
         DiscountDAO dao = new DiscountDAO();
         Discount discount = dao.findByCode(code.trim());

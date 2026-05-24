@@ -175,6 +175,24 @@ public class DiscountDAO extends BaseDAO {
         return list;
     }
 
+    // 2 người dùng cùng lúc mã giảm giá => đếm lần dùng (discount)
+    public boolean incrementUsedSafe(String code) {
+        String sql = "UPDATE Discounts " +
+                "SET used_count = used_count + 1 " +
+                "WHERE UPPER(code) = ? " +
+                "AND is_active = 1 " +
+                "AND (max_uses IS NULL OR used_count < max_uses) " +
+                "AND (expires_at IS NULL OR expires_at >= CAST(GETDATE() AS DATE))";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, code.trim().toUpperCase());
+            return ps.executeUpdate() > 0; // = 0 là hết được sài
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private Discount mapDiscount(ResultSet rs) throws SQLException {
         Discount d = new Discount();
         d.setId(rs.getInt("id"));
