@@ -139,7 +139,8 @@ public class OrderDAO extends BaseDAO {
                         + "VALUES (?, ?, ?, ?)";
 
         String deductStockSql =
-                "UPDATE Products SET stock_quantity = stock_quantity - ? WHERE id = ?";
+                "UPDATE Products SET stock_quantity = stock_quantity - ? " +
+                        "WHERE id = ? AND stock_quantity >= ?";
 
         Connection conn = null;
         try {
@@ -182,11 +183,19 @@ public class OrderDAO extends BaseDAO {
 
                     psStock.setInt(1, item.getQuantity());
                     psStock.setInt(2, productId);
+                    psStock.setInt(3, item.getQuantity());
                     psStock.addBatch();
                 }
 
                 psDetail.executeBatch();
-                psStock.executeBatch();
+
+                int[] stockResults = psStock.executeBatch();
+                for (int r : stockResults) {
+                    if (r == 0) { // hết hàng
+                        conn.rollback();
+                        return false;
+                    }
+                }
             }
 
             conn.commit();
@@ -618,6 +627,32 @@ public class OrderDAO extends BaseDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // đếm số lượng phân trang sản phẩm
+    public List<Order> getOrdersByPage(int page, int pageSize) {
+        String sql = "SELECT * FROM Orders ORDER BY order_date DESC " +
+                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        List<Order> list = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, (page - 1) * pageSize);
+            ps.setInt(2, pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapOrder(rs));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public int getTotalOrders() {
+        String sql = "SELECT COUNT(*) FROM Orders";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
     }
 
     public boolean completeOrderByUser(int orderId, int userId) {

@@ -63,8 +63,25 @@ public class AdminOrderServlet extends HttpServlet {
             }
 
         } else {
-            List<Order> list = orderDAO.getAllOrders();
+            // phân trang
+            int pageSize = 5;
+            int currentPage = 1;
+            String pageParam = request.getParameter("page");
+            if (pageParam != null) {
+                try { currentPage = Math.max(1, Integer.parseInt(pageParam)); }
+                catch (NumberFormatException ignored) {}
+            }
+
+            int totalOrders = orderDAO.getTotalOrders();
+            int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
+            if (totalPages == 0) totalPages = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            List<Order> list = orderDAO.getOrdersByPage(currentPage, pageSize);
             request.setAttribute("orders", list);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalOrders", totalOrders);
             request.getRequestDispatcher("adminOrders.jsp").forward(request, response);
         }
     }

@@ -219,24 +219,22 @@
                                 <td><strong>#${o.id}</strong></td>
                                 <td class="customer-info">
                                     <div style="font-weight: 600;">${o.recipientName}</div>
-                                    <div class="customer-sub"><i class="fas fa-phone-alt"
-                                                                 style="font-size: 10px;"></i> ${o.recipientPhone}</div>
+                                    <div class="customer-sub"><i class="fas fa-phone-alt" style="font-size: 10px;"></i> ${o.recipientPhone}</div>
                                 </td>
                                 <td>${o.orderDate}</td>
                                 <td class="price-text">
                                     <fmt:formatNumber value="${o.totalPrice}" type="currency" currencySymbol="₫"/>
                                 </td>
                                 <td>
-                                            <span class="status-badge
-                                                ${o.status == 'Đang xử lý' ? 'status-pending' :
-                                                  (o.status == 'Đang giao hàng' ? 'status-shipping' :
+                                            <span class="status-badge 
+                                                ${o.status == 'Đang xử lý' ? 'status-pending' : 
+                                                  (o.status == 'Đang giao hàng' ? 'status-shipping' : 
                                                   (o.status == 'Đã giao' || o.status == 'Hoàn thành' ? 'status-done' : 'status-cancel'))}">
                                                     ${o.status}
                                             </span>
                                 </td>
                                 <td>
-                                    <a href="adminOrders?action=view&id=${o.id}" class="action-btn view-btn"
-                                       title="Xem chi tiết">
+                                    <a href="adminOrders?action=view&id=${o.id}" class="action-btn view-btn" title="Xem chi tiết">
                                         <i class="fas fa-eye"></i> Xem
                                     </a>
 
@@ -245,14 +243,10 @@
                                             <i class="fas fa-pen"></i> <i class="fas fa-caret-down"></i>
                                         </button>
                                         <div class="dropdown-content">
-                                            <a href="adminOrders?action=update&id=${o.id}&status=Đang xử lý"><i
-                                                    class="fas fa-spinner"></i> Đang xử lý</a>
-                                            <a href="adminOrders?action=update&id=${o.id}&status=Đang giao hàng"><i
-                                                    class="fas fa-truck"></i> Đang giao hàng</a>
-                                            <a href="adminOrders?action=update&id=${o.id}&status=Đã giao"><i
-                                                    class="fas fa-check"></i> Đã giao</a>
-                                            <a href="adminOrders?action=update&id=${o.id}&status=Đã hủy"
-                                               style="color:red;"><i class="fas fa-times"></i> Hủy đơn</a>
+                                            <a href="adminOrders?action=update&id=${o.id}&status=Đang xử lý"><i class="fas fa-spinner"></i> Đang xử lý</a>
+                                            <a href="adminOrders?action=update&id=${o.id}&status=Đang giao hàng"><i class="fas fa-truck"></i> Đang giao hàng</a>
+                                            <a href="adminOrders?action=update&id=${o.id}&status=Đã giao"><i class="fas fa-check"></i> Đã giao</a>
+                                            <a href="adminOrders?action=update&id=${o.id}&status=Đã hủy" style="color:red;"><i class="fas fa-times"></i> Hủy đơn</a>
                                         </div>
                                     </div>
                                 </td>
