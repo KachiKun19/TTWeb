@@ -10,7 +10,7 @@ public class DBConnection {
             "jdbc:sqlserver://localhost:1433;databaseName=GamingGear;encrypt=true;trustServerCertificate=true;"
     );
     private static final String USER = System.getenv().getOrDefault("DB_USER", "sa");
-    private static final String PASS = System.getenv().getOrDefault("DB_PASS", "tranhung2005");
+    private static final String PASS = System.getenv().getOrDefault("DB_PASS", "khanhnhay2k5vcl");
 
     public static Connection getConnection() {
         Connection conn = null;
