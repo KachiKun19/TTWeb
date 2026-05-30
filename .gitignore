@@ -7,3 +7,5 @@ target/
 build/
 .gradle/
 gradle/wrapper/gradle-wrapper.jar
+google.properties
+*.properties
