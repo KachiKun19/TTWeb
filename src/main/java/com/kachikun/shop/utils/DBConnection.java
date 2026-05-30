@@ -5,12 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-    private static final String DB_URL = System.getenv().getOrDefault(
-            "DB_URL",
-            "jdbc:sqlserver://localhost:1433;databaseName=GamingGear;encrypt=true;trustServerCertificate=true;"
-    );
-    private static final String USER = System.getenv().getOrDefault("DB_USER", "sa");
-    private static final String PASS = System.getenv().getOrDefault("DB_PASS", "khanhnhay2k5vcl");
+    private static final String DB_URL = System.getenv("DB_URL");
+    private static final String USER = System.getenv("DB_USER");
+    private static final String PASS = System.getenv("DB_PASS");
 
     public static Connection getConnection() {
         Connection conn = null;
