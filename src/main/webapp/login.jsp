@@ -427,8 +427,8 @@
                 <h1 class="mb-4">Tạo tài khoản</h1>
 
                 <div class="social-container">
-                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-                    <a href="google-login" class="social"><i class="fab fa-google-plus-g"></i></a>
+                    <a href="${pageContext.request.contextPath}/facebook-login" class="social"><i class="fab fa-facebook-f"></i></a>
+                    <a href="${pageContext.request.contextPath}/google-login" class="social"><i class="fab fa-google-plus-g"></i></a>
                     <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                 </div>
                 <span>hoặc sử dụng email để đăng ký</span>
@@ -535,7 +535,7 @@
         <form action="login" method="post">
             <h1 class="mb-4">Đăng nhập</h1>
             <div class="social-container">
-                <a href="#" class="social"><i class="fab fa-facebook-f"></i></a> <a
+                <a href="${pageContext.request.contextPath}/facebook-login" class="social"><i class="fab fa-facebook-f"></i></a> <a
                     href="${pageContext.request.contextPath}/google-login" class="social"><i class="fab fa-google-plus-g"></i></a> <a
                     href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
             </div>
