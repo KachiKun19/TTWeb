@@ -30,12 +30,12 @@ task docker_app_start {
         println 'begin docker_app_start'
         ssh.run {
             session(remotes.host) {
-                execute 'docker stop tomcat9', ignoreError: true
+                execute 'docker stop tomcat10', ignoreError: true
                 execute 'docker run -it --rm -d ' +
-                        '--name tomcat9 ' +
+                        '--name tomcat10 ' +
                         '-v /usr/deploy:/usr/local/tomcat/webapps ' +
                         '-p 80:8080 ' +
-                        'tomcat:9.0&'
+                        'tomcat:10.1&'
             }
         }
     }
@@ -85,6 +85,10 @@ dependencies {
     implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
 
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    // HikariCP - Connection Pool
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.20.0'
 
     implementation 'com.google.api-client:google-api-client:2.6.0'
     implementation 'com.google.oauth-client:google-oauth-client-jetty:1.36.0'
