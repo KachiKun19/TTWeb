@@ -437,7 +437,7 @@ public class ProductDAO extends BaseDAO {
     public boolean insertProduct(Product product) {
         String sql = "INSERT INTO Products "
                 + "(name, description, price, image, stock_quantity, "
-                + " category_id, brand_id, connection_type, material, size) "
+                + " category_id, brand_id, connection_type, material, product_size) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
@@ -448,8 +448,8 @@ public class ProductDAO extends BaseDAO {
             ps.setDouble(3, product.getPrice());
             ps.setString(4, product.getImage());
             ps.setInt(5, product.getStock());
-            ps.setInt(6, product.getCategory().getId());
-            ps.setInt(7, product.getBrand().getId());
+            ps.setInt(6, product.getCategory() != null ? product.getCategory().getId() : 0);
+            ps.setInt(7, product.getBrand() != null ? product.getBrand().getId() : 0);
             ps.setString(8, product.getConnectionType());
             ps.setString(9, product.getMaterial());
             ps.setString(10, product.getSize());
