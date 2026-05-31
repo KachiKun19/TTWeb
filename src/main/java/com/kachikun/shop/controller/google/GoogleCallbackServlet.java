@@ -49,7 +49,7 @@ public class GoogleCallbackServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("user", dbUser);
 
-            response.sendRedirect(request.getContextPath() + "/home.jsp");
+            response.sendRedirect(request.getContextPath() + "/home");
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/login.jsp?error=google_auth_failed");
