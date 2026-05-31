@@ -3,7 +3,10 @@ package com.kachikun.shop.controller;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import com.kachikun.shop.model.Brand;
@@ -15,6 +18,11 @@ import com.kachikun.shop.dao.CategoryDAO;
 import com.kachikun.shop.dao.ProductDAO;
 
 @WebServlet("/editProduct")
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize       = 1024 * 1024 * 10,
+    maxRequestSize    = 1024 * 1024 * 15
+)
 public class EditProductServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private ProductDAO productDAO = new ProductDAO();
@@ -76,7 +84,7 @@ public class EditProductServlet extends HttpServlet {
         String name = request.getParameter("name");
         String description = request.getParameter("description");
         String priceStr = request.getParameter("price");
-        String image = request.getParameter("image");
+        String image = resolveImage(request);
         String stockStr = request.getParameter("stock");
         String connectionType = request.getParameter("connectionType");
         String material = request.getParameter("material");
@@ -135,5 +143,50 @@ public class EditProductServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
             doGet(request, response);
         }
+    }
+
+    private String resolveImage(HttpServletRequest request) throws IOException, ServletException {
+        Part filePart = request.getPart("imageFile");
+        if (filePart != null && filePart.getSize() > 0) {
+            String original = filePart.getSubmittedFileName();
+            if (original != null && !original.trim().isEmpty()) {
+                String safeName = System.currentTimeMillis() + "_" + original.replaceAll("[^a-zA-Z0-9._-]", "_");
+
+                String servingDir = getServletContext().getRealPath("/images/");
+                if (servingDir != null) {
+                    new File(servingDir).mkdirs();
+                    filePart.write(servingDir + File.separator + safeName);
+                }
+
+                File sourceDir = getSourceImagesDir(servingDir);
+                if (sourceDir != null) {
+                    sourceDir.mkdirs();
+                    File dest = new File(sourceDir, safeName);
+                    if (!dest.exists()) {
+                        File saved = new File(servingDir, safeName);
+                        if (saved.exists()) {
+                            Files.copy(saved.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        }
+                    }
+                }
+
+                return safeName;
+            }
+        }
+        return request.getParameter("image");
+    }
+
+    private File getSourceImagesDir(String servingDir) {
+        String env = System.getenv("UPLOAD_DIR");
+        if (env != null && !env.trim().isEmpty()) return null;
+
+        if (servingDir == null) return null;
+        try {
+            File candidate = new File(servingDir, "../../../../src/main/webapp/images").getCanonicalFile();
+            if (candidate.exists() && !candidate.getAbsolutePath().equals(new File(servingDir).getCanonicalPath())) {
+                return candidate;
+            }
+        } catch (IOException ignored) {}
+        return null;
     }
 }
