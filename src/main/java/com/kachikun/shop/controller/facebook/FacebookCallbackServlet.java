@@ -33,6 +33,7 @@ public class FacebookCallbackServlet extends HttpServlet {
 
             String accessToken = FacebookService.getAccessToken(code, redirectUri);
             FacebookUser fbUser = FacebookService.getUserInfo(accessToken);
+
             UserDAO userDAO = new UserDAO();
 
             User dbUser = userDAO.getUserByEmail(fbUser.getEmail());

@@ -15,13 +15,14 @@ public class FacebookService {
 
     public static String getAccessToken(String code, String redirectUri) throws IOException {
         OkHttpClient client = new OkHttpClient();
-
         HttpUrl url = HttpUrl.parse(FacebookConstants.FACEBOOK_LINK_GET_TOKEN).newBuilder().addQueryParameter("client_id", FacebookConstants.FACEBOOK_APP_ID).addQueryParameter("client_secret", FacebookConstants.FACEBOOK_APP_SECRET).addQueryParameter("redirect_uri", redirectUri).addQueryParameter("code", code).build();
 
         Request request = new Request.Builder().url(url).get().build();
 
         try (Response response = client.newCall(request).execute()) {
             String json = response.body().string();
+            System.out.println("=== TOKEN RESPONSE ===");
+            System.out.println(json);
             TokenResponse token = gson.fromJson(json, TokenResponse.class);
             return token.access_token;
         }
@@ -30,12 +31,16 @@ public class FacebookService {
     public static FacebookUser getUserInfo(String accessToken) throws IOException {
         OkHttpClient client = new OkHttpClient();
 
-        HttpUrl url = HttpUrl.parse(FacebookConstants.FACEBOOK_LINK_GET_USER_INFO).newBuilder().addQueryParameter("access_token", accessToken).build();
+        HttpUrl url = HttpUrl.parse(FacebookConstants.FACEBOOK_LINK_GET_USER_INFO).newBuilder()
+                .addQueryParameter("access_token", accessToken)
+                .build();
 
         Request request = new Request.Builder().url(url).get().build();
 
         try (Response response = client.newCall(request).execute()) {
             String json = response.body().string();
+            System.out.println("=== FACEBOOK RAW JSON ===");
+            System.out.println(json); // xem FB trả về gì
             return gson.fromJson(json, FacebookUser.class);
         }
     }
