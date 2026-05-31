@@ -7,5 +7,4 @@ target/
 build/
 .gradle/
 gradle/wrapper/gradle-wrapper.jar
-google.properties
-*.properties
+src/main/resources/config.properties
