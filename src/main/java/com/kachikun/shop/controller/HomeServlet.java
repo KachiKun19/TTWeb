@@ -35,7 +35,10 @@ public class HomeServlet extends HttpServlet {
         List<Product> list = productDAO.getAllProducts();
         List<Category> listC = cateDAO.getAllCategories();
         List<Product> featuredProducts = featuredDAO.getFeaturedProducts();
-        List<Discount> activeDiscounts = discountDAO.getActiveDiscounts();
+        Boolean sectionVisible = (Boolean) getServletContext().getAttribute("discountSectionVisible");
+        List<Discount> activeDiscounts = (sectionVisible != null && sectionVisible) // mặc định ẩn
+                ? discountDAO.getActiveDiscounts()
+                : java.util.Collections.emptyList();
 
         request.setAttribute("products", list);
         request.setAttribute("listCategories", listC);
