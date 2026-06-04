@@ -9,326 +9,352 @@
     <title>Quản Lý Liên Hệ - Kachi-Kun Shop</title>
     <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
     <link rel="stylesheet" href="css/Admin.css"/>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-    <link
-            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap"
-            rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-
-        .page-header {
-            margin-bottom: 25px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-        }
-
-
         .table-responsive {
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.08);
             overflow-x: auto;
-            padding: 20px;
+            padding: 0 0 10px;
         }
 
-        table {
+        .table-responsive table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        th {
-            background-color: #f8f9fa;
-            color: #555;
+        .table-responsive td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .table-responsive tr:hover td {
+            background-color: #f8f9ff;
+        }
+
+        .sender-name {
             font-weight: 600;
-            padding: 15px;
-            text-align: left;
-            border-bottom: 2px solid #2d7e7e;
-            text-transform: uppercase;
-            font-size: 0.85rem;
+            color: #1e293b;
         }
 
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: top;
-            color: #444;
-        }
-
-        tr:hover {
-            background-color: #f0f7f7;
-        }
-
-
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .status-unread {
-            background-color: #fff5f5;
-            color: #e53e3e;
-            border: 1px solid #fed7d7;
-        }
-
-        .status-read {
-            background-color: #f0fff4;
-            color: #38a169;
-            border: 1px solid #c6f6d5;
-        }
-
-
-        .btn-action {
-            background-color: #2d7e7e;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-action:hover {
-            background-color: #1a5c5c;
-            color: white;
+        .sender-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
         }
 
         .message-preview {
-            max-width: 300px;
+            max-width: 280px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            color: #666;
+            color: #64748b;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        .status-unread {
+            background-color: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+        }
+
+        .status-read {
+            background-color: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-replied {
+            background-color: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,.55);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
         }
 
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
             background: white;
-            margin: 10% auto;
-            padding: 20px;
-            width: 500px;
-            border-radius: 10px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 540px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .close {
-            float: right;
-            cursor: pointer;
-            font-size: 20px;
+        .modal-header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+
+        .modal-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: background .2s;
+        }
+
+        .modal-close:hover { background: rgba(255,255,255,.35); }
+
+        .modal-body {
+            padding: 20px 24px;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #475569;
+            min-width: 90px;
+        }
+
+        .info-value {
+            color: #1e293b;
+        }
+
+        .message-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px;
+            margin: 14px 0;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .reply-textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .reply-textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+        }
+
+        .modal-footer {
+            padding: 0 24px 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            padding: 9px 20px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            color: #64748b;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .btn-cancel:hover { background: #f8fafc; }
     </style>
 </head>
 <body>
 <c:if test="${empty user or user.role ne 1}">
     <c:redirect url="login"/>
 </c:if>
-<c:set var="activePage" value="contacts" scope="request" />
+<c:set var="activePage" value="contacts" scope="request"/>
 <jsp:include page="componentsAdmin/headerAdmin.jsp"/>
 
 <div class="admin-container">
     <jsp:include page="componentsAdmin/sidebarAdmin.jsp"/>
 
     <div class="main-content">
-
         <div class="page-header">
-            <h2><i class="fas fa-envelope"></i> Hộp thư góp ý & Liên hệ</h2>
-            <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">
-                Danh sách tin nhắn từ khách hàng gửi qua form liên hệ.
-            </p>
-        </div>
-        <div style="font-size: 12px; opacity: 0.9;">Quản trị viên</div>
-    </div>
-    <a href="logout">
-        <button class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i> Đăng xuất
-        </button>
-    </a>
-</div>
-</div>
-
-<div class="admin-container">
-    <div class="sidebar">
-        <ul class="sidebar-menu">
-            <li><a href="adminHome"><i class="fas fa-tachometer-alt"></i> Tổng quan</a></li>
-            <li><a href="adminUsers"><i class="fas fa-users"></i> Quản lý người dùng</a></li>
-            <li><a href="adminProducts"><i class="fas fa-box"></i> Quản lý sản phẩm</a></li>
-            <li><a href="adminOrders"><i class="fas fa-shopping-cart"></i> Quản lý đơn hàng</a></li>
-            <li><a href="adminContacts" class="active"><i class="fas fa-envelope"></i> Quản lý liên hệ</a></li>
-            <li><a href="home"><i class="fas fa-store"></i> Về trang cửa hàng</a></li>
-        </ul>
-    </div>
-
-    <div class="main-content">
-
-        <div class="page-header">
-            <h2><i class="fas fa-envelope"></i> Hộp thư góp ý & Liên hệ</h2>
-            <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">
-                Danh sách tin nhắn từ khách hàng gửi qua form liên hệ.
-            </p>
+            <h2><i class="fas fa-envelope-open-text"></i> Hộp thư Liên hệ</h2>
         </div>
 
         <div class="table-responsive">
             <table>
                 <thead>
                 <tr>
-                    <th width="5%">ID</th>
-                    <th width="20%">Người gửi</th>
-                    <th width="15%">Chủ đề</th>
-                    <th width="35%">Nội dung</th>
-                    <th width="15%">Thời gian</th>
-                    <th width="10%">Trạng thái</th>
+                    <th style="width:50px;">ID</th>
+                    <th style="width:20%;">Người gửi</th>
+                    <th style="width:15%;">Chủ đề</th>
+                    <th>Nội dung</th>
+                    <th style="width:140px;">Thời gian</th>
+                    <th style="width:160px;">Trạng thái</th>
                 </tr>
                 </thead>
                 <tbody>
-                <c:forEach items="${messages}" var="msg">
-                    <tr>
-                        <td>#${msg.id}</td>
-                        <td>
-                            <div style="font-weight: 700; color: #2d7e7e;">${msg.fullName}</div>
-                            <div style="font-size: 0.8rem; color: #777;">
-                                <i class="fas fa-envelope"></i> ${msg.email}
-                            </div>
-                            <c:if test="${not empty msg.phone}">
-                                <div style="font-size: 0.8rem; color: #777;">
-                                    <i class="fas fa-phone"></i> ${msg.phone}
-                                </div>
-                            </c:if>
-                        </td>
-                        <td style="font-weight: 500;">${msg.subject}</td>
-                        <td>
-                            <div class="message-preview" title="${msg.message}">
-                                    ${msg.message}
-                            </div>
-                        </td>
-                        <td>
-                            <div style="font-size: 0.85rem;">
-                                <i class="far fa-clock"></i>
-                                <fmt:formatDate value="${msg.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
-                            </div>
-                        </td>
-                        <td>
-                            <c:choose>
-                                <c:when test="${msg.status == 'Chưa đọc'}">
-                                    <span class="status-badge status-unread">Chưa đọc</span>
-                                    <div style="margin-top: 5px;">
-                                        <a href="adminContacts?action=markRead&id=${msg.id}" class="btn-action">
-                                            <i class="fas fa-check"></i> Xử lý
+                <c:choose>
+                    <c:when test="${empty messages}">
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:50px; color:#94a3b8;">
+                                <i class="fas fa-inbox" style="font-size:3rem; display:block; margin-bottom:12px;"></i>
+                                Chưa có tin nhắn liên hệ nào!
+                            </td>
+                        </tr>
+                    </c:when>
+                    <c:otherwise>
+                        <c:forEach items="${messages}" var="msg">
+                            <tr>
+                                <td style="text-align:center; font-weight:600; color:#94a3b8;">#${msg.id}</td>
+                                <td>
+                                    <div class="sender-name">${msg.fullName}</div>
+                                    <div class="sender-sub"><i class="fas fa-envelope" style="font-size:10px;"></i> ${msg.email}</div>
+                                    <c:if test="${not empty msg.phone}">
+                                        <div class="sender-sub"><i class="fas fa-phone" style="font-size:10px;"></i> ${msg.phone}</div>
+                                    </c:if>
+                                </td>
+                                <td style="font-weight:600; color:#334155;">${msg.subject}</td>
+                                <td>
+                                    <div class="message-preview" title="${msg.message}">${msg.message}</div>
+                                </td>
+                                <td style="font-size:13px; color:#64748b;">
+                                    <i class="far fa-clock"></i>
+                                    <fmt:formatDate value="${msg.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${msg.status == 'Chưa đọc'}">
+                                            <span class="status-badge status-unread"><i class="fas fa-circle" style="font-size:7px;"></i> Chưa đọc</span>
+                                        </c:when>
+                                        <c:when test="${msg.status == 'Đã xem'}">
+                                            <span class="status-badge status-read"><i class="fas fa-circle" style="font-size:7px;"></i> Đã xem</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="status-badge status-replied"><i class="fas fa-circle" style="font-size:7px;"></i> Đã trả lời</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <div class="action-row">
+                                        <c:if test="${msg.status == 'Chưa đọc'}">
+                                            <a href="adminContacts?action=markRead&id=${msg.id}" class="btn-action">
+                                                <i class="fas fa-check"></i> Xử lý
+                                            </a>
+                                        </c:if>
+                                        <a href="javascript:void(0)" class="btn-action"
+                                           onclick="openModal('${msg.id}','${msg.fullName}','${msg.email}',`${msg.message}`)">
+                                            <i class="fas fa-reply"></i> Trả lời
                                         </a>
                                     </div>
-                                </c:when>
-
-                                <c:when test="${msg.status == 'Đã xem'}">
-                                    <span class="status-badge status-read">Đã xem</span>
-                                </c:when>
-
-                                <c:when test="${msg.status == 'Đã trả lời'}">
-                                 <span class="status-badge" style="background:#e6fffa;color:#0d9488;">
-                                    Đã trả lời
-                                 </span>
-                                </c:when>
-
-                                <c:otherwise>
-                                    <span class="status-badge">Không xác định</span>
-                                </c:otherwise>
-
-                            </c:choose>
-                            <!-- NÚT XEM -->
-                            <div style="margin-top:5px;">
-                                <a href="javascript:void(0)" class="btn-action"
-                                   onclick="openModal('${msg.id}', '${msg.fullName}', '${msg.email}', `${msg.message}`)">
-                                    <i class="fas fa-eye"></i> Xem
-                                </a>
-
-                                <a href="javascript:void(0)" class="btn-action"
-                                   onclick="openModal('${msg.id}', '${msg.fullName}', '${msg.email}', `${msg.message}`)">
-                                    <i class="fas fa-reply"></i> Trả lời
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                </c:forEach>
-
-                <c:if test="${empty messages}">
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 40px; color: #888;">
-                            <i class="fas fa-clipboard-check"
-                               style="font-size: 3rem; margin-bottom: 10px; color: #cbd5e0;"></i>
-                            <p>Hiện chưa có tin nhắn liên hệ nào!</p>
-                        </td>
-                    </tr>
-                </c:if>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
-<div id="messageModal" class="modal">
-    <div class="modal-content">
 
-        <span class="close">&times;</span>
-
-        <h3 style="margin-bottom:10px;">📩 Chi tiết & phản hồi</h3>
-
-        <p><b>Người gửi:</b> <span id="modalName"></span></p>
-        <p><b>Email:</b> <span id="modalEmail"></span></p>
-
-        <p style="margin-top:10px;"><b>Nội dung:</b></p>
-        <div id="modalMessage"
-             style="background:#f5f7fa; padding:10px; border-radius:5px; margin-bottom:10px;"></div>
-
-        <form action="adminReply" method="post">
-            <input type="hidden" name="id" id="replyId">
-
-            <textarea name="reply" required
-                      placeholder="Nhập phản hồi cho khách..."
-                      style="width:100%; height:100px; padding:10px; border-radius:5px; border:1px solid #ddd;"></textarea>
-
-            <button type="submit" class="btn-action" style="margin-top:10px;">
-                <i class="fas fa-paper-plane"></i> Gửi phản hồi
-            </button>
-        </form>
-
+<!-- Modal phản hồi -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-reply"></i> Trả lời tin nhắn</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="info-row"><span class="info-label">Người gửi:</span><span class="info-value" id="modalName"></span></div>
+            <div class="info-row"><span class="info-label">Email:</span><span class="info-value" id="modalEmail"></span></div>
+            <div class="message-box" id="modalMessage"></div>
+            <form action="adminReply" method="post" id="replyForm">
+                <input type="hidden" name="id" id="replyId">
+                <label style="font-size:13px; font-weight:600; color:#475569; display:block; margin-bottom:8px;">Nội dung phản hồi:</label>
+                <textarea name="reply" class="reply-textarea" placeholder="Nhập phản hồi cho khách..." required></textarea>
+                <div class="modal-footer" style="padding:12px 0 0;">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn-action" style="padding:9px 20px; border:none; font-size:13px;">
+                        <i class="fas fa-paper-plane"></i> Gửi phản hồi
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
     function openModal(id, name, email, message) {
-        document.getElementById("modalName").innerText = name;
-        document.getElementById("modalEmail").innerText = email;
-        document.getElementById("modalMessage").innerText = message;
-
-        document.getElementById("replyId").value = id;
-
-        document.getElementById("messageModal").style.display = "block";
+        document.getElementById('modalName').textContent = name;
+        document.getElementById('modalEmail').textContent = email;
+        document.getElementById('modalMessage').textContent = message;
+        document.getElementById('replyId').value = id;
+        document.getElementById('modalOverlay').classList.add('open');
     }
 
-    // close modal
-    document.querySelector(".close").onclick = function () {
-        document.getElementById("messageModal").style.display = "none";
-    };
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('open');
+    }
 
-    // click outside
-    window.onclick = function (e) {
-        if (e.target.id === "messageModal") {
-            document.getElementById("messageModal").style.display = "none";
-        }
-    };
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
 </script>
 </body>
 </html>
