@@ -76,8 +76,8 @@ dependencies {
 
     implementation 'org.mindrot:jbcrypt:0.4'
 
-    implementation 'jakarta.mail:jakarta.mail-api:2.1.2'
-    implementation 'org.eclipse.angus:jakarta.mail:2.0.2'
+    implementation 'jakarta.mail:jakarta.mail-api:2.1.3'
+    implementation 'org.eclipse.angus:angus-mail:2.0.3'
 
     implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
 
