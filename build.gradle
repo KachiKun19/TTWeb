@@ -46,10 +46,7 @@ task docker_upload_file_to_server {
         println 'begin docker_upload_file_to_server'
         ssh.run {
             session(remotes.host) {
-                remove '/usr/deploy/ThucTapWeb.war'
-                remove '/usr/deploy/ThucTapWeb/'
-                put from: "${project.projectDir}/build/libs/ThucTapWeb-1.0-SNAPSHOT.war",
-                        into: "/usr/deploy/ThucTapWeb.war"
+                put from: "${project.projectDir}/build/libs/ROOT.war", to: "/usr/deploy/ROOT.war"
             }
         }
     }
@@ -101,5 +98,5 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('war') {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    archiveFileName = 'ThucTapWeb-1.0-SNAPSHOT.war'
+    archiveFileName = 'ROOT.war'
 }

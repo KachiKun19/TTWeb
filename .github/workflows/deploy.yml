@@ -51,4 +51,4 @@ jobs:
         with:
           app-name: ${{ secrets.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: 'build/libs/ThucTapWeb-1.0-SNAPSHOT.war'
+          package: 'build/libs/ROOT.war'
