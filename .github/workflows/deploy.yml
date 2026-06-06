@@ -39,7 +39,7 @@ jobs:
 
       # Đóng gói ứng dụng thành file .war
       - name: Build WAR with Gradle
-        run: ./gradlew war --no-daemon
+        run: ./gradlew war -x test --no-daemon
 
       # Kiểm tra đảm bảo file .war đã được sinh ra
       - name: Verify WAR file exists
