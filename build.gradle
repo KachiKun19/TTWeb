@@ -97,6 +97,6 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.named('war') {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName = 'ROOT.war'
 }
