@@ -33,7 +33,7 @@ public class AppCache {
             List<Category> fresh = new CategoryDAO().getAllCategories();
             cachedCategories     = Collections.unmodifiableList(fresh);
             log.info("[AppCache] Cập nhật Categories thành công, số lượng: " + fresh.size());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.log(Level.SEVERE, "[AppCache] THẤT BẠI khi cập nhật Categories! Đang giữ lại dữ liệu cũ.", e);
         }
     }
@@ -45,7 +45,7 @@ public class AppCache {
             List<Brand> fresh = new BrandDAO().getAllBrands();
             cachedBrands      = Collections.unmodifiableList(fresh);
             log.info("[AppCache] Cập nhật Brands thành công, số lượng: " + fresh.size());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.log(Level.SEVERE, "[AppCache] THẤT BẠI khi cập nhật Brands! Đang giữ lại dữ liệu cũ.", e);
         }
     }
