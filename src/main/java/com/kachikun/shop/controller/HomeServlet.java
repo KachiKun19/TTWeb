@@ -1,9 +1,13 @@
 package com.kachikun.shop.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
+import com.kachikun.shop.dao.CategoryDAO;
+import com.kachikun.shop.dao.DiscountDAO;
+import com.kachikun.shop.dao.FeaturedProductDAO;
+import com.kachikun.shop.model.Category;
+import com.kachikun.shop.model.Discount;
+import com.kachikun.shop.model.Product;
+import com.kachikun.shop.model.User;
+import com.kachikun.shop.utils.AppCache;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,37 +15,30 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import com.kachikun.shop.dao.CategoryDAO;
-import com.kachikun.shop.dao.DiscountDAO;
-import com.kachikun.shop.model.Category;
-import com.kachikun.shop.model.Discount;
-import com.kachikun.shop.dao.ProductDAO;
-import com.kachikun.shop.dao.FeaturedProductDAO;
-import com.kachikun.shop.model.Product;
-import com.kachikun.shop.model.User;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 @WebServlet("/home")
 public class HomeServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
 
-    CategoryDAO cateDAO = new CategoryDAO();
-    private ProductDAO productDAO = new ProductDAO();
-    private FeaturedProductDAO featuredDAO = new FeaturedProductDAO();
-    private DiscountDAO discountDAO = new DiscountDAO();
+    private final CategoryDAO categoryDAO       = new CategoryDAO();
+    private final FeaturedProductDAO featuredDAO = new FeaturedProductDAO();
+    private final DiscountDAO discountDAO        = new DiscountDAO();
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<Product> list = productDAO.getAllProducts();
-        List<Category> listC = cateDAO.getAllCategories();
-        List<Product> featuredProducts = featuredDAO.getFeaturedProducts();
-        List<Discount> activeDiscounts = discountDAO.getActiveDiscounts();
+        List<Category> categories = AppCache.getCategories();
+        List<Product>  featuredProducts  = featuredDAO.getFeaturedProducts();
+        List<Discount> activeDiscounts   = discountDAO.getActiveDiscounts();
 
-        request.setAttribute("products", list);
-        request.setAttribute("listCategories", listC);
+        request.setAttribute("listCategories",   categories);
         request.setAttribute("featuredProducts", featuredProducts);
-        request.setAttribute("activeDiscounts", activeDiscounts);
+        request.setAttribute("activeDiscounts",  activeDiscounts);
 
+        // Query thêm nếu user đã đăng nhập
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
@@ -50,10 +47,5 @@ public class HomeServlet extends HttpServlet {
         }
 
         request.getRequestDispatcher("home.jsp").forward(request, response);
-    }
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
     }
 }
