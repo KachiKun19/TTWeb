@@ -101,4 +101,5 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('war') {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    archiveFileName = 'ThucTapWeb-1.0-SNAPSHOT.war'
 }

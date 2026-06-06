@@ -27,10 +27,11 @@ public class DBConnection {
         config.setMinimumIdle(2);
 
         // Timeouts
-        config.setConnectionTimeout(20_000);
+        config.setConnectionTimeout(10_000);
         config.setIdleTimeout(300_000);
         config.setMaxLifetime(600_000);         // kết nối tối đa 10 phút
         config.setKeepaliveTime(60_000);        // ping DB mỗi 60s để tránh bị Azure ngủ
+        config.setLeakDetectionThreshold(5_000);
 
         // Connection test
         config.setConnectionTestQuery("SELECT 1");
@@ -42,6 +43,13 @@ public class DBConnection {
 
     public static Connection getConnection() throws SQLException {
         return dataSource.getConnection();
+    }
+
+    public static void closePool() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+            System.out.println("DBConnection: HikariCP Connection Pool đã được đóng.");
+        }
     }
 
     // Dùng cho DBConnection.main() test thủ công
