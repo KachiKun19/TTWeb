@@ -37,6 +37,8 @@ public class DBConnection {
         config.setConnectionTestQuery("SELECT 1");
         config.setPoolName("KachiKunPool");
 
+        config.setInitializationFailTimeout(-1);
+
         dataSource = new HikariDataSource(config);
         System.out.println("[HikariCP] Connection pool đã khởi động.");
     }
