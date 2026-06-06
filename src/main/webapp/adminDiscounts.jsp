@@ -168,6 +168,26 @@
             font-style: italic;
         }
 
+        .section-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: 2px solid;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .section-toggle-btn.is-visible  { background:#d1fae5; color:#059669; border-color:#6ee7b7; }
+        .section-toggle-btn.is-visible:hover  { background:#a7f3d0; }
+        .section-toggle-btn.is-hidden { background:#fef2f2; color:#dc2626; border-color:#fca5a5; }
+        .section-toggle-btn.is-hidden:hover { background:#fee2e2; }
+
         .edit-btn {
             padding: 7px 14px;
             border-radius: 4px;
@@ -500,9 +520,17 @@
     <div class="main-content">
         <div class="page-header">
             <h2><i class="fas fa-tag"></i> Quản Lý Mã Giảm Giá</h2>
-            <button class="add-btn" onclick="openAddModal()">
-                <i class="fas fa-plus-circle"></i> Thêm Mã Mới
-            </button>
+            <div style="display:flex;gap:10px;align-items:center;">
+                <button id="sectionToggleBtn"
+                        class="section-toggle-btn ${discountSectionVisible ? 'is-visible' : 'is-hidden'}"
+                        onclick="toggleSection()">
+                    <i class="fas ${discountSectionVisible ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                    <span>${discountSectionVisible ? 'Đang hiện trên trang chủ' : 'Đang ẩn trên trang chủ'}</span>
+                </button>
+                <button class="add-btn" onclick="openAddModal()">
+                    <i class="fas fa-plus-circle"></i> Thêm Mã Mới
+                </button>
+            </div>
         </div>
 
         <c:if test="${param.success eq 'added'}">
@@ -861,6 +889,27 @@
             el.style.display = 'none';
         });
     }, 5000);
+
+    function toggleSection() {
+        var btn = document.getElementById('sectionToggleBtn');
+        btn.disabled = true;
+        fetch('adminDiscounts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=toggleHomeVisibility'
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    var v = data.visible;
+                    btn.className = 'section-toggle-btn ' + (v ? 'is-visible' : 'is-hidden');
+                    btn.querySelector('i').className = 'fas ' + (v ? 'fa-eye' : 'fa-eye-slash');
+                    btn.querySelector('span').textContent = v ? 'Đang hiện trên trang chủ' : 'Đang ẩn trên trang chủ';
+                }
+            })
+            .catch(() => alert('Lỗi kết nối!'))
+            .finally(() => { btn.disabled = false; });
+    }
 </script>
 </body>
 </html>

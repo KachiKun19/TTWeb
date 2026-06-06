@@ -3,7 +3,10 @@ package com.kachikun.shop.controller;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import com.kachikun.shop.model.Product;
@@ -15,6 +18,11 @@ import com.kachikun.shop.dao.CategoryDAO;
 import com.kachikun.shop.dao.BrandDAO;
 
 @WebServlet("/addProduct")
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize       = 1024 * 1024 * 10,
+    maxRequestSize    = 1024 * 1024 * 15
+)
 public class AddProductServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private ProductDAO productDAO = new ProductDAO();
@@ -61,7 +69,7 @@ public class AddProductServlet extends HttpServlet {
         String name = request.getParameter("name");
         String description = request.getParameter("description");
         String priceStr = request.getParameter("price");
-        String image = request.getParameter("image");
+        String image = resolveImage(request);
         String stockStr = request.getParameter("stock");
         String connectionType = request.getParameter("connectionType");
         String material = request.getParameter("material");
@@ -122,5 +130,52 @@ public class AddProductServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
             doGet(request, response);
         }
+    }
+
+    private String resolveImage(HttpServletRequest request) throws IOException, ServletException {
+        Part filePart = request.getPart("imageFile");
+        if (filePart != null && filePart.getSize() > 0) {
+            String original = filePart.getSubmittedFileName();
+            if (original != null && !original.trim().isEmpty()) {
+                String safeName = System.currentTimeMillis() + "_" + original.replaceAll("[^a-zA-Z0-9._-]", "_");
+
+                // Lưu vào artifact dir → hiện ảnh ngay lập tức khi đang chạy
+                String servingDir = getServletContext().getRealPath("/images/");
+                if (servingDir != null) {
+                    new File(servingDir).mkdirs();
+                    filePart.write(servingDir + File.separator + safeName);
+                }
+
+                // Đồng thời copy vào src/main/webapp/images → không mất sau khi restart
+                File sourceDir = getSourceImagesDir(servingDir);
+                if (sourceDir != null) {
+                    sourceDir.mkdirs();
+                    File dest = new File(sourceDir, safeName);
+                    if (!dest.exists()) {
+                        File saved = new File(servingDir, safeName);
+                        if (saved.exists()) {
+                            Files.copy(saved.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        }
+                    }
+                }
+
+                return safeName;
+            }
+        }
+        return request.getParameter("image");
+    }
+
+    private File getSourceImagesDir(String servingDir) {
+        String env = System.getenv("UPLOAD_DIR");
+        if (env != null && !env.trim().isEmpty()) return null; // dùng env thì không cần copy
+
+        if (servingDir == null) return null;
+        try {
+            File candidate = new File(servingDir, "../../../../src/main/webapp/images").getCanonicalFile();
+            if (candidate.exists() && !candidate.getAbsolutePath().equals(new File(servingDir).getCanonicalPath())) {
+                return candidate;
+            }
+        } catch (IOException ignored) {}
+        return null;
     }
 }

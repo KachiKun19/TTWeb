@@ -16,6 +16,11 @@ public class AdminDiscountServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private DiscountDAO discountDAO = new DiscountDAO();
 
+    private boolean isDiscountSectionVisible() {
+        Boolean v = (Boolean) getServletContext().getAttribute("discountSectionVisible");
+        return v != null && v; // mặc định ẩn
+    }
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
@@ -51,6 +56,7 @@ public class AdminDiscountServlet extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalCount", totalCount);
         request.setAttribute("nowMs", System.currentTimeMillis());
+        request.setAttribute("discountSectionVisible", isDiscountSectionVisible());
         request.getRequestDispatcher("adminDiscounts.jsp").forward(request, response);
     }
 
@@ -69,10 +75,17 @@ public class AdminDiscountServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
 
-        try {
-            Discount d = parseDiscount(request);
+        if ("toggleHomeVisibility".equals(action)) {
+            response.setContentType("application/json;charset=UTF-8");
+            boolean nowVisible = !isDiscountSectionVisible();
+            getServletContext().setAttribute("discountSectionVisible", nowVisible);
+            response.getWriter().write("{\"success\":true,\"visible\":" + nowVisible + "}");
+            return;
+        }
 
+        try {
             if ("add".equals(action)) {
+                Discount d = parseDiscount(request);
                 if (discountDAO.findByCode(d.getCode()) != null) {
                     response.sendRedirect("adminDiscounts?error=duplicate_code");
                     return;
@@ -80,6 +93,7 @@ public class AdminDiscountServlet extends HttpServlet {
                 boolean ok = discountDAO.insert(d);
                 response.sendRedirect("adminDiscounts?success=" + (ok ? "added" : "false"));
             } else if ("edit".equals(action)) {
+                Discount d = parseDiscount(request);
                 int id = Integer.parseInt(request.getParameter("id"));
                 d.setId(id);
                 boolean ok = discountDAO.update(d);

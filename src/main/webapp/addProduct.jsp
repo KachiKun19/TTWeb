@@ -295,6 +295,68 @@ body {
 		justify-content: center;
 	}
 }
+
+.image-preview-box {
+	width: 100%;
+	height: 160px;
+	border: 2px dashed #ddd;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	background: #fafafa;
+	margin-bottom: 10px;
+	transition: border-color 0.3s;
+}
+.image-preview-box img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	display: none;
+}
+.image-preview-box .placeholder-text {
+	color: #aaa;
+	font-size: 13px;
+	text-align: center;
+}
+.upload-btn-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 9px 16px;
+	background: #e8f4f4;
+	color: #2d7e7e;
+	border: 1px solid #b2d8d8;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 600;
+	transition: background 0.2s;
+	margin-bottom: 6px;
+}
+.upload-btn-label:hover { background: #d0ecec; }
+.file-name-display {
+	font-size: 12px;
+	color: #777;
+	margin-left: 6px;
+}
+.image-or-divider {
+	text-align: center;
+	color: #bbb;
+	font-size: 12px;
+	margin: 8px 0;
+	position: relative;
+}
+.image-or-divider::before, .image-or-divider::after {
+	content: '';
+	display: inline-block;
+	width: 35%;
+	height: 1px;
+	background: #e0e0e0;
+	vertical-align: middle;
+	margin: 0 6px;
+}
 </style>
 </head>
 <body>
@@ -362,7 +424,7 @@ body {
 			</c:if>
 
 			<div class="product-form-container">
-				<form action="addProduct" method="POST">
+				<form action="addProduct" method="POST" enctype="multipart/form-data">
 					<div class="form-row">
 						<div class="form-col">
 							<div class="form-group">
@@ -415,11 +477,23 @@ body {
 							</div>
 
 							<div class="form-group">
-								<label for="image">URL hình ảnh</label>
+								<label>Hình ảnh sản phẩm</label>
+								<div class="image-preview-box" id="previewBox">
+									<img id="imgPreview" src="" alt="Preview" style="display:none;">
+									<div class="placeholder-text" id="previewPlaceholder">
+										<i class="fas fa-image" style="font-size:28px; margin-bottom:6px; display:block;"></i>
+										Chưa chọn ảnh
+									</div>
+								</div>
+								<label class="upload-btn-label" for="imageFile">
+									<i class="fas fa-upload"></i> Chọn ảnh từ máy tính
+								</label>
+								<span class="file-name-display" id="fileNameDisplay">Chưa chọn file</span>
+								<input type="file" id="imageFile" name="imageFile" accept="image/*" style="display:none">
+								<div class="image-or-divider">hoặc nhập URL</div>
 								<input type="text" id="image" name="image" class="form-control"
 									placeholder="https://example.com/image.jpg">
-								<small style="color: #777;">Nhập đường dẫn ảnh hoặc để
-									trống để sử dụng ảnh mặc định</small>
+								<small style="color: #777;">Nếu chọn ảnh từ máy, URL sẽ bị bỏ qua</small>
 							</div>
 
 							<div class="form-group">
@@ -482,6 +556,45 @@ body {
 						return;
 					}
 				});
+
+		// File picker preview
+		document.getElementById('imageFile').addEventListener('change', function() {
+			var file = this.files[0];
+			if (!file) return;
+			document.getElementById('fileNameDisplay').textContent = file.name;
+			document.getElementById('image').value = '';
+			var reader = new FileReader();
+			reader.onload = function(e) { showPreview(e.target.result); };
+			reader.readAsDataURL(file);
+		});
+
+		// URL preview
+		document.getElementById('image').addEventListener('input', function() {
+			var url = this.value.trim();
+			if (url) {
+				document.getElementById('imageFile').value = '';
+				document.getElementById('fileNameDisplay').textContent = 'Chưa chọn file';
+				showPreview(url);
+			} else {
+				clearPreview();
+			}
+		});
+
+		function showPreview(src) {
+			var img = document.getElementById('imgPreview');
+			img.src = src;
+			img.style.display = 'block';
+			document.getElementById('previewPlaceholder').style.display = 'none';
+			document.getElementById('previewBox').style.borderColor = '#2d7e7e';
+		}
+
+		function clearPreview() {
+			var img = document.getElementById('imgPreview');
+			img.src = '';
+			img.style.display = 'none';
+			document.getElementById('previewPlaceholder').style.display = 'block';
+			document.getElementById('previewBox').style.borderColor = '#ddd';
+		}
 	</script>
 </body>
 </html>

@@ -12,8 +12,8 @@ import jakarta.mail.internet.MimeMessage;
 
 public class EmailService {
 
-    private static final String FROM_EMAIL = "tranhung26042005@gmail.com";
-    private static final String FROM_PASSWORD = "vpvx yhaz geax mvsh";
+    private static final String FROM_EMAIL = System.getenv("MAIL_EMAIL");
+    private static final String FROM_PASSWORD = System.getenv("MAIL_PASSWORD");
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
 

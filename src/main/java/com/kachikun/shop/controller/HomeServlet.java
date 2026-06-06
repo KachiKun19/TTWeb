@@ -32,7 +32,11 @@ public class HomeServlet extends HttpServlet {
 
         List<Category> categories = AppCache.getCategories();
         List<Product>  featuredProducts  = featuredDAO.getFeaturedProducts();
-        List<Discount> activeDiscounts   = discountDAO.getActiveDiscounts();
+
+        Boolean sectionVisible = (Boolean) getServletContext().getAttribute("discountSectionVisible");
+        List<Discount> activeDiscounts = (sectionVisible != null && sectionVisible)
+                ? discountDAO.getActiveDiscounts()
+                : java.util.Collections.emptyList();
 
         request.setAttribute("listCategories",   categories);
         request.setAttribute("featuredProducts", featuredProducts);

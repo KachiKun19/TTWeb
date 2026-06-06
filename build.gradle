@@ -34,6 +34,7 @@ task docker_app_start {
                 execute 'docker run -it --rm -d ' +
                         '--name tomcat10 ' +
                         '-v /usr/deploy:/usr/local/tomcat/webapps ' +
+                        '-v /usr/uploads:/usr/local/tomcat/webapps/ThucTapWeb/images ' +
                         '-p 80:8080 ' +
                         'tomcat:10.1&'
             }

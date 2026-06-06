@@ -1,29 +1,23 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: Admin
-  Date: 5/24/2026
-  Time: 2:26 AM
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <div class="admin-header">
     <h1>
-        <i class="fas fa-crown"></i> Trang Quản Trị - Kachi-Kun Shop
+        <span class="header-crown"><i class="fas fa-crown"></i></span>
+        <span class="header-title-text">Kachi-Kun Shop &nbsp;<span style="color:#94a3b8;font-weight:400;font-size:15px;">/ Quản trị</span></span>
     </h1>
     <div class="user-info">
         <div class="user-avatar">
             <i class="fas fa-user-shield"></i>
         </div>
-        <div>
-            <div>
-                Xin chào, <strong>${user.fullName}</strong>
-            </div>
-            <div style="font-size: 12px; opacity: 0.9;">Quản trị viên</div>
+        <div class="user-meta">
+            <span class="user-name-text">
+                <c:if test="${not empty user}">${user.fullName}</c:if>
+                <c:if test="${empty user}">Admin</c:if>
+            </span>
+            <span class="user-role-text">Quản trị viên</span>
         </div>
-        <a href="logout">
-            <button class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Đăng xuất
-            </button>
+        <a href="logout" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Đăng xuất
         </a>
     </div>
 </div>
