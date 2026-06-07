@@ -48,7 +48,12 @@ public class OrderHistoryServlet extends HttpServlet {
 		if ("cancel".equals(action) && idStr != null) {
 			int orderId = Integer.parseInt(idStr);
 			String reason = request.getParameter("cancel_reason");
-			if (reason == null || reason.trim().isEmpty()) reason = "Khách hủy đơn";
+			if ("Khác".equals(reason)) {
+				String custom = request.getParameter("custom_reason");
+				reason = (custom != null && !custom.trim().isEmpty()) ? custom.trim() : "Khách hủy đơn";
+			} else if (reason == null || reason.trim().isEmpty()) {
+				reason = "Khách hủy đơn";
+			}
 
 			boolean cancelled = orderDAO.userCancelOrder(orderId, user.getId(), reason);
 			if (cancelled) {

@@ -28,19 +28,49 @@
 <%-- hủy đơn --%>
 <div id="cancelModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
 	<div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-		<h3 class="text-lg font-bold text-gray-800 mb-1">Xác nhận hủy đơn</h3>
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-bold text-gray-800">Xác nhận hủy đơn</h3>
+			<button type="button" onclick="closeCancelModal()" class="text-gray-400 hover:text-gray-600 text-xl">
+				<i class="fa-solid fa-xmark"></i>
+			</button>
+		</div>
 		<p class="text-sm text-gray-500 mb-4">Đơn hàng sẽ bị hủy và không thể khôi phục. Hàng sẽ được hoàn lại kho.</p>
 		<form method="get" action="order-history" id="cancelForm">
 			<input type="hidden" name="action" value="cancel"/>
 			<input type="hidden" name="id" id="cancelOrderId"/>
 			<input type="hidden" name="status" value="${statusFilter}"/>
-			<input type="hidden" name="page"   value="${currentPage}"/>
-			<div class="mb-4">
-				<label class="text-sm text-gray-600 mb-1 block">Lý do hủy (không bắt buộc)</label>
-				<textarea name="cancel_reason" rows="3"
-						  class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-300"
-						  placeholder="VD: Đặt nhầm sản phẩm, muốn đổi địa chỉ..."></textarea>
+			<input type="hidden" name="page" value="${currentPage}"/>
+
+			<div class="space-y-2 mb-4">
+				<label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-pink-400 cursor-pointer transition-colors">
+					<input type="radio" name="cancel_reason" value="Tôi muốn thay đổi địa chỉ giao hàng" class="accent-pink-500"/>
+					<span class="text-sm text-gray-700">Tôi muốn thay đổi địa chỉ giao hàng</span>
+				</label>
+				<label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-pink-400 cursor-pointer transition-colors">
+					<input type="radio" name="cancel_reason" value="Tôi muốn thay đổi sản phẩm/số lượng" class="accent-pink-500"/>
+					<span class="text-sm text-gray-700">Tôi muốn thay đổi sản phẩm/số lượng</span>
+				</label>
+				<label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-pink-400 cursor-pointer transition-colors">
+					<input type="radio" name="cancel_reason" value="Tôi tìm được giá rẻ hơn ở nơi khác" class="accent-pink-500"/>
+					<span class="text-sm text-gray-700">Tôi tìm được giá rẻ hơn ở nơi khác</span>
+				</label>
+				<label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-pink-400 cursor-pointer transition-colors">
+					<input type="radio" name="cancel_reason" value="Tôi không còn nhu cầu mua nữa" class="accent-pink-500"/>
+					<span class="text-sm text-gray-700">Tôi không còn nhu cầu mua nữa</span>
+				</label>
+				<label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-pink-400 cursor-pointer transition-colors">
+					<input type="radio" name="cancel_reason" value="Khác" class="accent-pink-500" onchange="document.getElementById('customReasonBox').classList.remove('hidden')"/>
+					<span class="text-sm text-gray-700">Khác</span>
+				</label>
 			</div>
+
+			<%-- Ô nhập khi chọn Khác --%>
+			<div id="customReasonBox" class="hidden mb-4">
+        <textarea name="custom_reason" rows="3"
+				  placeholder="Nhập lý do của bạn..."
+				  class="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-pink-400 resize-none"></textarea>
+			</div>
+
 			<div class="flex gap-3">
 				<button type="button" onclick="closeCancelModal()"
 						class="flex-1 border border-gray-200 rounded-xl py-2 text-sm text-gray-600 hover:bg-gray-50 transition">Giữ đơn</button>
