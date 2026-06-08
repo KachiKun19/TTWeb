@@ -37,15 +37,14 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      #Tạo file config.properties từ GitHub Secrets
+      # Tạo file config.properties từ GitHub Secrets
       - name: Create config.properties
         run: |
-          cat > src/main/resources/config.properties << EOF
-          FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}
-          FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
-          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-          EOF
+          mkdir -p src/main/resources
+          echo "FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}" > src/main/resources/config.properties
+          echo "FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}" >> src/main/resources/config.properties
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> src/main/resources/config.properties
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> src/main/resources/config.properties
 
       # Đóng gói ứng dụng thành file .war
       - name: Build WAR with Gradle
