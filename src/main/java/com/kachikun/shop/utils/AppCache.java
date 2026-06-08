@@ -14,16 +14,49 @@ public class AppCache {
 
     private static final Logger log = Logger.getLogger(AppCache.class.getName());
 
-    // Khởi tạo danh sách trống mặc định
-    private static volatile List<Category> cachedCategories  = Collections.emptyList();
-    private static volatile List<Brand> cachedBrands         = Collections.emptyList();
+    private static volatile List<Category> cachedCategories  = null;
+    private static volatile List<Brand> cachedBrands         = null;
 
+    // Áp dụng double-checked locking để tự động nạp lại an toàn khi trống
     public static List<Category> getCategories() {
-        return cachedCategories;
+        if (cachedCategories == null || cachedCategories.isEmpty()) {
+            synchronized (AppCache.class) {
+                if (cachedCategories == null || cachedCategories.isEmpty()) {
+                    try {
+                        log.info("[AppCache] Cache Categories trống, tự động nạp từ Database...");
+                        List<Category> fresh = new CategoryDAO().getAllCategories();
+                        if (fresh != null && !fresh.isEmpty()) {
+                            cachedCategories = Collections.unmodifiableList(fresh);
+                            log.info("[AppCache] Tự động nạp Categories thành công, số lượng: " + fresh.size());
+                        }
+                    } catch (Throwable e) {
+                        log.log(Level.SEVERE, "[AppCache] Tự động nạp Categories THẤT BẠI!", e);
+                    }
+                }
+            }
+        }
+        return cachedCategories != null ? cachedCategories : Collections.emptyList();
     }
 
+    // áp dụng double check giống trên
     public static List<Brand> getBrands() {
-        return cachedBrands;
+        if (cachedBrands == null || cachedBrands.isEmpty()) {
+            synchronized (AppCache.class) {
+                if (cachedBrands == null || cachedBrands.isEmpty()) {
+                    try {
+                        log.info("[AppCache] Cache Brands trống, tự động nạp từ Database...");
+                        List<Brand> fresh = new BrandDAO().getAllBrands();
+                        if (fresh != null && !fresh.isEmpty()) {
+                            cachedBrands = Collections.unmodifiableList(fresh);
+                            log.info("[AppCache] Tự động nạp Brands thành công, số lượng: " + fresh.size());
+                        }
+                    } catch (Throwable e) {
+                        log.log(Level.SEVERE, "[AppCache] Tự động nạp Brands THẤT BẠI!", e);
+                    }
+                }
+            }
+        }
+        return cachedBrands != null ? cachedBrands : Collections.emptyList();
     }
 
     // Hàm làm mới danh sách Categories do Listener hoặc Admin gọi
