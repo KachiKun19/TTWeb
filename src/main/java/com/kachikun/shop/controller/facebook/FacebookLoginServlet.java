@@ -12,9 +12,18 @@ import java.io.IOException;
 public class FacebookLoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String redirectUri = request.getScheme() + "://"
-                + request.getServerName() + ":"
-                + request.getServerPort()
+        String scheme = request.getScheme();
+        int port = request.getServerPort();
+        String portPart = "";
+
+        if (!((scheme.equals("https") && port == 443)
+                || (scheme.equals("http")  && port == 80))) {
+            portPart = ":" + port;
+        }
+
+        String redirectUri = scheme + "://"
+                + request.getServerName()
+                + portPart
                 + request.getContextPath()
                 + "/facebook-callback";
 
