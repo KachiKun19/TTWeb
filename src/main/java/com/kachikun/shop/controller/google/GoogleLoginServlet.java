@@ -11,11 +11,7 @@ import java.io.IOException;
 @WebServlet("/google-login")
 public class GoogleLoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String redirectUri = request.getScheme() + "://"
-                + request.getServerName() + ":"
-                + request.getServerPort()
-                + request.getContextPath()
-                + "/google-callback";
+        String redirectUri = buildRedirectUri(request, "/google-callback");
 
         String url = "https://accounts.google.com/o/oauth2/auth"
                 + "?client_id=" + GoogleConstants.GOOGLE_CLIENT_ID
@@ -24,5 +20,19 @@ public class GoogleLoginServlet extends HttpServlet {
                 + "&scope=email%20profile";
 
         response.sendRedirect(url);
+    }
+
+    static String buildRedirectUri(HttpServletRequest request, String path) {
+        String scheme = request.getScheme();
+        int port = request.getServerPort();
+        boolean isDefaultPort = (scheme.equals("https") && port == 443)
+                || (scheme.equals("http")  && port == 80);
+        String portPart = isDefaultPort ? "" : ":" + port;
+
+        return scheme + "://"
+                + request.getServerName()
+                + portPart
+                + request.getContextPath()
+                + path;
     }
 }

@@ -18,11 +18,8 @@ public class GoogleCallbackServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String code = request.getParameter("code");
-        String redirectUri = request.getScheme() + "://"
-                + request.getServerName() + ":"
-                + request.getServerPort()
-                + request.getContextPath()
-                + "/google-callback";
+        String redirectUri = GoogleLoginServlet.buildRedirectUri(request, "/google-callback");
+
         if (code == null || code.isEmpty()) {
             response.sendRedirect("login.jsp?error=google_auth_failed");
             return;
@@ -36,13 +33,12 @@ public class GoogleCallbackServlet extends HttpServlet {
             User dbUser = userDAO.getUserByEmail(googleUser.getEmail());
 
             if (dbUser == null) {
-                dbUser = new com.kachikun.shop.model.User();
+                dbUser = new User();
                 dbUser.setUsername(googleUser.getEmail());
                 dbUser.setPassword("");
                 dbUser.setEmail(googleUser.getEmail());
                 dbUser.setFullName(googleUser.getName());
                 dbUser.setRole(2);
-
                 userDAO.register(dbUser);
             }
 
@@ -56,4 +52,3 @@ public class GoogleCallbackServlet extends HttpServlet {
         }
     }
 }
-
