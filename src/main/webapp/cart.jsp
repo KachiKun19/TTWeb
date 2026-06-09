@@ -10,8 +10,7 @@
     <title>Giỏ hàng - Kachi-Kun Shop</title>
     <link rel="icon" type="image/png" href="images/LogoRemake.png"/>
     <link rel="stylesheet" href="css/style.css"/>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
-          rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
     <style>
@@ -69,8 +68,7 @@
         <div class="text-center py-16 bg-white rounded shadow-sm">
             <div class="text-6xl text-gray-300 mb-4"><i class="fas fa-shopping-basket"></i></div>
             <p class="text-xl text-gray-500 mb-6">Giỏ hàng của bạn đang trống trơn!</p>
-            <a href="home"
-               class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 transition uppercase font-bold">
+            <a href="home" class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 transition uppercase font-bold">
                 Tiếp tục mua sắm
             </a>
         </div>
@@ -79,19 +77,16 @@
     <c:if test="${not empty sessionScope.cart}">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            <c:set var="serverError"
-                   value="${requestScope.stockError != null ? requestScope.stockError : sessionScope.stockError}"/>
+            <c:set var="serverError" value="${requestScope.stockError != null ? requestScope.stockError : sessionScope.stockError}"/>
 
             <div id="error-alert" class="col-span-1 md:col-span-3 ${not empty serverError ? '' : 'hidden'}">
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-md flex items-center animate-pulse"
-                     role="alert">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-md flex items-center animate-pulse" role="alert">
                     <i class="fas fa-exclamation-triangle text-2xl mr-3"></i>
                     <div>
                         <strong class="font-bold">Thông báo:</strong>
                         <span id="error-msg" class="block sm:inline">${serverError}</span>
                     </div>
-                    <span onclick="document.getElementById('error-alert').classList.add('hidden')"
-                          class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer hover:text-red-900">
+                    <span onclick="document.getElementById('error-alert').classList.add('hidden')" class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer hover:text-red-900">
                         <i class="fas fa-times"></i>
                     </span>
                 </div>
@@ -103,8 +98,7 @@
                 <div class="bg-white rounded shadow overflow-hidden">
                     <div class="hidden md:grid grid-cols-12 gap-4 p-4 bg-gray-100 font-bold text-gray-700 text-sm uppercase">
                         <div class="col-span-1 flex items-center justify-center">
-                            <input type="checkbox" id="select-all" class="cart-checkbox"
-                                   onchange="toggleSelectAll(this)" checked/>
+                            <input type="checkbox" id="select-all" class="cart-checkbox" onchange="toggleSelectAll(this)" checked/>
                         </div>
                         <div class="col-span-5">Sản phẩm</div>
                         <div class="col-span-2 text-center">Đơn giá</div>
@@ -113,24 +107,15 @@
                     </div>
 
                     <c:forEach items="${sessionScope.cart}" var="item">
-                        <div id="row-${item.product.id}"
-                             class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 items-center border-b last:border-0 hover:bg-gray-50 transition">
+                        <div id="row-${item.product.id}" class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 items-center border-b last:border-0 hover:bg-gray-50 transition">
 
                             <div class="col-span-1 flex items-center justify-center">
-                                <input type="checkbox"
-                                       name="selectedIds"
-                                       value="${item.product.id}"
-                                       class="cart-checkbox item-checkbox"
-                                       data-price="${item.totalPrice}"
-                                       checked
-                                       onchange="recalcSelected()"/>
+                                <input type="checkbox" name="selectedIds" value="${item.product.id}" class="cart-checkbox item-checkbox" data-price="${item.totalPrice}" checked onchange="recalcSelected()"/>
                             </div>
 
                             <div class="col-span-5 flex gap-4 items-center">
-                                <a href="product-detail?id=${item.product.id}"
-                                   class="w-20 h-20 flex-shrink-0 border rounded overflow-hidden hover:opacity-80 transition">
-                                    <img src="images/${item.product.image}" alt="${item.product.name}"
-                                         class="w-full h-full object-cover">
+                                <a href="product-detail?id=${item.product.id}" class="w-20 h-20 flex-shrink-0 border rounded overflow-hidden hover:opacity-80 transition">
+                                    <img src="images/${item.product.image}" alt="${item.product.name}" class="w-full h-full object-cover">
                                 </a>
                                 <div>
                                     <h3 class="font-bold text-gray-800 hover:text-blue-600 transition">
@@ -143,8 +128,7 @@
                                             <i class="fas fa-box-open mr-1"></i> Kho còn: ${item.product.stock}
                                         </span>
                                     </div>
-                                    <a href="update-cart?id=${item.product.id}&mod=-999"
-                                       class="text-red-500 text-xs mt-2 hover:underline flex items-center gap-1 cursor-pointer">
+                                    <a href="update-cart?id=${item.product.id}&mod=-999" class="text-red-500 text-xs mt-2 hover:underline flex items-center gap-1 cursor-pointer">
                                         <i class="fas fa-trash"></i> Xóa
                                     </a>
                                 </div>
@@ -156,18 +140,11 @@
 
                             <div class="col-span-2 flex justify-center">
                                 <div class="flex items-center border rounded border-gray-300">
-                                    <button type="button"
-                                            onclick="updateQuantityAjax(${item.product.id}, -1)"
-                                            class="px-3 py-1 text-gray-600 hover:bg-gray-100 font-bold border-r border-gray-200 focus:outline-none transition h-full">
+                                    <button type="button" onclick="updateQuantityAjax(${item.product.id}, -1)" class="px-3 py-1 text-gray-600 hover:bg-gray-100 font-bold border-r border-gray-200 focus:outline-none transition h-full">
                                         -
                                     </button>
-                                    <input type="number" id="qty-${item.product.id}"
-                                           value="${item.quantity}"
-                                           onchange="updateQuantityDirectly(${item.product.id}, this)"
-                                           class="w-16 text-center border-0 text-sm font-bold text-gray-900 focus:ring-0 bg-transparent p-0 qty-input"/>
-                                    <button type="button"
-                                            onclick="updateQuantityAjax(${item.product.id}, 1)"
-                                            class="px-3 py-1 text-gray-600 hover:bg-gray-100 font-bold border-l border-gray-200 focus:outline-none transition h-full">
+                                    <input type="number" id="qty-${item.product.id}" value="${item.quantity}" onchange="updateQuantityDirectly(${item.product.id}, this)" class="w-16 text-center border-0 text-sm font-bold text-gray-900 focus:ring-0 bg-transparent p-0 qty-input"/>
+                                    <button type="button" onclick="updateQuantityAjax(${item.product.id}, 1)" class="px-3 py-1 text-gray-600 hover:bg-gray-100 font-bold border-l border-gray-200 focus:outline-none transition h-full">
                                         +
                                     </button>
                                 </div>
@@ -227,12 +204,8 @@
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Mã giảm giá</label>
                         <div class="flex gap-2">
-                            <input type="text" id="discount-input"
-                                   placeholder="Nhập mã..."
-                                   class="flex-1 text-sm p-2 border border-gray-300 rounded focus:ring-black focus:border-black"
-                                   oninput="this.value = this.value.toUpperCase()">
-                            <button type="button" onclick="applyDiscount()"
-                                    class="bg-black text-white px-3 py-2 rounded text-sm font-bold hover:bg-gray-800 transition whitespace-nowrap">
+                            <input type="text" id="discount-input" placeholder="Nhập mã..." class="flex-1 text-sm p-2 border border-gray-300 rounded focus:ring-black focus:border-black" oninput="this.value = this.value.toUpperCase()">
+                            <button type="button" onclick="applyDiscount()" class="bg-black text-white px-3 py-2 rounded text-sm font-bold hover:bg-gray-800 transition whitespace-nowrap">
                                 Áp dụng
                             </button>
                         </div>
@@ -242,8 +215,7 @@
                         <%-- Gợi ý mã đã lưu --%>
                     <c:if test="${not empty savedDiscounts}">
                         <div class="mb-4">
-                            <button type="button" onclick="openDiscountModal()"
-                                    class="w-full flex items-center justify-center gap-2 border border-dashed border-pink-400 rounded-lg px-3 py-2 text-pink-600 font-semibold text-sm hover:bg-pink-50 transition">
+                            <button type="button" onclick="openDiscountModal()" class="w-full flex items-center justify-center gap-2 border border-dashed border-pink-400 rounded-lg px-3 py-2 text-pink-600 font-semibold text-sm hover:bg-pink-50 transition">
                                 <i class="fas fa-bookmark"></i> Chọn mã đã lưu của tôi
                             </button>
                         </div>
@@ -255,82 +227,60 @@
                         <hr class="border-dashed">
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Họ tên người nhận
-                                *</label>
-                            <input type="text" name="fullname"
-                                   pattern="^[A-Za-zÀ-ỹ\s]+$"
-                                   oninvalid="this.setCustomValidity('Chỉ được nhập chữ cái, không có số!')"
-                                   oninput="this.setCustomValidity('')"
-                                   placeholder="Nguyễn Văn A" required
-                                   class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black">
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Họ tên người nhận *</label>
+                            <input type="text" name="fullname" pattern="^[A-Za-zÀ-ỹ\s]+$" oninvalid="this.setCustomValidity('Chỉ được nhập chữ cái, không có số!')" oninput="this.setCustomValidity('')" placeholder="Nguyễn Văn A" required class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Số điện thoại *</label>
-                            <input type="number" name="phone" pattern="0[0-9]{9}"
-                                   placeholder="09xxxxxxx" required
-                                   class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black">
+                            <input type="text" name="phone" pattern="0[0-9]{9}" placeholder="09xxxxxxx" required class="w-full text-sm p-2.5 border border-gray-300 rounded focus:ring-black focus:border-black">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ giao hàng
-                                *</label>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ giao hàng *</label>
                             <div class="space-y-3">
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Tỉnh / Thành
-                                        phố</label>
-                                    <select id="province"
-                                            class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Tỉnh / Thành phố</label>
+                                    <select id="province" class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
                                         <option value="">-- Chọn tỉnh --</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Quận /
-                                        Huyện</label>
-                                    <select id="districtSelect" onchange="loadWards()"
-                                            class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Quận / Huyện</label>
+                                    <select id="districtSelect" class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
                                         <option value="">-- Chọn quận --</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Phường /
-                                        Xã</label>
-                                    <select id="wardSelect" onchange="calculateShipping()"
-                                            class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Phường / Xã</label>
+                                    <select id="wardSelect" class="w-full border border-gray-300 rounded p-2 text-sm bg-white text-black">
                                         <option value="">-- Chọn phường --</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ chi
-                                        tiết</label>
-                                    <textarea name="address" rows="3"
-                                              placeholder="Số nhà, tên đường..." required
-                                              class="w-full text-sm p-2.5 border border-gray-300 rounded text-black"></textarea>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Địa chỉ chi tiết</label>
+                                    <textarea name="address" rows="3" placeholder="Số nhà, tên đường..." required class="w-full text-sm p-2.5 border border-gray-300 rounded text-black"></textarea>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Phương thức thanh
-                                toán</label>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Phương thức thanh toán</label>
                             <div class="flex items-center mb-2">
-                                <input id="payment-cod" type="radio" value="COD" name="payment_method" checked
-                                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                                <input id="payment-cod" type="radio" value="COD" name="payment_method" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
                                 <label for="payment-cod" class="ml-2 text-sm font-medium text-gray-900">
                                     Thanh toán khi nhận hàng (COD)
                                 </label>
                             </div>
                             <div class="flex items-center">
-                                <input id="payment-bank" type="radio" value="BANKING" name="payment_method"
-                                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                                <input id="payment-bank" type="radio" value="BANKING" name="payment_method" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
                                 <label for="payment-bank" class="ml-2 text-sm font-medium text-gray-900">
                                     Chuyển khoản ngân hàng
                                 </label>
                             </div>
                         </div>
 
-                        <button type="submit"
-                                class="w-full bg-red-600 text-white py-3 rounded font-bold hover:bg-red-700 transition uppercase shadow-lg transform hover:-translate-y-1">
+                        <button type="submit" id="btn-submit-order" class="w-full bg-red-600 text-white py-3 rounded font-bold hover:bg-red-700 transition uppercase shadow-lg transform hover:-translate-y-1">
                             Tiến hành đặt hàng
                         </button>
 
@@ -348,8 +298,7 @@
 
 <%-- Modal thông báo sau thanh toán --%>
 <c:if test="${not empty msg}">
-    <div id="paymentModal"
-         class="fixed inset-0 bg-gray-800 bg-opacity-75 overflow-y-auto h-full w-full z-[9999] flex items-center justify-center backdrop-blur-sm">
+    <div id="paymentModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 overflow-y-auto h-full w-full z-[9999] flex items-center justify-center backdrop-blur-sm">
         <div class="relative p-6 border w-[450px] shadow-2xl rounded-2xl bg-white text-center transform transition-all scale-100">
 
             <c:if test="${paymentMethod == 'COD'}">
@@ -359,12 +308,10 @@
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-2">Đặt hàng thành công!</h3>
                     <div class="mt-2 px-2 py-3">
-                        <p class="text-gray-500">Cảm ơn bạn đã mua sắm tại Kachi-Kun Shop.<br>Đơn hàng của bạn đã được
-                            ghi nhận.</p>
+                        <p class="text-gray-500">Cảm ơn bạn đã mua sắm tại Kachi-Kun Shop.<br>Đơn hàng của bạn đã được ghi nhận.</p>
                     </div>
                     <div class="mt-4">
-                        <button onclick="window.location.href='home'"
-                                class="px-6 py-3 bg-green-600 text-white text-base font-bold rounded-lg w-full shadow hover:bg-green-700 transition duration-300">
+                        <button onclick="window.location.href='home'" class="px-6 py-3 bg-green-600 text-white text-base font-bold rounded-lg w-full shadow hover:bg-green-700 transition duration-300">
                             Về trang chủ
                         </button>
                     </div>
@@ -373,25 +320,20 @@
 
             <c:if test="${paymentMethod == 'BANKING'}">
                 <div class="mt-2">
-                    <img src="https://cdn.tgdd.vn/2020/04/GameApp/icon-200x200.jpg" alt="VCB Logo"
-                         class="h-10 mx-auto mb-4">
+                    <img src="https://cdn.tgdd.vn/2020/04/GameApp/icon-200x200.jpg" alt="VCB Logo" class="h-10 mx-auto mb-4">
                     <h3 class="text-xl font-bold text-gray-800 mb-4 uppercase border-b pb-2">Thông tin chuyển khoản</h3>
                     <div class="mt-4 mb-6 text-center">
-                        <img src="images/qr.jpg" alt="QR Code Thanh Toán"
-                             class="mx-auto w-48 h-48 border border-gray-200 rounded-lg shadow-md">
+                        <img src="images/qr.jpg" alt="QR Code Thanh Toán" class="mx-auto w-48 h-48 border border-gray-200 rounded-lg shadow-md">
                         <p class="text-sm text-gray-600 mt-2">Quét mã QR để chuyển khoản nhanh</p>
                     </div>
                     <div class="text-left bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-inner mx-1">
                         <div class="mb-4 text-center">
-                            <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-1">Số tài
-                                khoản</p>
+                            <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-1">Số tài khoản</p>
                             <div class="flex items-center justify-center gap-2">
-                                <p id="bank-acc-num"
-                                   class="text-blue-700 font-extrabold text-3xl tracking-widest font-mono">
+                                <p id="bank-acc-num" class="text-blue-700 font-extrabold text-3xl tracking-widest font-mono">
                                     9355 849 425
                                 </p>
-                                <button type="button" onclick="copyToClipboard()"
-                                        class="text-gray-400 hover:text-blue-600" title="Sao chép">
+                                <button type="button" onclick="copyToClipboard()" class="text-gray-400 hover:text-blue-600" title="Sao chép">
                                     <i class="far fa-copy"></i>
                                 </button>
                             </div>
@@ -420,12 +362,10 @@
                     </div>
                     <p class="text-[11px] text-gray-500 mt-4 italic">*Vui lòng chuyển khoản đúng số tiền.</p>
                     <div class="mt-5 space-y-2">
-                        <button onclick="alert('Đơn hàng của bạn đang được xử lý. Cảm ơn bạn!'); window.location.href='home'"
-                                class="px-4 py-3 bg-blue-700 text-white text-base font-bold rounded-lg w-full shadow-lg hover:bg-blue-800 transition transform hover:-translate-y-0.5">
+                        <button onclick="alert('Đơn hàng của bạn đang được xử lý. Cảm ơn bạn!'); window.location.href='home'" class="px-4 py-3 bg-blue-700 text-white text-base font-bold rounded-lg w-full shadow-lg hover:bg-blue-800 transition transform hover:-translate-y-0.5">
                             Đã chuyển khoản xong
                         </button>
-                        <button type="button" onclick="window.location.href='home'"
-                                class="px-4 py-2 text-gray-500 text-sm hover:text-gray-800 underline">
+                        <button type="button" onclick="window.location.href='home'" class="px-4 py-2 text-gray-500 text-sm hover:text-gray-800 underline">
                             Để sau, về trang chủ
                         </button>
                     </div>
@@ -448,34 +388,27 @@
 
 <%-- Modal chọn mã giảm giá đã lưu --%>
 <c:if test="${not empty savedDiscounts}">
-    <div id="discount-modal" onclick="if(event.target===this)closeDiscountModal()"
-         class="fixed inset-0 z-50 flex items-center justify-center hidden"
-         style="background:rgba(0,0,0,0.5);">
+    <div id="discount-modal" onclick="if(event.target===this)closeDiscountModal()" class="fixed inset-0 z-50 flex items-center justify-center hidden" style="background:rgba(0,0,0,0.5);">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
                     <i class="fas fa-bookmark text-pink-500"></i> Mã giảm giá của bạn
                 </h3>
-                <button type="button" onclick="closeDiscountModal()"
-                        class="text-gray-400 hover:text-gray-600 text-xl leading-none">
+                <button type="button" onclick="closeDiscountModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="flex flex-col gap-3 max-h-80 overflow-y-auto pr-1">
                 <c:forEach var="sd" items="${savedDiscounts}">
-                    <button type="button" onclick="selectSavedCode('${sd.code}')"
-                            class="flex items-center justify-between w-full border border-dashed border-pink-400 rounded-xl px-4 py-3 hover:bg-pink-50 transition text-left group">
+                    <button type="button" onclick="selectSavedCode('${sd.code}')" class="flex items-center justify-between w-full border border-dashed border-pink-400 rounded-xl px-4 py-3 hover:bg-pink-50 transition text-left group">
                         <div>
                             <div class="font-bold text-pink-600 text-sm tracking-wider">${sd.code}</div>
                             <div class="text-xs text-gray-500 mt-0.5">
                                 <c:choose>
                                     <c:when test="${sd.discountType eq 'PERCENT'}">Giảm ${sd.discountValue}%</c:when>
-                                    <c:otherwise>Giảm <fmt:formatNumber value="${sd.discountValue}" type="number"
-                                                                        maxFractionDigits="0"
-                                                                        groupingUsed="true"/>₫</c:otherwise>
+                                    <c:otherwise>Giảm <fmt:formatNumber value="${sd.discountValue}" type="number" maxFractionDigits="0" groupingUsed="true"/>₫</c:otherwise>
                                 </c:choose>
-                                &nbsp;·&nbsp; Đơn từ <fmt:formatNumber value="${sd.minOrderValue}" type="number"
-                                                                       maxFractionDigits="0" groupingUsed="true"/>₫
+                                &nbsp;·&nbsp; Đơn từ <fmt:formatNumber value="${sd.minOrderValue}" type="number" maxFractionDigits="0" groupingUsed="true"/>₫
                                 <c:if test="${sd.expiresAt != null}">
                                     &nbsp;·&nbsp; HSD: <fmt:formatDate value="${sd.expiresAt}" pattern="dd/MM/yyyy"/>
                                 </c:if>
@@ -507,8 +440,6 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-<script src="script.js"></script>
-
 <script>
     var subtotalRaw = ${not empty cartSubtotal ? cartSubtotal : 0};
     var discountAmountRaw = 0;
@@ -689,92 +620,133 @@
         if (count === 0) location.reload();
     }
 
-    // ─── GHN Shipping ────────────────────────────────────────────────────────
-    function loadProvinces() {
-        fetch('ghn-provinces')
-            .then(function (res) {
-                return res.json();
-            })
-            .then(function (data) {
-                var provinceSelect = document.getElementById('province');
-                provinceSelect.innerHTML = '<option value="">-- Chọn tỉnh --</option>';
-                data.data.forEach(function (p) {
-                    var option = document.createElement("option");
-                    option.value = p.ProvinceID;
-                    option.textContent = p.ProvinceName;
-                    provinceSelect.appendChild(option);
-                });
-            });
+    // ─── GHN Shipping  ───────────
+    const _ghn = {};
+
+    async function loadProvinces() {
+        const sel = document.getElementById('province');
+        sel.disabled = true;
+        sel.innerHTML = '<option value="">⏳ Đang tải tỉnh thành...</option>';
+        try {
+            if (!_ghn.provinces) {
+                const res = await fetch('ghn-provinces');
+                const data = await res.json();
+                if (!data.data) throw new Error(data.message || 'Lỗi hệ thống API');
+                _ghn.provinces = data.data; // Lưu bộ nhớ đệm
+            }
+            sel.innerHTML = '<option value="">-- Chọn tỉnh --</option>';
+            _ghn.provinces.forEach(p => sel.append(new Option(p.ProvinceName, p.ProvinceID)));
+        } catch (e) {
+            console.warn('GHN provinces error:', e.message);
+            sel.innerHTML = '<option value="">Không tải được tỉnh thành</option>';
+        } finally {
+            sel.disabled = false;
+        }
     }
 
-    function loadDistricts() {
-        var provinceId = document.getElementById('province').value;
+    async function loadDistricts() {
+        const provinceId = document.getElementById('province').value;
+        const distSel = document.getElementById('districtSelect');
+        const wardSel = document.getElementById('wardSelect');
         if (!provinceId) return;
-        fetch('ghn-districts?provinceId=' + provinceId)
-            .then(function (res) {
-                return res.json();
-            })
-            .then(function (data) {
-                var district = document.getElementById('districtSelect');
-                district.innerHTML = '<option value="">-- Chọn quận --</option>';
-                data.data.forEach(function (d) {
-                    var option = document.createElement("option");
-                    option.value = d.DistrictID;
-                    option.textContent = d.DistrictName;
-                    district.appendChild(option);
-                });
-            })
-            .catch(function (err) {
-                console.log(err);
-            });
+
+        distSel.disabled = true;
+        distSel.innerHTML = '<option value="">⏳ Đang tải quận huyện...</option>';
+        wardSel.innerHTML = '<option value="">-- Chọn phường --</option>';
+        wardSel.disabled = true;
+        document.getElementById('shipping-fee').innerText = '0₫';
+        shippingFeeRaw = 0;
+        updateFinalTotal();
+
+        const key = 'dist_' + provinceId;
+        try {
+            if (!_ghn[key]) {
+                const res = await fetch('ghn-districts?provinceId=' + provinceId);
+                const data = await res.json();
+                if (!data.data) throw new Error(data.message || 'Lỗi hệ thống API');
+                _ghn[key] = data.data; // Lưu bộ nhớ đệm theo Tỉnh
+            }
+            distSel.innerHTML = '<option value="">-- Chọn quận --</option>';
+            _ghn[key].forEach(d => distSel.append(new Option(d.DistrictName, d.DistrictID)));
+        } catch (e) {
+            console.warn('GHN districts error:', e.message);
+            distSel.innerHTML = '<option value="">Không tải được quận huyện</option>';
+        } finally {
+            distSel.disabled = false;
+            wardSel.disabled = false;
+        }
     }
 
-    function loadWards() {
-        var districtId = document.getElementById("districtSelect").value;
+    async function loadWards() {
+        const districtId = document.getElementById('districtSelect').value;
+        const wardSel = document.getElementById('wardSelect');
         if (!districtId) return;
-        fetch('ghn/wards?district_id=' + districtId)
-            .then(function (res) {
-                return res.json();
-            })
-            .then(function (data) {
-                var wardSelect = document.getElementById("wardSelect");
-                wardSelect.innerHTML = '<option value="">-- Chọn phường --</option>';
-                data.data.forEach(function (ward) {
-                    var option = document.createElement("option");
-                    option.value = ward.WardCode;
-                    option.textContent = ward.WardName;
-                    wardSelect.appendChild(option);
-                });
-            })
-            .catch(function (err) {
-                console.log(err);
-            });
+
+        wardSel.disabled = true;
+        wardSel.innerHTML = '<option value="">⏳ Đang tải phường xã...</option>';
+        document.getElementById('shipping-fee').innerText = '0₫';
+        shippingFeeRaw = 0;
+        updateFinalTotal();
+
+        const key = 'ward_' + districtId;
+        try {
+            if (!_ghn[key]) {
+                const res = await fetch('ghn/wards?district_id=' + districtId);
+                const data = await res.json();
+                if (!data.data) throw new Error(data.message || 'Lỗi hệ thống API');
+                _ghn[key] = data.data; // Lưu bộ nhớ đệm theo Quận
+            }
+            wardSel.innerHTML = '<option value="">-- Chọn phường --</option>';
+            _ghn[key].forEach(w => wardSel.append(new Option(w.WardName, w.WardCode)));
+        } catch (e) {
+            console.warn('GHN wards error:', e.message);
+            wardSel.innerHTML = '<option value="">Không tải được phường xã</option>';
+        } finally {
+            wardSel.disabled = false;
+        }
     }
 
-    function calculateShipping() {
-        var districtId = document.getElementById('districtSelect').value;
-        var wardCode = document.getElementById('wardSelect').value;
+    async function calculateShipping() {
+        const districtId = document.getElementById('districtSelect').value;
+        const wardCode = document.getElementById('wardSelect').value;
         if (!districtId || !wardCode) return;
-        fetch('ghn/shipping-fee', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: 'district_id=' + districtId + '&ward_code=' + wardCode
-        })
-            .then(function (res) {
-                return res.json();
-            })
-            .then(function (data) {
-                shippingFeeRaw = data.data.total;
-                document.getElementById("shipping-fee").innerText = formatVND(shippingFeeRaw);
-                updateFinalTotal();
+
+        const submitBtn = document.getElementById('btn-submit-order');
+        document.getElementById('shipping-fee').innerText = '⏳ Đang tính...';
+        if(submitBtn) submitBtn.disabled = true; // Chặn bấm submit khi đang tính phí
+
+        try {
+            const res = await fetch('ghn/shipping-fee', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'district_id=' + districtId + '&ward_code=' + wardCode
             });
+            const data = await res.json();
+            if (data.data && data.data.total) {
+                shippingFeeRaw = data.data.total;
+                document.getElementById('shipping-fee').innerText = formatVND(shippingFeeRaw);
+                updateFinalTotal();
+            } else {
+                console.warn('GHN fee error:', data.message || data.code);
+                document.getElementById('shipping-fee').innerText = 'Không hỗ trợ';
+            }
+        } catch (e) {
+            console.warn('GHN shipping net error:', e.message);
+            document.getElementById('shipping-fee').innerText = 'Không hỗ trợ';
+        } finally {
+            if(submitBtn) submitBtn.disabled = false; // Mở khóa nút submit
+        }
     }
 
     // ─── Init ────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function () {
         recalcSelected();
         loadProvinces();
+
+        // Gắn bộ lắng nghe sự kiện đồng bộ tuần tự
         document.getElementById('province').addEventListener('change', loadDistricts);
+        document.getElementById('districtSelect').addEventListener('change', loadWards);
+        document.getElementById('wardSelect').addEventListener('change', calculateShipping);
 
         document.querySelector('form[action="checkout"]').addEventListener('submit', function (e) {
             var form = this;
