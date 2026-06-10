@@ -151,42 +151,33 @@ public class EditProductServlet extends HttpServlet {
             String original = filePart.getSubmittedFileName();
             if (original != null && !original.trim().isEmpty()) {
                 String safeName = System.currentTimeMillis() + "_" + original.replaceAll("[^a-zA-Z0-9._-]", "_");
-
-                String servingDir = getServletContext().getRealPath("/images/");
-                if (servingDir != null) {
-                    new File(servingDir).mkdirs();
-                    filePart.write(servingDir + File.separator + safeName);
-                }
-
-                File sourceDir = getSourceImagesDir(servingDir);
-                if (sourceDir != null) {
-                    sourceDir.mkdirs();
-                    File dest = new File(sourceDir, safeName);
-                    if (!dest.exists()) {
-                        File saved = new File(servingDir, safeName);
-                        if (saved.exists()) {
-                            Files.copy(saved.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        }
-                    }
-                }
-
+                saveImage(filePart, safeName);
                 return safeName;
             }
         }
         return request.getParameter("image");
     }
 
-    private File getSourceImagesDir(String servingDir) {
-        String env = System.getenv("UPLOAD_DIR");
-        if (env != null && !env.trim().isEmpty()) return null;
+    private void saveImage(Part filePart, String safeName) throws IOException {
+        String uploadDir = System.getenv("UPLOAD_DIR");
+        if (uploadDir != null && !uploadDir.trim().isEmpty()) {
+            File dir = new File(uploadDir);
+            dir.mkdirs();
+            filePart.write(new File(dir, safeName).getAbsolutePath());
+            return;
+        }
 
-        if (servingDir == null) return null;
+        String servingDir = getServletContext().getRealPath("/images/");
+        if (servingDir == null) return;
+        new File(servingDir).mkdirs();
+        filePart.write(servingDir + File.separator + safeName);
+
         try {
-            File candidate = new File(servingDir, "../../../../src/main/webapp/images").getCanonicalFile();
-            if (candidate.exists() && !candidate.getAbsolutePath().equals(new File(servingDir).getCanonicalPath())) {
-                return candidate;
+            File sourceDir = new File(servingDir, "../../../../src/main/webapp/images").getCanonicalFile();
+            if (sourceDir.exists() && !sourceDir.equals(new File(servingDir).getCanonicalFile())) {
+                File dest = new File(sourceDir, safeName);
+                if (!dest.exists()) Files.copy(new File(servingDir, safeName).toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException ignored) {}
-        return null;
     }
 }
