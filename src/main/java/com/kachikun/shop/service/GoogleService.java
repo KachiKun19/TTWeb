@@ -1,7 +1,8 @@
-package com.kachikun.shop.utils;
+package com.kachikun.shop.service;
 
 import com.google.gson.Gson;
 import com.kachikun.shop.model.GoogleUser;
+import com.kachikun.shop.utils.GoogleConstants;
 import okhttp3.*;
 
 import java.io.IOException;

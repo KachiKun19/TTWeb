@@ -3,7 +3,7 @@ package com.kachikun.shop.controller.facebook;
 import com.kachikun.shop.dao.UserDAO;
 import com.kachikun.shop.model.FacebookUser;
 import com.kachikun.shop.model.User;
-import com.kachikun.shop.utils.FacebookService;
+import com.kachikun.shop.service.FacebookService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
