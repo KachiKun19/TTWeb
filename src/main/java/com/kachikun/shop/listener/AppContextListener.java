@@ -1,10 +1,12 @@
 package com.kachikun.shop.listener;
 
 import com.kachikun.shop.utils.AppCache;
+import com.kachikun.shop.utils.DBConnection;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
+import java.sql.Connection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +25,15 @@ public class AppContextListener implements ServletContextListener {
         //  Kiểm tra cấu hình Azure/Môi trường trước khi chạy
         if (System.getenv("DB_URL") == null) {
             log.severe("[Lifecycle] ⚠️ CẢNH BÁO: Biến môi trường DB_URL chưa được cấu hình trên Azure Portal!");
+        }
+
+        // warmup DB pool
+        try (Connection conn = DBConnection.getConnection()) {
+            if (conn != null && !conn.isClosed()) {
+                log.info("[Lifecycle] DB pool warmup thành công.");
+            }
+        } catch (Exception e) {
+            log.warning("[Lifecycle] DB pool warmup thất bại: " + e.getMessage());
         }
 
         // nạp dữ liệu lần đầu ngay khi bật App
