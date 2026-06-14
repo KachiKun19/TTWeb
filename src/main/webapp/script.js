@@ -3,10 +3,10 @@ const dots = document.querySelectorAll(".slider-nav .dot");
 
 if (backgroundElement && dots.length > 0) {
     const images = [
-        "https://cdn.sforum.vn/sforum/wp-content/uploads/2022/02/9-9-960x538.jpg",
-        "https://cdn2.fptshop.com.vn/unsafe/0x0/hinh_nen_may_tinh_bang_8_f5284d566e.jpg",
-        "https://cdn2.fptshop.com.vn/unsafe/0x0/hinh_nen_may_tinh_bang_9_a5b793ee3d.jpg",
-        "https://cdn2.fptshop.com.vn/unsafe/0x0/hinh_nen_may_tinh_bang_11_90150a3686.jpg",
+        "https://www.phongcachxanh.vn/cdn/shop/collections/chuot-gaming-banner_730e8164-fb23-4b96-9cb0-98e85e9c1a44.webp?v=1778120728&width=2000",
+        "https://www.phongcachxanh.vn/cdn/shop/collections/banner-oni-20-background.webp?v=1778120933&width=2000",
+        "https://www.phongcachxanh.vn/cdn/shop/collections/banner-ghe-cong-thai-hoc-cao-cap.webp?v=1778120981&width=2000",
+        "https://www.phongcachxanh.vn/cdn/shop/collections/banner-phu-kien-chuot-gaming.webp?v=1778121015&width=2000",
     ];
     let currentIndex = 0;
     let slideInterval;
