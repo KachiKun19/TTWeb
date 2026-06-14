@@ -24,6 +24,16 @@ public class DiscountDAO extends BaseDAO {
         return null;
     }
 
+    public boolean delete(int id) {
+        String sql = "DELETE FROM Discounts WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
+    }
+
     public boolean incrementUsed(String code) {
         String sql = "UPDATE Discounts SET used_count = used_count + 1 WHERE UPPER(code) = ?";
         try (Connection conn = getConnection();

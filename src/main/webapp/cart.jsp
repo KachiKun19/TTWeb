@@ -266,16 +266,29 @@
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase mb-2">Phương thức thanh toán</label>
-                            <div class="flex items-center mb-2">
-                                <input id="payment-cod" type="radio" value="COD" name="payment_method" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
-                                <label for="payment-cod" class="ml-2 text-sm font-medium text-gray-900">
-                                    Thanh toán khi nhận hàng (COD)
+                            <div class="space-y-2">
+                                <label for="payment-cod" class="payment-card flex items-center gap-3 border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-green-400 transition-all has-[:checked]:border-green-500 has-[:checked]:bg-green-50">
+                                    <input id="payment-cod" type="radio" value="COD" name="payment_method" checked class="hidden peer">
+                                    <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-money-bill-wave text-green-600 text-sm"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-bold text-gray-900">Thanh toán khi nhận hàng</p>
+                                        <p class="text-xs text-gray-500">Trả tiền mặt khi shipper giao hàng (COD)</p>
+                                    </div>
+                                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0 cod-dot"></div>
                                 </label>
-                            </div>
-                            <div class="flex items-center">
-                                <input id="payment-bank" type="radio" value="BANKING" name="payment_method" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
-                                <label for="payment-bank" class="ml-2 text-sm font-medium text-gray-900">
-                                    Chuyển khoản ngân hàng
+
+                                <label for="payment-bank" class="payment-card flex items-center gap-3 border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-blue-400 transition-all has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                                    <input id="payment-bank" type="radio" value="BANKING" name="payment_method" class="hidden peer">
+                                    <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-university text-blue-600 text-sm"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-bold text-gray-900">Chuyển khoản ngân hàng</p>
+                                        <p class="text-xs text-gray-500">Quét QR hoặc chuyển khoản thủ công</p>
+                                    </div>
+                                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0 bank-dot"></div>
                                 </label>
                             </div>
                         </div>
@@ -298,89 +311,124 @@
 
 <%-- Modal thông báo sau thanh toán --%>
 <c:if test="${not empty msg}">
-    <div id="paymentModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 overflow-y-auto h-full w-full z-[9999] flex items-center justify-center backdrop-blur-sm">
-        <div class="relative p-6 border w-[450px] shadow-2xl rounded-2xl bg-white text-center transform transition-all scale-100">
+    <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-60 overflow-y-auto h-full w-full z-[9999] flex items-center justify-center backdrop-blur-sm p-4">
 
-            <c:if test="${paymentMethod == 'COD'}">
-                <div class="mt-2">
-                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4 animate-bounce">
-                        <i class="fas fa-check text-green-600 text-3xl"></i>
+        <%-- COD Modal --%>
+        <c:if test="${paymentMethod == 'COD'}">
+            <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden">
+                <div class="bg-gradient-to-br from-green-400 to-emerald-600 px-6 pt-10 pb-16 text-center text-white">
+                    <div class="mx-auto w-20 h-20 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-4">
+                        <i class="fas fa-check-circle text-white text-4xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Đặt hàng thành công!</h3>
-                    <div class="mt-2 px-2 py-3">
-                        <p class="text-gray-500">Cảm ơn bạn đã mua sắm tại Kachi-Kun Shop.<br>Đơn hàng của bạn đã được ghi nhận.</p>
-                    </div>
-                    <div class="mt-4">
-                        <button onclick="window.location.href='home'" class="px-6 py-3 bg-green-600 text-white text-base font-bold rounded-lg w-full shadow hover:bg-green-700 transition duration-300">
-                            Về trang chủ
-                        </button>
-                    </div>
+                    <h3 class="text-2xl font-extrabold">Đặt hàng thành công!</h3>
+                    <p class="text-green-100 text-sm mt-1">Cảm ơn bạn đã tin tưởng Kachi-Kun Shop</p>
                 </div>
-            </c:if>
 
-            <c:if test="${paymentMethod == 'BANKING'}">
-                <div class="mt-2">
-                    <img src="https://cdn.tgdd.vn/2020/04/GameApp/icon-200x200.jpg" alt="VCB Logo" class="h-10 mx-auto mb-4">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 uppercase border-b pb-2">Thông tin chuyển khoản</h3>
-                    <div class="mt-4 mb-6 text-center">
-                        <img src="images/qr.jpg" alt="QR Code Thanh Toán" class="mx-auto w-48 h-48 border border-gray-200 rounded-lg shadow-md">
-                        <p class="text-sm text-gray-600 mt-2">Quét mã QR để chuyển khoản nhanh</p>
+                <div class="-mt-8 mx-4 bg-white rounded-2xl shadow-lg p-5">
+                    <div class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-3 mb-4">
+                        <i class="fas fa-money-bill-wave text-green-500 text-xl"></i>
+                        <div>
+                            <p class="text-xs text-gray-500 font-semibold uppercase">Phương thức</p>
+                            <p class="text-sm font-bold text-gray-800">Thanh toán khi nhận hàng (COD)</p>
+                        </div>
                     </div>
-                    <div class="text-left bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-inner mx-1">
-                        <div class="mb-4 text-center">
-                            <p class="text-gray-500 text-xs uppercase font-semibold tracking-wider mb-1">Số tài khoản</p>
-                            <div class="flex items-center justify-center gap-2">
-                                <p id="bank-acc-num" class="text-blue-700 font-extrabold text-3xl tracking-widest font-mono">
-                                    9355 849 425
-                                </p>
-                                <button type="button" onclick="copyToClipboard()" class="text-gray-400 hover:text-blue-600" title="Sao chép">
-                                    <i class="far fa-copy"></i>
+                    <div class="flex justify-between text-sm py-2 border-b border-dashed border-gray-100">
+                        <span class="text-gray-500">Tổng thanh toán</span>
+                        <span class="font-bold text-red-600 text-base">
+                            <fmt:formatNumber value="${finalTotal}" type="currency" currencySymbol="₫"/>
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-3 text-center">Shipper sẽ liên hệ bạn sớm nhất có thể</p>
+                </div>
+
+                <div class="px-4 pb-6 pt-4 space-y-2">
+                    <button onclick="window.location.href='orderHistory'" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition text-sm shadow">
+                        <i class="fas fa-list-alt mr-2"></i>Xem đơn hàng của tôi
+                    </button>
+                    <button onclick="window.location.href='home'" class="w-full text-gray-500 hover:text-gray-800 py-2 text-sm font-medium underline underline-offset-2 transition">
+                        Tiếp tục mua sắm
+                    </button>
+                </div>
+            </div>
+        </c:if>
+
+        <%-- Banking Modal --%>
+        <c:if test="${paymentMethod == 'BANKING'}">
+            <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden">
+                <div class="bg-gradient-to-br from-blue-500 to-indigo-700 px-6 pt-8 pb-14 text-center text-white">
+                    <div class="mx-auto w-16 h-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-3">
+                        <i class="fas fa-university text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-extrabold">Thông tin chuyển khoản</h3>
+                    <p class="text-blue-100 text-xs mt-1">Vui lòng chuyển khoản để xác nhận đơn hàng</p>
+                </div>
+
+                <div class="-mt-6 mx-4 bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <%-- QR code --%>
+                    <div class="bg-gray-50 p-4 text-center border-b border-gray-100">
+                        <img src="images/qr.jpg" alt="QR Code" class="mx-auto w-40 h-40 rounded-xl border border-gray-200 shadow">
+                        <p class="text-xs text-gray-400 mt-2">Quét mã QR để chuyển khoản nhanh</p>
+                    </div>
+
+                    <%-- Bank info --%>
+                    <div class="p-4 space-y-2 text-sm">
+                        <div class="flex justify-between py-1.5 border-b border-dashed border-gray-100">
+                            <span class="text-gray-500">Ngân hàng</span>
+                            <span class="font-bold text-gray-900">Vietcombank (VCB)</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-dashed border-gray-100">
+                            <span class="text-gray-500">Chủ tài khoản</span>
+                            <span class="font-bold text-gray-900 uppercase">TRAN XUAN HUNG</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-dashed border-gray-100">
+                            <span class="text-gray-500">Số tài khoản</span>
+                            <div class="flex items-center gap-1.5">
+                                <span id="bank-acc-num" class="font-mono font-bold text-blue-700 tracking-wider">9355849425</span>
+                                <button type="button" onclick="copyToClipboard()" id="copy-btn" class="text-gray-300 hover:text-blue-500 transition" title="Sao chép">
+                                    <i class="far fa-copy text-sm"></i>
                                 </button>
                             </div>
                         </div>
-                        <div class="border-t border-blue-200 my-3 border-dashed"></div>
-                        <div class="space-y-3 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Ngân hàng:</span>
-                                <span class="font-bold text-gray-900">VCB</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Chủ tài khoản:</span>
-                                <span class="font-bold text-gray-900 uppercase">TRAN XUAN HUNG</span>
-                            </div>
-                            <div class="flex justify-between items-center bg-white p-2 rounded border border-blue-100">
-                                <span class="text-gray-600">Số tiền:</span>
-                                <span class="text-red-600 font-bold text-lg">
-                                    <fmt:formatNumber value="${finalTotal}" type="currency" currencySymbol="₫"/>
-                                </span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Nội dung:</span>
-                                <span class="font-bold text-gray-900 italic">Thanh toan don hang</span>
-                            </div>
+                        <div class="flex justify-between items-center py-1.5 border-b border-dashed border-gray-100">
+                            <span class="text-gray-500">Số tiền</span>
+                            <span class="font-bold text-red-600 text-base">
+                                <fmt:formatNumber value="${finalTotal}" type="currency" currencySymbol="₫"/>
+                            </span>
+                        </div>
+                        <div class="flex justify-between py-1.5">
+                            <span class="text-gray-500">Nội dung CK</span>
+                            <span class="font-bold text-gray-900 italic">Thanh toan don hang</span>
                         </div>
                     </div>
-                    <p class="text-[11px] text-gray-500 mt-4 italic">*Vui lòng chuyển khoản đúng số tiền.</p>
-                    <div class="mt-5 space-y-2">
-                        <button onclick="alert('Đơn hàng của bạn đang được xử lý. Cảm ơn bạn!'); window.location.href='home'" class="px-4 py-3 bg-blue-700 text-white text-base font-bold rounded-lg w-full shadow-lg hover:bg-blue-800 transition transform hover:-translate-y-0.5">
-                            Đã chuyển khoản xong
-                        </button>
-                        <button type="button" onclick="window.location.href='home'" class="px-4 py-2 text-gray-500 text-sm hover:text-gray-800 underline">
-                            Để sau, về trang chủ
-                        </button>
+                </div>
+
+                <div class="px-4 pt-3 pb-1">
+                    <div class="flex items-start gap-2 bg-yellow-50 border border-yellow-300 rounded-xl px-3 py-2.5">
+                        <i class="fas fa-camera text-yellow-500 mt-0.5 flex-shrink-0"></i>
+                        <p class="text-xs text-yellow-800 font-medium leading-relaxed">
+                            Vui lòng <span class="font-bold">chụp màn hình</span> hoặc lưu lại thông tin chuyển khoản để đối chiếu khi cần.
+                        </p>
                     </div>
                 </div>
-            </c:if>
-        </div>
+
+                <div class="px-4 pb-6 pt-3 space-y-2">
+                    <button onclick="window.location.href='orderHistory'" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition text-sm shadow">
+                        <i class="fas fa-check mr-2"></i>Đã chuyển khoản xong
+                    </button>
+                    <button onclick="window.location.href='home'" class="w-full text-gray-500 hover:text-gray-800 py-2 text-sm font-medium underline underline-offset-2 transition">
+                        Để sau, về trang chủ
+                    </button>
+                </div>
+            </div>
+        </c:if>
     </div>
     <script>
         function copyToClipboard() {
-            var copyText = document.getElementById("bank-acc-num").innerText;
-            var rawText = copyText.replace(/\s/g, '');
+            var rawText = document.getElementById("bank-acc-num").innerText.replace(/\s/g, '');
             navigator.clipboard.writeText(rawText).then(function () {
-                alert("Đã sao chép số tài khoản: " + rawText);
-            }, function (err) {
-                console.error('Lỗi sao chép: ', err);
+                var btn = document.getElementById('copy-btn');
+                btn.innerHTML = '<i class="fas fa-check text-sm text-green-500"></i>';
+                setTimeout(function() { btn.innerHTML = '<i class="far fa-copy text-sm"></i>'; }, 2000);
             });
         }
     </script>
@@ -738,10 +786,36 @@
         }
     }
 
+    // ─── Payment card highlight ──────────────────────────────────────────────
+    function initPaymentCards() {
+        var radios = document.querySelectorAll('input[name="payment_method"]');
+        function updateCards() {
+            document.querySelectorAll('.payment-card').forEach(function(card) {
+                var radio = card.querySelector('input[type="radio"]');
+                var dot = card.querySelector('.cod-dot, .bank-dot');
+                if (radio && radio.checked) {
+                    if (dot) dot.classList.add('border-green-500', 'bg-green-500');
+                } else {
+                    if (dot) dot.classList.remove('border-green-500', 'bg-green-500');
+                }
+            });
+            var bankDot = document.querySelector('.bank-dot');
+            var bankRadio = document.getElementById('payment-bank');
+            if (bankRadio && bankRadio.checked) {
+                if (bankDot) { bankDot.classList.remove('border-green-500', 'bg-green-500'); bankDot.classList.add('border-blue-500', 'bg-blue-500'); }
+            } else {
+                if (bankDot) bankDot.classList.remove('border-blue-500', 'bg-blue-500');
+            }
+        }
+        radios.forEach(function(r) { r.addEventListener('change', updateCards); });
+        updateCards();
+    }
+
     // ─── Init ────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function () {
         recalcSelected();
         loadProvinces();
+        initPaymentCards();
 
         // Gắn bộ lắng nghe sự kiện đồng bộ tuần tự
         document.getElementById('province').addEventListener('change', loadDistricts);
