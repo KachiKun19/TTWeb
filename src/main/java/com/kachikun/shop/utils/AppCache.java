@@ -2,9 +2,12 @@ package com.kachikun.shop.utils;
 
 import com.kachikun.shop.dao.BrandDAO;
 import com.kachikun.shop.dao.CategoryDAO;
+import com.kachikun.shop.dao.DiscountDAO;
 import com.kachikun.shop.model.Brand;
 import com.kachikun.shop.model.Category;
+import com.kachikun.shop.model.Discount;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -69,6 +72,16 @@ public class AppCache {
         } catch (Throwable e) {
             log.log(Level.SEVERE, "[AppCache] THẤT BẠI khi cập nhật Categories! Đang giữ lại dữ liệu cũ.", e);
         }
+    }
+
+    private static volatile List<Discount> cachedDiscounts = new ArrayList<>();
+
+    public static void refreshDiscounts() {
+        cachedDiscounts = new DiscountDAO().getActiveDiscounts();
+    }
+
+    public static List<Discount> getDiscounts() {
+        return cachedDiscounts;
     }
 
     // Hàm làm mới danh sách Brands do Listener hoặc Admin gọi

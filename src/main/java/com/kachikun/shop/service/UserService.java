@@ -9,6 +9,10 @@ import com.kachikun.shop.utils.BCryptUtils;
 public class UserService {
     private UserDAO userDAO = new UserDAO();
 
+    public User getUserByEmail(String email) {
+        return userDAO.getUserByEmail(email);
+    }
+
     public User login(String username, String password) {
         User user = userDAO.getUserByUsername(username);
 

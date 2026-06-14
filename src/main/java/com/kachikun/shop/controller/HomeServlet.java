@@ -35,7 +35,7 @@ public class HomeServlet extends HttpServlet {
 
         Boolean sectionVisible = (Boolean) getServletContext().getAttribute("discountSectionVisible");
         List<Discount> activeDiscounts = (sectionVisible != null && sectionVisible)
-                ? discountDAO.getActiveDiscounts()
+                ? AppCache.getDiscounts()
                 : java.util.Collections.emptyList();
 
         request.setAttribute("listCategories",   categories);
