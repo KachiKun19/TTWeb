@@ -24,7 +24,7 @@ public class DBConnection {
 
         // Pool sizing
         config.setMaximumPoolSize(10);
-        config.setMinimumIdle(2);
+        config.setMinimumIdle(5);
 
         // Timeouts
         config.setConnectionTimeout(10_000);
@@ -34,10 +34,10 @@ public class DBConnection {
         config.setLeakDetectionThreshold(5_000);
 
         // Connection test
-        config.setConnectionTestQuery("SELECT 1");
+        //config.setConnectionTestQuery("SELECT 1");
         config.setPoolName("KachiKunPool");
 
-        config.setInitializationFailTimeout(-1);
+        config.setInitializationFailTimeout(0);
 
         dataSource = new HikariDataSource(config);
         System.out.println("[HikariCP] Connection pool đã khởi động.");

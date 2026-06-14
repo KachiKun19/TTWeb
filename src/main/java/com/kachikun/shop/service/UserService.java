@@ -42,24 +42,6 @@ public class UserService {
     }
 
     public String register(String username, String password, String email, String fullName, int role) {
-        if (username == null || password == null)
-            return "Vui lòng nhập đủ thông tin!";
-
-        if (password.length() < 6) {
-            return "Mật khẩu quá ngắn! Phải từ 6 ký tự trở lên.";
-        }
-
-        if (email == null || email.trim().isEmpty())
-            return "Email không được để trống!";
-
-        if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))
-            return "Email không đúng định dạng!";
-
-        if (userDAO.isUsernameExists(username))
-            return "Tên đăng nhập đã tồn tại!";
-        if (userDAO.isEmailExists(email))
-            return "Email đã được sử dụng!";
-
         String hashedPassword = BCryptUtils.hashPassword(password);
 
         User u = new User();
@@ -69,12 +51,14 @@ public class UserService {
         u.setFullName(fullName);
         u.setRole(role);
 
-        boolean success = userDAO.register(u);
-
-        if (success) {
-            return "Success";
-        } else {
-            return "Lỗi hệ thống! Không thể lưu vào Database (Kiểm tra Console Eclipse).";
+        try {
+            boolean success = userDAO.register(u);
+            return success ? "Success" : "Lỗi hệ thống!";
+        } catch (Exception e) {
+            String msg = e.getMessage().toLowerCase();
+            if (msg.contains("username")) return "Tên đăng nhập đã tồn tại!";
+            if (msg.contains("email")) return "Email đã được sử dụng!";
+            return "Lỗi hệ thống!";
         }
     }
 
