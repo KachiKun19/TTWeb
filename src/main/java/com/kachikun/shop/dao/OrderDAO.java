@@ -14,10 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OrderDAO extends BaseDAO {
 
@@ -695,5 +692,114 @@ public class OrderDAO extends BaseDAO {
         } finally {
             if (conn != null) try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
         }
+    }
+    // ─── THÊM CÁC METHOD NÀY VÀO OrderDAO.java ───
+
+// Import cần thêm vào đầu file:
+// import java.time.LocalDate;
+// import java.sql.Date;
+
+    /**
+     * Sản phẩm bán chạy (>= 10) trong khoảng tuần
+     */
+    public List<Map<String, Object>> getTopSellingProductsByWeek(LocalDate from, LocalDate to) {
+        String sql = "SELECT TOP 20 p.id, p.name, p.image, p.price, p.stock_quantity, " +
+                "SUM(od.quantity) AS week_sold " +
+                "FROM OrderDetails od " +
+                "INNER JOIN Products p ON od.product_id = p.id " +
+                "INNER JOIN Orders o ON od.order_id = o.id " +
+                "WHERE CAST(o.order_date AS DATE) BETWEEN ? AND ? " +
+                "AND o.status NOT IN (N'Đã hủy') " +
+                "GROUP BY p.id, p.name, p.image, p.price, p.stock_quantity " +
+                "HAVING SUM(od.quantity) >= 10 " +
+                "ORDER BY week_sold DESC";
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, Date.valueOf(from));
+            ps.setDate(2, Date.valueOf(to));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("id",             rs.getInt("id"));
+                    row.put("name",           rs.getString("name"));
+                    row.put("image",          rs.getString("image"));
+                    row.put("price",          rs.getDouble("price"));
+                    row.put("stock_quantity", rs.getInt("stock_quantity"));
+                    row.put("week_sold",      rs.getInt("week_sold"));
+                    list.add(row);
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    /**
+     * Sản phẩm KHÔNG bán được trong khoảng tuần
+     */
+    public List<Map<String, Object>> getNotSellingProductsByWeek(LocalDate from, LocalDate to) {
+        String sql = "SELECT p.id, p.name, p.image, p.price, p.stock_quantity, p.sold_count " +
+                "FROM Products p " +
+                "WHERE p.stock_quantity > 0 " +
+                "AND p.id NOT IN ( " +
+                "    SELECT DISTINCT od.product_id " +
+                "    FROM OrderDetails od " +
+                "    INNER JOIN Orders o ON od.order_id = o.id " +
+                "    WHERE CAST(o.order_date AS DATE) BETWEEN ? AND ? " +
+                "    AND o.status NOT IN (N'Đã hủy') " +
+                ") " +
+                "ORDER BY p.stock_quantity DESC";
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, Date.valueOf(from));
+            ps.setDate(2, Date.valueOf(to));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("id",             rs.getInt("id"));
+                    row.put("name",           rs.getString("name"));
+                    row.put("image",          rs.getString("image"));
+                    row.put("price",          rs.getDouble("price"));
+                    row.put("stock_quantity", rs.getInt("stock_quantity"));
+                    row.put("sold_count",     rs.getInt("sold_count"));
+                    list.add(row);
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    /**
+     * Toàn bộ tồn kho
+     */
+    public List<Map<String, Object>> getAllInventory() {
+        String sql = "SELECT p.id, p.name, p.image, p.price, p.stock_quantity, p.sold_count, " +
+                "c.name AS category_name, b.name AS brand_name " +
+                "FROM Products p " +
+                "LEFT JOIN Categories c ON p.category_id = c.id " +
+                "LEFT JOIN Brands b ON p.brand_id = b.id " +
+                "ORDER BY p.stock_quantity ASC";
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("id",             rs.getInt("id"));
+                row.put("name",           rs.getString("name"));
+                row.put("image",          rs.getString("image"));
+                row.put("price",          rs.getDouble("price"));
+                row.put("stock_quantity", rs.getInt("stock_quantity"));
+                row.put("sold_count",     rs.getInt("sold_count"));
+                row.put("category_name",  rs.getString("category_name"));
+                row.put("brand_name",     rs.getString("brand_name"));
+                list.add(row);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
     }
 }
