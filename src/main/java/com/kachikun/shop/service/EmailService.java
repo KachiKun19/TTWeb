@@ -1,7 +1,6 @@
 package com.kachikun.shop.service;
 
 import java.util.Properties;
-
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;

@@ -3,7 +3,7 @@ package com.kachikun.shop.controller.google;
 import com.kachikun.shop.dao.UserDAO;
 import com.kachikun.shop.model.GoogleUser;
 import com.kachikun.shop.model.User;
-import com.kachikun.shop.utils.GoogleService;
+import com.kachikun.shop.service.GoogleService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

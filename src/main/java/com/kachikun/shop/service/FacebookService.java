@@ -1,7 +1,8 @@
-package com.kachikun.shop.utils;
+package com.kachikun.shop.service;
 
 import com.google.gson.Gson;
 import com.kachikun.shop.model.FacebookUser;
+import com.kachikun.shop.utils.FacebookConstants;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
