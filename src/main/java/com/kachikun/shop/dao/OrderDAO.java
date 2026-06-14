@@ -638,7 +638,9 @@ public class OrderDAO extends BaseDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(mapOrder(rs));
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
@@ -648,7 +650,9 @@ public class OrderDAO extends BaseDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
@@ -686,23 +690,26 @@ public class OrderDAO extends BaseDAO {
             return true;
 
         } catch (Exception e) {
-            if (conn != null) try { conn.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
+            if (conn != null) try {
+                conn.rollback();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
             return false;
         } finally {
-            if (conn != null) try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
+            if (conn != null) try {
+                conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
-    // ─── THÊM CÁC METHOD NÀY VÀO OrderDAO.java ───
-
-// Import cần thêm vào đầu file:
-// import java.time.LocalDate;
-// import java.sql.Date;
 
     /**
-     * Sản phẩm bán chạy (>= 10) trong khoảng tuần
+     * Sản phẩm bán chạy
      */
-    public List<Map<String, Object>> getTopSellingProductsByWeek(LocalDate from, LocalDate to) {
+    public List<Map<String, Object>> getTopSellingProductsByWeek(LocalDate from, LocalDate to, int threshold) {
         String sql = "SELECT TOP 20 p.id, p.name, p.image, p.price, p.stock_quantity, " +
                 "SUM(od.quantity) AS week_sold " +
                 "FROM OrderDetails od " +
@@ -711,7 +718,7 @@ public class OrderDAO extends BaseDAO {
                 "WHERE CAST(o.order_date AS DATE) BETWEEN ? AND ? " +
                 "AND o.status NOT IN (N'Đã hủy') " +
                 "GROUP BY p.id, p.name, p.image, p.price, p.stock_quantity " +
-                "HAVING SUM(od.quantity) >= 10 " +
+                "HAVING SUM(od.quantity) >= " + threshold +
                 "ORDER BY week_sold DESC";
 
         List<Map<String, Object>> list = new ArrayList<>();
@@ -722,32 +729,36 @@ public class OrderDAO extends BaseDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> row = new HashMap<>();
-                    row.put("id",             rs.getInt("id"));
-                    row.put("name",           rs.getString("name"));
-                    row.put("image",          rs.getString("image"));
-                    row.put("price",          rs.getDouble("price"));
+                    row.put("id", rs.getInt("id"));
+                    row.put("name", rs.getString("name"));
+                    row.put("image", rs.getString("image"));
+                    row.put("price", rs.getDouble("price"));
                     row.put("stock_quantity", rs.getInt("stock_quantity"));
-                    row.put("week_sold",      rs.getInt("week_sold"));
+                    row.put("week_sold", rs.getInt("week_sold"));
                     list.add(row);
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
     /**
      * Sản phẩm KHÔNG bán được trong khoảng tuần
      */
-    public List<Map<String, Object>> getNotSellingProductsByWeek(LocalDate from, LocalDate to) {
+    public List<Map<String, Object>> getNotSellingProductsByWeek(LocalDate from, LocalDate to, int threshold) {
         String sql = "SELECT p.id, p.name, p.image, p.price, p.stock_quantity, p.sold_count " +
                 "FROM Products p " +
                 "WHERE p.stock_quantity > 0 " +
                 "AND p.id NOT IN ( " +
-                "    SELECT DISTINCT od.product_id " +
+                "    SELECT od.product_id " +
                 "    FROM OrderDetails od " +
                 "    INNER JOIN Orders o ON od.order_id = o.id " +
                 "    WHERE CAST(o.order_date AS DATE) BETWEEN ? AND ? " +
                 "    AND o.status NOT IN (N'Đã hủy') " +
+                "    GROUP BY od.product_id " +
+                "    HAVING SUM(od.quantity) >= ? " +
                 ") " +
                 "ORDER BY p.stock_quantity DESC";
 
@@ -756,6 +767,7 @@ public class OrderDAO extends BaseDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDate(1, Date.valueOf(from));
             ps.setDate(2, Date.valueOf(to));
+            ps.setInt(3, threshold);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> row = new HashMap<>();
@@ -789,17 +801,19 @@ public class OrderDAO extends BaseDAO {
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Map<String, Object> row = new HashMap<>();
-                row.put("id",             rs.getInt("id"));
-                row.put("name",           rs.getString("name"));
-                row.put("image",          rs.getString("image"));
-                row.put("price",          rs.getDouble("price"));
+                row.put("id", rs.getInt("id"));
+                row.put("name", rs.getString("name"));
+                row.put("image", rs.getString("image"));
+                row.put("price", rs.getDouble("price"));
                 row.put("stock_quantity", rs.getInt("stock_quantity"));
-                row.put("sold_count",     rs.getInt("sold_count"));
-                row.put("category_name",  rs.getString("category_name"));
-                row.put("brand_name",     rs.getString("brand_name"));
+                row.put("sold_count", rs.getInt("sold_count"));
+                row.put("category_name", rs.getString("category_name"));
+                row.put("brand_name", rs.getString("brand_name"));
                 list.add(row);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 }
