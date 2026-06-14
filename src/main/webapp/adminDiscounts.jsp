@@ -98,9 +98,53 @@
         }
 
         .discounts-table th:last-child, .discounts-table td:last-child {
-            width: 100px;
+            width: 155px;
             text-align: center;
         }
+
+        .delete-btn {
+            padding: 7px 10px;
+            border-radius: 4px;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover { background-color: #c0392b; }
+
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-overlay.open { display: flex; }
+
+        .confirm-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .confirm-box h4 { margin: 0 0 12px; font-size: 18px; color: #333; }
+        .confirm-box p  { color: #666; margin-bottom: 24px; }
+        .confirm-actions { display: flex; gap: 12px; justify-content: center; }
 
         .code-badge {
             font-family: monospace;
@@ -547,6 +591,9 @@
                 tra lại!
             </div>
         </c:if>
+        <c:if test="${param.success eq 'deleted'}">
+            <div class="alert alert-success"><i class="fas fa-check-circle"></i> Xóa mã giảm giá thành công!</div>
+        </c:if>
         <c:if test="${param.success eq 'false'}">
             <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Thao tác thất bại. Vui lòng thử
                 lại!
@@ -650,18 +697,23 @@
                                     </c:choose>
                                 </td>
                                 <td style="text-align:center;">
-                                    <button class="edit-btn"
-                                            data-id="${d.id}"
-                                            data-code="${d.code}"
-                                            data-type="${d.discountType}"
-                                            data-value="${d.discountValue}"
-                                            data-min="${d.minOrderValue}"
-                                            data-max="${d.maxUses}"
-                                            data-active="${d.active}"
-                                            data-expires="${d.expiresAt}"
-                                            onclick="openEditModal(this)">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </button>
+                                    <div style="display:flex;gap:5px;justify-content:center;">
+                                        <button class="edit-btn"
+                                                data-id="${d.id}"
+                                                data-code="${d.code}"
+                                                data-type="${d.discountType}"
+                                                data-value="${d.discountValue}"
+                                                data-min="${d.minOrderValue}"
+                                                data-max="${d.maxUses}"
+                                                data-active="${d.active}"
+                                                data-expires="${d.expiresAt}"
+                                                onclick="openEditModal(this)">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </button>
+                                        <button class="delete-btn" onclick="confirmDelete(${d.id}, '${d.code}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -811,7 +863,41 @@
     </div>
 </div>
 
+<!-- Modal xác nhận xóa -->
+<div class="confirm-overlay" id="confirmDeleteOverlay">
+    <div class="confirm-box">
+        <h4><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> Xác nhận xóa</h4>
+        <p>Bạn có chắc muốn xóa mã <strong id="deleteCodeLabel"></strong>?<br>Hành động này không thể hoàn tác.</p>
+        <div class="confirm-actions">
+            <button class="btn-cancel" onclick="closeConfirmDelete()">Hủy</button>
+            <button class="delete-btn" onclick="doDelete()"><i class="fas fa-trash"></i> Xóa</button>
+        </div>
+    </div>
+</div>
+
 <script>
+    var _deleteId = 0;
+    function confirmDelete(id, code) {
+        _deleteId = id;
+        document.getElementById('deleteCodeLabel').textContent = code;
+        document.getElementById('confirmDeleteOverlay').classList.add('open');
+    }
+    function closeConfirmDelete() {
+        document.getElementById('confirmDeleteOverlay').classList.remove('open');
+        _deleteId = 0;
+    }
+    function doDelete() {
+        if (!_deleteId) return;
+        var form = document.createElement('form');
+        form.method = 'POST'; form.action = 'adminDiscounts';
+        var a = document.createElement('input');
+        a.type = 'hidden'; a.name = 'action'; a.value = 'delete';
+        var i = document.createElement('input');
+        i.type = 'hidden'; i.name = 'id'; i.value = _deleteId;
+        form.appendChild(a); form.appendChild(i);
+        document.body.appendChild(form); form.submit();
+    }
+
     function openAddModal() {
         document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Thêm Mã Giảm Giá Mới';
         document.getElementById('action').value = 'add';

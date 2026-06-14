@@ -98,6 +98,10 @@ public class AdminDiscountServlet extends HttpServlet {
                 d.setId(id);
                 boolean ok = discountDAO.update(d);
                 response.sendRedirect("adminDiscounts?success=" + (ok ? "updated" : "false"));
+            } else if ("delete".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                boolean ok = discountDAO.delete(id);
+                response.sendRedirect("adminDiscounts?success=" + (ok ? "deleted" : "false"));
             } else {
                 response.sendRedirect("adminDiscounts");
             }
