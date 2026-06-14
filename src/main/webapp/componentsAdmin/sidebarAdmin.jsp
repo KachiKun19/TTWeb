@@ -64,6 +64,12 @@
                 <span>Sản phẩm nổi bật</span>
             </a>
         </li>
+        <li>
+            <a href="adminInventory" class="${activePage == 'inventory' ? 'active' : ''}">
+                <i class="fas fa-warehouse"></i>
+                <span>Tồn kho</span>
+            </a>
+        </li
     </ul>
 
     <div class="sidebar-divider"></div>
