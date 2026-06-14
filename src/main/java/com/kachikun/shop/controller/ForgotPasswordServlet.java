@@ -19,7 +19,6 @@ public class ForgotPasswordServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final String PREFIX = "fp";
 
-    private UserDAO userDAO = new UserDAO();
     private UserService userService = new UserService();
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -30,7 +29,8 @@ public class ForgotPasswordServlet extends HttpServlet {
         if ("request".equals(action)) {
 
             String email = request.getParameter("email");
-            User user = userDAO.getUserByEmail(email);
+            User user = userService.getUserByEmail(email);
+
             if (user == null) {
                 request.setAttribute("error", "Email không tồn tại!");
                 request.getRequestDispatcher("forgotPassword.jsp").forward(request, response);

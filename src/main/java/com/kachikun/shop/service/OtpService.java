@@ -2,6 +2,7 @@ package com.kachikun.shop.service;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
 public class OtpService {
@@ -10,7 +11,7 @@ public class OtpService {
 
     // Tao ma OTP, luu vao session
     public static String generateAndSave(HttpSession session, String prefix) {
-        String otp = String.format("%06d", new Random().nextInt(999999));
+        String otp = String.format("%06d", new SecureRandom().nextInt(1000000));
         session.setAttribute(prefix + "Otp", otp);
         session.setAttribute(prefix + "OtpSentAt", System.currentTimeMillis());
         return otp;

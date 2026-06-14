@@ -41,16 +41,17 @@ public class ProductServlet extends HttpServlet {
 			}
 		}
 
-		List<Product> listProduct;
-		int count;
+		// ✅ Dùng COUNT(*) OVER() — lấy list + total chỉ trong 1 query, tiết kiệm 1 round-trip DB
+		ProductDAO.PageResult result;
 
 		if (cateId == null || cateId.isEmpty()) {
-			count       = productDAO.getTotalProducts();
-			listProduct = productDAO.pagingProduct(index);
+			result = productDAO.pagingProductWithCount(index);
 		} else {
-			count       = productDAO.countProductsByCategory(cateId);
-			listProduct = productDAO.pagingProductByCategory(cateId, index);
+			result = productDAO.pagingProductByCategoryWithCount(cateId, index);
 		}
+
+		List<Product> listProduct = result.products;
+		int count                 = result.totalCount;
 
 		int endPage = count / 3 + (count % 3 != 0 ? 1 : 0);
 

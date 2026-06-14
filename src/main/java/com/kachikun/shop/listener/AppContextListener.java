@@ -39,6 +39,7 @@ public class AppContextListener implements ServletContextListener {
         // nạp dữ liệu lần đầu ngay khi bật App
         AppCache.refreshCategories();
         AppCache.refreshBrands();
+        AppCache.refreshDiscounts();
 
         // khởi tạo luồng chạy ngầm cập nhật định kỳ
         scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -51,6 +52,7 @@ public class AppContextListener implements ServletContextListener {
             log.info("[Lifecycle] Đang chạy tác vụ làm mới dữ liệu định kỳ ngầm...");
             AppCache.refreshCategories();
             AppCache.refreshBrands();
+            AppCache.refreshDiscounts();
         }, 10, 10, TimeUnit.MINUTES);
     }
 

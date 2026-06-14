@@ -196,6 +196,84 @@ public class ProductDAO extends BaseDAO {
         return productList;
     }
 
+    //gom list + totalCount
+    public static class PageResult {
+        public final List<Product> products;
+        public final int           totalCount;
+
+        public PageResult(List<Product> products, int totalCount) {
+            this.products   = products;
+            this.totalCount = totalCount;
+        }
+    }
+
+    // danh sach theo trang
+    public PageResult pagingProductWithCount(int pageIndex) {
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, "
+                + "b.name AS brand_name, b.logo AS brand_logo, "
+                + "COUNT(*) OVER() AS total_count "
+                + "FROM Products p "
+                + "LEFT JOIN Categories c ON p.category_id = c.id "
+                + "LEFT JOIN Brands b ON p.brand_id = b.id "
+                + "ORDER BY p.id "
+                + "OFFSET ? ROWS FETCH NEXT 3 ROWS ONLY";
+
+        List<Product> productList = new ArrayList<>();
+        int totalCount = 0;
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, (pageIndex - 1) * 3);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    if (totalCount == 0) totalCount = rs.getInt("total_count");
+                    productList.add(mapProductWithLogo(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new PageResult(productList, totalCount);
+    }
+
+    /**
+     * Lấy danh sách sản phẩm theo trang + danh mục VÀ tổng số bản ghi
+     * chỉ trong 1 query nhờ window function COUNT(*) OVER().
+     */
+    public PageResult pagingProductByCategoryWithCount(String categoryName, int pageIndex) {
+        String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, "
+                + "b.name AS brand_name, b.logo AS brand_logo, "
+                + "COUNT(*) OVER() AS total_count "
+                + "FROM Products p "
+                + "LEFT JOIN Categories c ON p.category_id = c.id "
+                + "LEFT JOIN Brands b ON p.brand_id = b.id "
+                + "WHERE c.name LIKE ? "
+                + "ORDER BY p.id "
+                + "OFFSET ? ROWS FETCH NEXT 3 ROWS ONLY";
+
+        List<Product> productList = new ArrayList<>();
+        int totalCount = 0;
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + categoryName + "%");
+            ps.setInt(2, (pageIndex - 1) * 3);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    if (totalCount == 0) totalCount = rs.getInt("total_count");
+                    productList.add(mapProductWithLogo(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new PageResult(productList, totalCount);
+    }
+
     // lấy sp theo trang
     public List<Product> getProductsByPage(int pageIndex, int pageSize) {
         String sql = "SELECT p.*, c.name AS cat_name, c.icon AS cat_icon, b.name AS brand_name "
