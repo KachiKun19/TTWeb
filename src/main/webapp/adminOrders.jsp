@@ -81,6 +81,16 @@
             color: #721c24;
         }
 
+        .status-unpaid {
+            background-color: #fff0e0;
+            color: #b45309;
+        }
+
+        .status-paid {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
 
         .action-btn {
             padding: 6px 12px;
@@ -226,10 +236,12 @@
                                     <fmt:formatNumber value="${o.totalPrice}" type="currency" currencySymbol="₫"/>
                                 </td>
                                 <td>
-                                            <span class="status-badge 
-                                                ${o.status == 'Đang xử lý' ? 'status-pending' : 
-                                                  (o.status == 'Đang giao hàng' ? 'status-shipping' : 
-                                                  (o.status == 'Đã giao' || o.status == 'Hoàn thành' ? 'status-done' : 'status-cancel'))}">
+                                            <span class="status-badge
+                                                ${o.status == 'Chưa thanh toán' ? 'status-unpaid' :
+                                                  (o.status == 'Đã thanh toán' ? 'status-paid' :
+                                                  (o.status == 'Đang xử lý' ? 'status-pending' :
+                                                  (o.status == 'Đang giao hàng' ? 'status-shipping' :
+                                                  (o.status == 'Đã giao' || o.status == 'Hoàn thành' ? 'status-done' : 'status-cancel'))))}">
                                                     ${o.status}
                                             </span>
                                 </td>
@@ -298,7 +310,6 @@
                             Trang ${currentPage} / ${totalPages} &nbsp;•&nbsp; ${totalOrders} đơn hàng
                         </p>
                     </c:if>
-                    <%-- phân trang --%>
                 </c:otherwise>
             </c:choose>
         </div>

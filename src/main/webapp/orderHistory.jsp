@@ -64,7 +64,6 @@
 				</label>
 			</div>
 
-			<%-- Ô nhập khi chọn Khác --%>
 			<div id="customReasonBox" class="hidden mb-4">
         <textarea name="custom_reason" rows="3"
 				  placeholder="Nhập lý do của bạn..."
@@ -81,7 +80,6 @@
 	</div>
 </div>
 
-<%-- đánh giá--%>
 <div id="reviewModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 transition-all duration-300">
 	<div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl overflow-hidden transform transition-all scale-95 border border-gray-100">
 		<div class="px-8 py-6 border-b flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
@@ -100,8 +98,17 @@
 	</div>
 </div>
 
-<%--main content --%>
 <div class="max-w-4xl mx-auto p-6">
+
+	<c:if test="${not empty sessionScope.vnpayMsg}">
+		<div class="mb-4 flex items-center gap-3 px-4 py-3 rounded-xl shadow
+			${sessionScope.vnpaySuccess ? 'bg-green-50 border border-green-300 text-green-800' : 'bg-red-50 border border-red-300 text-red-800'}">
+			<i class="fas ${sessionScope.vnpaySuccess ? 'fa-check-circle text-green-500' : 'fa-times-circle text-red-500'} text-xl"></i>
+			<span class="text-sm font-medium">${sessionScope.vnpayMsg}</span>
+		</div>
+		<c:remove var="vnpayMsg" scope="session"/>
+		<c:remove var="vnpaySuccess" scope="session"/>
+	</c:if>
 
 	<div class="flex items-center justify-between mb-6">
 		<div>
@@ -127,10 +134,9 @@
 		</div>
 	</c:if>
 
-	<%--
-		 dùng c:url + c:param để encode tiếng Việt đúng cách.
-	--%>
 	<c:url var="urlAll"       value="order-history"><c:param name="page" value="1"/><c:param name="status" value="ALL"/></c:url>
+	<c:url var="urlUnpaid"    value="order-history"><c:param name="page" value="1"/><c:param name="status" value="Chưa thanh toán"/></c:url>
+	<c:url var="urlPaid"      value="order-history"><c:param name="page" value="1"/><c:param name="status" value="Đã thanh toán"/></c:url>
 	<c:url var="urlPending"   value="order-history"><c:param name="page" value="1"/><c:param name="status" value="Đang xử lý"/></c:url>
 	<c:url var="urlShipping"  value="order-history"><c:param name="page" value="1"/><c:param name="status" value="Đang giao hàng"/></c:url>
 	<c:url var="urlDelivered" value="order-history"><c:param name="page" value="1"/><c:param name="status" value="Đã giao"/></c:url>
@@ -142,6 +148,22 @@
 		<a href="${urlAll}" class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all
 			${'ALL' eq statusFilter ? 'bg-pink-600 text-white shadow' : 'bg-white text-gray-600 border border-gray-200 hover:border-pink-300 hover:text-pink-600'}">
 			Tất cả <span class="ml-1 text-xs opacity-70">(${statusCount['ALL']})</span>
+		</a>
+
+		<a href="${urlUnpaid}" class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all
+			${'Chưa thanh toán' eq statusFilter ? 'bg-orange-500 text-white shadow' : 'bg-white text-gray-600 border border-gray-200 hover:border-orange-300 hover:text-orange-600'}">
+			Chưa thanh toán
+			<c:if test="${statusCount['Chưa thanh toán'] != null}">
+				<span class="ml-1 text-xs opacity-70">(${statusCount['Chưa thanh toán']})</span>
+			</c:if>
+		</a>
+
+		<a href="${urlPaid}" class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all
+			${'Đã thanh toán' eq statusFilter ? 'bg-indigo-500 text-white shadow' : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'}">
+			Đã thanh toán
+			<c:if test="${statusCount['Đã thanh toán'] != null}">
+				<span class="ml-1 text-xs opacity-70">(${statusCount['Đã thanh toán']})</span>
+			</c:if>
 		</a>
 
 		<a href="${urlPending}" class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all
@@ -184,8 +206,6 @@
 			</c:if>
 		</a>
 	</div>
-
-	<%-- danh sách--%>
 	<c:choose>
 		<c:when test="${empty myOrders}">
 			<div class="bg-white rounded-2xl shadow-sm p-16 text-center">
@@ -295,7 +315,6 @@
 				</c:forEach>
 			</div>
 
-			<%-- Phân trang --%>
 			<c:if test="${totalPages > 1}">
 				<div class="flex items-center justify-center gap-2 mt-8">
 
