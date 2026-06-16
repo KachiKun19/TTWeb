@@ -54,9 +54,7 @@ public class OrderDAO extends BaseDAO {
         return order;
     }
 
-    /**
-     * Lấy trạng thái hiện tại của đơn hàng theo ID.
-     */
+
     private String getOrderStatus(int orderId) {
         String sql = "SELECT status FROM Orders WHERE id = ?";
 
@@ -76,6 +74,10 @@ public class OrderDAO extends BaseDAO {
 
     private boolean isValidStatusTransition(String currentStatus, String nextStatus) {
         switch (currentStatus) {
+            case "Chưa thanh toán":
+                return "Đang xử lý".equals(nextStatus) || "Đang giao hàng".equals(nextStatus) || "Đã hủy".equals(nextStatus);
+            case "Đã thanh toán":
+                return "Đang xử lý".equals(nextStatus) || "Đang giao hàng".equals(nextStatus) || "Đã hủy".equals(nextStatus);
             case "Đang xử lý":
                 return "Đang giao hàng".equals(nextStatus) || "Đã hủy".equals(nextStatus);
             case "Đang giao hàng":
@@ -87,9 +89,6 @@ public class OrderDAO extends BaseDAO {
         }
     }
 
-    /**
-     * Lấy danh sách [productId, quantity] của tất cả sản phẩm trong đơn
-     */
     private List<int[]> getOrderItemQuantities(Connection conn, int orderId) throws SQLException {
         String sql = "SELECT product_id, quantity FROM OrderDetails WHERE order_id = ?";
         List<int[]> items = new ArrayList<>();
@@ -105,9 +104,7 @@ public class OrderDAO extends BaseDAO {
         return items;
     }
 
-    /**
-     * Hoàn trả tồn kho cho danh sách sản phẩm (batch update).
-     */
+
     private void restoreStock(Connection conn, List<int[]> items) throws SQLException {
         String sql = "UPDATE Products SET stock_quantity = stock_quantity + ? WHERE id = ?";
 
@@ -122,6 +119,104 @@ public class OrderDAO extends BaseDAO {
     }
 
 
+    public int createOrderReturnId(User user, List<CartItem> cart, double totalPrice,
+                                   String recipientName, String recipientPhone,
+                                   String shippingAddress, String paymentMethod) {
+
+        String insertOrderSql =
+                "INSERT INTO Orders (user_id, total_price, status, order_date, "
+                        + "  recipient_name, recipient_phone, shipping_address, payment_method) "
+                        + "VALUES (?, ?, N'Chưa thanh toán', GETDATE(), ?, ?, ?, ?)";
+
+        String insertDetailSql =
+                "INSERT INTO OrderDetails (order_id, product_id, price, quantity) VALUES (?, ?, ?, ?)";
+
+        String deductStockSql =
+                "UPDATE Products SET stock_quantity = stock_quantity - ? "
+                        + "WHERE id = ? AND stock_quantity >= ?";
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+
+            int orderId = -1;
+            try (PreparedStatement ps = conn.prepareStatement(insertOrderSql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, user.getId());
+                ps.setDouble(2, totalPrice);
+                ps.setString(3, recipientName);
+                ps.setString(4, recipientPhone);
+                ps.setString(5, shippingAddress);
+                ps.setString(6, paymentMethod);
+                ps.executeUpdate();
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) orderId = keys.getInt(1);
+                }
+            }
+
+            if (orderId == -1) { conn.rollback(); return -1; }
+
+            try (PreparedStatement psDetail = conn.prepareStatement(insertDetailSql);
+                 PreparedStatement psStock  = conn.prepareStatement(deductStockSql)) {
+
+                for (CartItem item : cart) {
+                    int pid = item.getProduct().getId();
+                    psDetail.setInt(1, orderId);
+                    psDetail.setInt(2, pid);
+                    psDetail.setDouble(3, item.getProduct().getPrice());
+                    psDetail.setInt(4, item.getQuantity());
+                    psDetail.addBatch();
+
+                    psStock.setInt(1, item.getQuantity());
+                    psStock.setInt(2, pid);
+                    psStock.setInt(3, item.getQuantity());
+                    psStock.addBatch();
+                }
+
+                psDetail.executeBatch();
+                int[] stockResults = psStock.executeBatch();
+                for (int r : stockResults) {
+                    if (r == 0) { conn.rollback(); return -1; }
+                }
+            }
+
+            conn.commit();
+            return orderId;
+
+        } catch (Exception e) {
+            if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            e.printStackTrace();
+            return -1;
+        } finally {
+            if (conn != null) try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
+        }
+    }
+
+    public boolean confirmVNPayPayment(int orderId) {
+        String sql = "UPDATE Orders SET status = N'Đã thanh toán' WHERE id = ? AND status = N'Chưa thanh toán'";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean cancelVNPayOrder(int orderId) {
+        String sql = "UPDATE Orders SET status = N'Đã hủy', cancel_reason = N'Thanh toán VNPay thất bại' "
+                + "WHERE id = ? AND status = N'Chưa thanh toán'";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean createOrder(User user, List<CartItem> cart, double totalPrice,
                                String recipientName, String recipientPhone,
                                String shippingAddress, String paymentMethod) {
@@ -129,7 +224,7 @@ public class OrderDAO extends BaseDAO {
         String insertOrderSql =
                 "INSERT INTO Orders (user_id, total_price, status, order_date, "
                         + "  recipient_name, recipient_phone, shipping_address, payment_method) "
-                        + "VALUES (?, ?, N'Đang xử lý', GETDATE(), ?, ?, ?, ?)";
+                        + "VALUES (?, ?, N'Chưa thanh toán', GETDATE(), ?, ?, ?, ?)";
 
         String insertDetailSql =
                 "INSERT INTO OrderDetails (order_id, product_id, price, quantity) "
@@ -259,7 +354,7 @@ public class OrderDAO extends BaseDAO {
     public boolean userCancelOrder(int orderId, int userId, String reason) {
         String updateSql =
                 "UPDATE Orders SET status = N'Đã hủy', cancel_reason = ? "
-                        + "WHERE id = ? AND user_id = ? AND status = N'Đang xử lý'";
+                        + "WHERE id = ? AND user_id = ? AND status IN (N'Đang xử lý', N'Chưa thanh toán')";
 
         return cancelOrderAndRestoreStock(
                 orderId, updateSql,

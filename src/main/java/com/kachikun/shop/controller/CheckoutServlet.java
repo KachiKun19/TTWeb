@@ -21,6 +21,7 @@ import com.kachikun.shop.model.CartItem;
 import com.kachikun.shop.model.Discount;
 import com.kachikun.shop.model.Product;
 import com.kachikun.shop.model.User;
+import com.kachikun.shop.payment.VNPayHelper;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
@@ -36,7 +37,6 @@ public class CheckoutServlet extends HttpServlet {
         String paymentMethod = request.getParameter("payment_method");
         String discountCode  = request.getParameter("discountCode");
 
-        // Lấy danh sách productId được chọn từ checkbox
         String[] selectedIdsArr = request.getParameterValues("selectedIds");
 
         HttpSession session = request.getSession();
@@ -82,7 +82,6 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        // Kiểm tra tồn kho của các item được chọn
         ProductDAO pDao = new ProductDAO();
         for (CartItem item : selectedCart) {
             Product dbProduct = pDao.getProductById(item.getProduct().getId());
@@ -97,7 +96,6 @@ public class CheckoutServlet extends HttpServlet {
             }
         }
 
-        // Tính tổng và áp dụng discount
         double totalMoney = calculateTotal(selectedCart);
         double discountAmount = 0;
 
@@ -110,37 +108,42 @@ public class CheckoutServlet extends HttpServlet {
         }
         double finalTotal = totalMoney - discountAmount;
 
-        // ── Tạo đơn hàng chỉ từ selectedCart ────────────────────────────────
         OrderDAO dao = new OrderDAO();
+
+        if ("VNPAY".equals(paymentMethod)) {
+            int orderId = dao.createOrderReturnId(user, selectedCart, finalTotal, fullname, phone, address, paymentMethod);
+            if (orderId > 0) {
+                applyDiscountIfValid(discountCode, discountAmount, user);
+                removeFromSessionCart(session, cart, selectedCart);
+                try {
+                    String ipAddr = request.getRemoteAddr();
+                    String payUrl = VNPayHelper.buildPaymentUrl(orderId, (long) finalTotal, ipAddr);
+                    response.sendRedirect(payUrl);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    request.setAttribute("error", "Không thể kết nối cổng thanh toán VNPay. Vui lòng thử lại!");
+                    request.setAttribute("totalMoney", totalMoney);
+                    request.setAttribute("savedDiscounts", savedDiscounts);
+                    request.getRequestDispatcher("cart.jsp").forward(request, response);
+                }
+            } else {
+                request.setAttribute("error", "Đặt hàng thất bại. Vui lòng thử lại!");
+                request.setAttribute("totalMoney", totalMoney);
+                request.setAttribute("savedDiscounts", savedDiscounts);
+                request.getRequestDispatcher("cart.jsp").forward(request, response);
+            }
+            return;
+        }
+
         boolean check = dao.createOrder(user, selectedCart, finalTotal, fullname, phone, address, paymentMethod);
 
         if (check) {
-            if (discountCode != null && !discountCode.trim().isEmpty() && discountAmount > 0) {
-                boolean usedOk = new DiscountDAO().incrementUsedSafe(discountCode.trim());
-                if (!usedOk) {
-                    System.out.println("[WARN] Discount quota race condition: code=" + discountCode
-                            + ", userId=" + user.getId());
-                }
-            }
-
-            // Xóa khỏi session chỉ những item đã mua, giữ lại item chưa chọn
-            Set<Integer> boughtIds = selectedCart.stream()
-                    .map(item -> item.getProduct().getId())
-                    .collect(Collectors.toSet());
-            List<CartItem> remainingCart = cart.stream()
-                    .filter(item -> !boughtIds.contains(item.getProduct().getId()))
-                    .collect(Collectors.toList());
-
-            if (remainingCart.isEmpty()) {
-                session.removeAttribute("cart");
-            } else {
-                session.setAttribute("cart", remainingCart);
-            }
+            applyDiscountIfValid(discountCode, discountAmount, user);
+            removeFromSessionCart(session, cart, selectedCart);
 
             request.setAttribute("msg", "Đặt hàng thành công!");
             request.setAttribute("paymentMethod", paymentMethod);
             request.setAttribute("finalTotal", finalTotal);
-            request.setAttribute("orderId", System.currentTimeMillis());
             request.getRequestDispatcher("cart.jsp").forward(request, response);
 
         } else {
@@ -157,6 +160,24 @@ public class CheckoutServlet extends HttpServlet {
             for (CartItem item : cart) total += item.getTotalPrice();
         }
         return total;
+    }
+
+    private void applyDiscountIfValid(String discountCode, double discountAmount, User user) {
+        if (discountCode != null && !discountCode.trim().isEmpty() && discountAmount > 0) {
+            boolean ok = new DiscountDAO().incrementUsedSafe(discountCode.trim());
+            if (!ok) System.out.println("[WARN] Discount race condition: code=" + discountCode + ", userId=" + user.getId());
+        }
+    }
+
+    private void removeFromSessionCart(HttpSession session, List<CartItem> cart, List<CartItem> boughtItems) {
+        Set<Integer> boughtIds = boughtItems.stream()
+                .map(item -> item.getProduct().getId())
+                .collect(Collectors.toSet());
+        List<CartItem> remaining = cart.stream()
+                .filter(item -> !boughtIds.contains(item.getProduct().getId()))
+                .collect(Collectors.toList());
+        if (remaining.isEmpty()) session.removeAttribute("cart");
+        else session.setAttribute("cart", remaining);
     }
 
 }

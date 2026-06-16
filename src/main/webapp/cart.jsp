@@ -279,16 +279,16 @@
                                     <div class="w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0 cod-dot"></div>
                                 </label>
 
-                                <label for="payment-bank" class="payment-card flex items-center gap-3 border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-blue-400 transition-all has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                                    <input id="payment-bank" type="radio" value="BANKING" name="payment_method" class="hidden peer">
-                                    <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-university text-blue-600 text-sm"></i>
+<label for="payment-vnpay" class="payment-card flex items-center gap-3 border-2 border-gray-200 rounded-xl p-3 cursor-pointer hover:border-indigo-400 transition-all has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50">
+                                    <input id="payment-vnpay" type="radio" value="VNPAY" name="payment_method" class="hidden peer">
+                                    <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-qrcode text-indigo-600 text-sm"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <p class="text-sm font-bold text-gray-900">Chuyển khoản ngân hàng</p>
-                                        <p class="text-xs text-gray-500">Quét QR hoặc chuyển khoản thủ công</p>
+                                        <p class="text-sm font-bold text-gray-900">VNPay</p>
+                                        <p class="text-xs text-gray-500">Thanh toán qua ví VNPay, thẻ ATM / Visa</p>
                                     </div>
-                                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0 bank-dot"></div>
+                                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0 vnpay-dot"></div>
                                 </label>
                             </div>
                         </div>
@@ -342,7 +342,7 @@
                 </div>
 
                 <div class="px-4 pb-6 pt-4 space-y-2">
-                    <button onclick="window.location.href='orderHistory'" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition text-sm shadow">
+                    <button onclick="window.location.href='order-history'" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition text-sm shadow">
                         <i class="fas fa-list-alt mr-2"></i>Xem đơn hàng của tôi
                     </button>
                     <button onclick="window.location.href='home'" class="w-full text-gray-500 hover:text-gray-800 py-2 text-sm font-medium underline underline-offset-2 transition">
@@ -412,7 +412,7 @@
                 </div>
 
                 <div class="px-4 pb-6 pt-3 space-y-2">
-                    <button onclick="window.location.href='orderHistory'" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition text-sm shadow">
+                    <button onclick="window.location.href='order-history'" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition text-sm shadow">
                         <i class="fas fa-check mr-2"></i>Đã chuyển khoản xong
                     </button>
                     <button onclick="window.location.href='home'" class="w-full text-gray-500 hover:text-gray-800 py-2 text-sm font-medium underline underline-offset-2 transition">
@@ -434,7 +434,6 @@
     </script>
 </c:if>
 
-<%-- Modal chọn mã giảm giá đã lưu --%>
 <c:if test="${not empty savedDiscounts}">
     <div id="discount-modal" onclick="if(event.target===this)closeDiscountModal()" class="fixed inset-0 z-50 flex items-center justify-center hidden" style="background:rgba(0,0,0,0.5);">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
@@ -648,7 +647,6 @@
                     if (qtyInput) qtyInput.value = data.newQty;
                     if (itemTotalSpan) itemTotalSpan.innerText = formatVND(data.itemTotalRaw);
 
-                    // Cập nhật data-price cho checkbox
                     var chk = document.querySelector('.item-checkbox[value="' + productId + '"]');
                     if (chk) chk.setAttribute('data-price', data.itemTotalRaw);
 
@@ -668,7 +666,6 @@
         if (count === 0) location.reload();
     }
 
-    // ─── GHN Shipping  ───────────
     const _ghn = {};
 
     async function loadProvinces() {
@@ -712,7 +709,7 @@
                 const res = await fetch('ghn-districts?provinceId=' + provinceId);
                 const data = await res.json();
                 if (!data.data) throw new Error(data.message || 'Lỗi hệ thống API');
-                _ghn[key] = data.data; // Lưu bộ nhớ đệm theo Tỉnh
+                _ghn[key] = data.data;
             }
             distSel.innerHTML = '<option value="">-- Chọn quận --</option>';
             _ghn[key].forEach(d => distSel.append(new Option(d.DistrictName, d.DistrictID)));
@@ -742,7 +739,7 @@
                 const res = await fetch('ghn/wards?district_id=' + districtId);
                 const data = await res.json();
                 if (!data.data) throw new Error(data.message || 'Lỗi hệ thống API');
-                _ghn[key] = data.data; // Lưu bộ nhớ đệm theo Quận
+                _ghn[key] = data.data;
             }
             wardSel.innerHTML = '<option value="">-- Chọn phường --</option>';
             _ghn[key].forEach(w => wardSel.append(new Option(w.WardName, w.WardCode)));
@@ -761,7 +758,7 @@
 
         const submitBtn = document.getElementById('btn-submit-order');
         document.getElementById('shipping-fee').innerText = '⏳ Đang tính...';
-        if(submitBtn) submitBtn.disabled = true; // Chặn bấm submit khi đang tính phí
+        if(submitBtn) submitBtn.disabled = true;
 
         try {
             const res = await fetch('ghn/shipping-fee', {
@@ -782,11 +779,10 @@
             console.warn('GHN shipping net error:', e.message);
             document.getElementById('shipping-fee').innerText = 'Không hỗ trợ';
         } finally {
-            if(submitBtn) submitBtn.disabled = false; // Mở khóa nút submit
+            if(submitBtn) submitBtn.disabled = false;
         }
     }
 
-    // ─── Payment card highlight ──────────────────────────────────────────────
     function initPaymentCards() {
         var radios = document.querySelectorAll('input[name="payment_method"]');
         function updateCards() {
@@ -799,25 +795,23 @@
                     if (dot) dot.classList.remove('border-green-500', 'bg-green-500');
                 }
             });
-            var bankDot = document.querySelector('.bank-dot');
-            var bankRadio = document.getElementById('payment-bank');
-            if (bankRadio && bankRadio.checked) {
-                if (bankDot) { bankDot.classList.remove('border-green-500', 'bg-green-500'); bankDot.classList.add('border-blue-500', 'bg-blue-500'); }
+var vnpayDot = document.querySelector('.vnpay-dot');
+            var vnpayRadio = document.getElementById('payment-vnpay');
+            if (vnpayRadio && vnpayRadio.checked) {
+                if (vnpayDot) { vnpayDot.classList.remove('border-green-500', 'bg-green-500'); vnpayDot.classList.add('border-indigo-500', 'bg-indigo-500'); }
             } else {
-                if (bankDot) bankDot.classList.remove('border-blue-500', 'bg-blue-500');
+                if (vnpayDot) vnpayDot.classList.remove('border-indigo-500', 'bg-indigo-500');
             }
         }
         radios.forEach(function(r) { r.addEventListener('change', updateCards); });
         updateCards();
     }
 
-    // ─── Init ────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function () {
         recalcSelected();
         loadProvinces();
         initPaymentCards();
 
-        // Gắn bộ lắng nghe sự kiện đồng bộ tuần tự
         document.getElementById('province').addEventListener('change', loadDistricts);
         document.getElementById('districtSelect').addEventListener('change', loadWards);
         document.getElementById('wardSelect').addEventListener('change', calculateShipping);
